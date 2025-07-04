@@ -1,25 +1,40 @@
 // src/pages/Login.tsx
-import { useState } from 'react';
-import { Input } from '../components/Input';
+import { useState } from "react";
+import { Input } from "../components/Input";
+import { AuthApi } from "../api/auth";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const isDisabled = !email || !password;
+
+  const allowedRoles = ["super_admin", "admin", "main"];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    // Simular petición al backend
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const { access_token, user } = await AuthApi.login({ email, password });
 
-    console.log({ email, password });
+      console.log("Token:", access_token);
+      console.log("Usuario:", user);
 
-    // Aquí iría el manejo del token o redirección
-    setLoading(false);
+      if (!allowedRoles.includes(user.role)) {
+        return;
+      }
+
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -51,11 +66,11 @@ export default function Login() {
           disabled={isDisabled || loading}
           className={`w-full py-2 text-white font-semibold rounded-lg ${
             isDisabled || loading
-              ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-blue-600 hover:bg-blue-700'
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
           }`}
         >
-          {loading ? 'Cargando...' : 'Ingresar'}
+          {loading ? "Cargando..." : "Ingresar"}
         </button>
       </form>
     </div>
