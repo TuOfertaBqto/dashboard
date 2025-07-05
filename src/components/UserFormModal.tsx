@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { User } from "../pages/Users";
+import type { User } from "../api/user";
 
 interface Props {
   open: boolean;
@@ -15,7 +15,7 @@ export const UserFormModal = ({
   initialData,
 }: Props) => {
   const [form, setForm] = useState<Partial<User>>({
-    name: "",
+    firstName: "",
     email: "",
     role: "admin",
   });
@@ -24,7 +24,7 @@ export const UserFormModal = ({
     if (initialData) {
       setForm(initialData);
     } else {
-      setForm({ name: "", email: "", role: "admin" });
+      setForm({ firstName: "", email: "", role: "admin" });
     }
   }, [initialData]);
 
@@ -55,7 +55,7 @@ export const UserFormModal = ({
           <label className="block text-sm mb-1">Nombre</label>
           <input
             name="name"
-            value={form.name}
+            value={form.firstName}
             onChange={handleChange}
             className="w-full border p-2 rounded"
             required

@@ -1,4 +1,4 @@
-import type { User } from "../pages/Users";
+import type { User } from "../api/user";
 
 interface Props {
   users: User[];
@@ -28,7 +28,9 @@ export const UserTable = ({ users, onEdit, onDelete }: Props) => {
           ) : (
             users.map((user) => (
               <tr key={user.id} className="border-t">
-                <td className="p-3">{user.name}</td>
+                <td className="p-3">
+                  {user.firstName} {user.lastName}
+                </td>
                 <td className="p-3">{user.email}</td>
                 <td className="p-3">{user.role}</td>
                 <td className="p-3 space-x-2">

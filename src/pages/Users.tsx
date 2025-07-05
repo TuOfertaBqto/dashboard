@@ -1,16 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { UserTable } from "../components/UserTable";
 import { UserFormModal } from "../components/UserFormModal";
+import { userApi, type User } from "../api/user";
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-}
+// export interface User {
+//   id: string;
+//   name: string;
+//   email: string;
+//   role: string;
+// }
 
 export default function UsersPage() {
-  const [users] = useState<User[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -39,6 +40,19 @@ export default function UsersPage() {
     console.log("Guardar usuario:", data);
     setIsModalOpen(false);
   };
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const data = await userApi.getAll();
+        setUsers(data);
+      } catch (err) {
+        console.error("Error al cargar usuarios:", err);
+      }
+    };
+
+    fetchUsers();
+  }, []);
 
   return (
     <div className="space-y-6">
