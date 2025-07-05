@@ -2,10 +2,12 @@
 import { useState } from "react";
 import { Input } from "../components/Input";
 import { AuthApi } from "../api/auth";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/useAuth";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login, token, user } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,6 +31,7 @@ export default function Login() {
         return;
       }
 
+      login(access_token, user);
       navigate("/");
     } catch (err) {
       console.error(err);
@@ -36,6 +39,10 @@ export default function Login() {
       setLoading(false);
     }
   };
+
+  if (token && user && allowedRoles.includes(user.role)) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="flex h-screen items-center justify-center bg-gray-100">
