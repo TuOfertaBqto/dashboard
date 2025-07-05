@@ -8,7 +8,7 @@ export const Layout = ({ children }: { children: ReactNode }) => {
       <Sidebar />
       <div className="flex flex-col flex-1">
         <Header />
-        <main className="p-4 overflow-auto">{children}</main>
+        <main className="p-6 overflow-auto">{children}</main>
       </div>
     </div>
   );

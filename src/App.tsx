@@ -3,6 +3,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import { AuthProvider } from "./auth/AuthProvider";
 import { PrivateRoute } from "./auth/PrivateRoute";
+import { Layout } from "./components/Layout";
 
 function App() {
   return (
@@ -14,7 +15,9 @@ function App() {
             path="/"
             element={
               <PrivateRoute>
-                <Dashboard />
+                <Layout>
+                  <Dashboard />
+                </Layout>
               </PrivateRoute>
             }
           />
