@@ -69,7 +69,11 @@ export const Sidebar = () => {
     },
   ];
 
-  if (userRole === "main" || userRole === "super_admin") {
+  if (
+    userRole === "main" ||
+    userRole === "super_admin" ||
+    userRole === "admin"
+  ) {
     generalMenuItems.push(
       {
         name: "Usuarios",

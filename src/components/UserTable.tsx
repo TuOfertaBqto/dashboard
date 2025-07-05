@@ -22,7 +22,7 @@ export const UserTable = ({ users, onEdit, onDelete }: Props) => {
         <tbody>
           {users.length === 0 ? (
             <tr>
-              <td colSpan={4} className="text-center py-6 text-gray-400">
+              <td colSpan={5} className="text-center py-6 text-gray-400">
                 No hay usuarios registrados.
               </td>
             </tr>
