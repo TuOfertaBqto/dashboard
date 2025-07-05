@@ -12,6 +12,7 @@ export const UserTable = ({ users, onEdit, onDelete }: Props) => {
       <table className="w-full table-auto">
         <thead className="bg-gray-100 text-gray-700 text-left">
           <tr>
+            <th className="p-3 w-[75px]">Codigo</th>
             <th className="p-3">Nombre</th>
             <th className="p-3">Correo</th>
             <th className="p-3">Rol</th>
@@ -28,6 +29,7 @@ export const UserTable = ({ users, onEdit, onDelete }: Props) => {
           ) : (
             users.map((user) => (
               <tr key={user.id} className="border-t">
+                <td className="p-3 w-[75px]">{user.code ? `C${user.code}` : ""}</td>
                 <td className="p-3">
                   {user.firstName} {user.lastName}
                 </td>
