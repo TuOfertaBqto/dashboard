@@ -4,6 +4,7 @@ import Dashboard from "./pages/Dashboard";
 import { AuthProvider } from "./auth/AuthProvider";
 import { PrivateRoute } from "./auth/PrivateRoute";
 import { Layout } from "./components/Layout";
+import UsersPage from "./pages/Users";
 
 function App() {
   return (
@@ -17,6 +18,17 @@ function App() {
               <PrivateRoute>
                 <Layout>
                   <Dashboard />
+                </Layout>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/users"
+            element={
+              <PrivateRoute>
+                <Layout>
+                  <UsersPage />
                 </Layout>
               </PrivateRoute>
             }
