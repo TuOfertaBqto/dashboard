@@ -48,7 +48,7 @@ export const userApi = {
 
   update: async (id: string, data: Partial<User>) => {
     try {
-      const res = await api.put(`/user/${id}`, data);
+      const res = await api.patch(`/user/${id}`, data);
       return res.data;
     } catch (error) {
       console.error("Error updating user:", error);

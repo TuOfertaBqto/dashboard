@@ -54,7 +54,7 @@ export const UserFormModal = ({
         <div>
           <label className="block text-sm mb-1">Nombre</label>
           <input
-            name="name"
+            name="firstName"
             value={form.firstName}
             onChange={handleChange}
             className="w-full border p-2 rounded"
@@ -85,8 +85,8 @@ export const UserFormModal = ({
           >
             <option value="admin">Admin</option>
             <option value="main">Main</option>
-            <option value="branch_admin">Branch Admin</option>
-            <option value="user">User</option>
+            <option value="super_admin">Super Admin</option>
+            <option value="vendor">Vendor</option>
           </select>
         </div>
 

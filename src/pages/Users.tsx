@@ -29,28 +29,39 @@ export default function UsersPage() {
     setIsModalOpen(false);
     setSelectedUser(null);
   };
+  const fetchUsers = async () => {
+    try {
+      const data = await userApi.getAll();
+      setUsers(data);
+    } catch (err) {
+      console.error("Error al cargar usuarios:", err);
+    }
+  };
 
   const handleDeleteUser = (id: string) => {
     // 🔁 Aquí conectas con tu API para eliminar
     console.log("Eliminar usuario con ID:", id);
   };
 
-  const handleSaveUser = (data: Partial<User>) => {
-    // 🔁 Aquí conectas con tu API para crear o actualizar
-    console.log("Guardar usuario:", data);
-    setIsModalOpen(false);
+  const handleSaveUser = async (data: Partial<User>) => {
+    const { firstName, lastName } = data;
+
+    try {
+      if (selectedUser) {
+        await userApi.update(selectedUser.id, { firstName, lastName });
+      } else {
+        await userApi.create(data);
+      }
+
+      await fetchUsers();
+      setIsModalOpen(false);
+      setSelectedUser(null);
+    } catch (error) {
+      console.error("Error al guardar usuario:", error);
+    }
   };
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const data = await userApi.getAll();
-        setUsers(data);
-      } catch (err) {
-        console.error("Error al cargar usuarios:", err);
-      }
-    };
-
     fetchUsers();
   }, []);
 
