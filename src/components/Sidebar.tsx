@@ -69,17 +69,21 @@ export const Sidebar = () => {
     },
   ];
 
-  if (userRole === "admin" || userRole === "super_admin") {
+  if (
+    userRole === "main" ||
+    userRole === "super_admin" ||
+    userRole === "admin"
+  ) {
     generalMenuItems.push(
-      {
-        name: "Sucursales",
-        icon: <BuildingStorefrontIcon className="h-5 w-5" />,
-        route: "/branches",
-      },
       {
         name: "Usuarios",
         icon: <UsersIcon className="h-5 w-5" />,
         route: "/users",
+      },
+      {
+        name: "Sucursales",
+        icon: <BuildingStorefrontIcon className="h-5 w-5" />,
+        route: "/branches",
       }
     );
   }
