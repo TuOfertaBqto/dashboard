@@ -15,7 +15,7 @@ export default function UserFormPage() {
     phoneNumber: "",
     documentId: "",
     adress: "",
-    code: "",
+    code: null,
   });
 
   useEffect(() => {
@@ -116,10 +116,11 @@ export default function UserFormPage() {
               className="w-full border p-2 rounded"
               required
             >
-              <option value="admin">Admin</option>
               <option value="main">Main</option>
-              <option value="branch_admin">Branch Admin</option>
-              <option value="user">User</option>
+              <option value="super_admin">Super Admin</option>
+              <option value="admin">Admin</option>
+              <option value="vendor">Vendedor</option>
+              <option value="customer">Cliente</option>
             </select>
           </div>
           <div>
