@@ -5,6 +5,7 @@ import { AuthProvider } from "./auth/AuthProvider";
 import { PrivateRoute } from "./auth/PrivateRoute";
 import { Layout } from "./components/Layout";
 import UsersPage from "./pages/Users";
+import UserFormPage from "./pages/UserFormPage";
 
 function App() {
   return (
@@ -33,6 +34,8 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route path="users/new" element={<UserFormPage />} />
+          <Route path="users/:id/edit" element={<UserFormPage />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
