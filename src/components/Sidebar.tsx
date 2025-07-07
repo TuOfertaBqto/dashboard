@@ -3,12 +3,10 @@ import {
   Bars3BottomRightIcon,
   SquaresPlusIcon,
   Square3Stack3DIcon,
-  ChartBarIcon,
   ChevronDownIcon,
-  TagIcon,
   UsersIcon,
-  BuildingStorefrontIcon,
   ArrowRightEndOnRectangleIcon,
+  DocumentTextIcon,
 } from "@heroicons/react/24/outline";
 
 import { useState } from "react";
@@ -48,24 +46,19 @@ export const Sidebar = () => {
       route: "/",
     },
     {
+      name: "Contratos",
+      icon: <DocumentTextIcon className="h-5 w-5" />,
+      route: "/contracts",
+    },
+    {
       name: "Inventario",
       icon: <Square3Stack3DIcon className="h-5 w-5" />,
       route: "/inventory",
       subItems: [
         { name: "Productos", route: "/products" },
-        { name: "Presentaciones", route: "/presentations" },
+        //{ name: "Presentaciones", route: "/presentations" },
         { name: "Categorías", route: "/categories" },
       ],
-    },
-    {
-      name: "Órdenes",
-      icon: <ChartBarIcon className="h-5 w-5" />,
-      route: "/orders",
-    },
-    {
-      name: "Promos",
-      icon: <TagIcon className="h-5 w-5" />,
-      route: "/promos",
     },
   ];
 
@@ -74,18 +67,11 @@ export const Sidebar = () => {
     userRole === "super_admin" ||
     userRole === "admin"
   ) {
-    generalMenuItems.push(
-      {
-        name: "Usuarios",
-        icon: <UsersIcon className="h-5 w-5" />,
-        route: "/users",
-      },
-      {
-        name: "Sucursales",
-        icon: <BuildingStorefrontIcon className="h-5 w-5" />,
-        route: "/branches",
-      }
-    );
+    generalMenuItems.push({
+      name: "Usuarios",
+      icon: <UsersIcon className="h-5 w-5" />,
+      route: "/users",
+    });
   }
 
   const otherMenuItems: MenuItem[] = [
