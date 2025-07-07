@@ -41,9 +41,10 @@ export default function UsersPage() {
     }
   };
 
-  const handleDeleteUser = (id: string) => {
+  const handleDeleteUser = async (id: string) => {
     // 🔁 Aquí conectas con tu API para eliminar
     console.log("Eliminar usuario con ID:", id);
+    await userApi.remove(id);
   };
 
   // const handleSaveUser = async (data: Partial<User>) => {
