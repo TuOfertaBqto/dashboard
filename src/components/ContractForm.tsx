@@ -1,15 +1,23 @@
 import { useEffect, useState } from "react";
-import type { Contract } from "../api/contract";
+import type { Contract, CreateContract } from "../api/contract";
+import type { User } from "../api/user";
 
 interface Props {
   initialData?: Contract | null;
-  onSubmit: (data: Partial<Contract>) => void;
+  onSubmit: (data: CreateContract) => void;
+  vendors?: User[]; // Lista de usuarios rol vendedor
+  customers?: User[]; // Lista de clientes
 }
 
-export const ContractForm = ({ initialData, onSubmit }: Props) => {
-  const [form, setForm] = useState<Partial<Contract>>({
-    // vendorId: "",
-    // customerId: "",
+export const ContractForm = ({
+  initialData,
+  onSubmit,
+  vendors = [],
+  customers = [],
+}: Props) => {
+  const [form, setForm] = useState<CreateContract>({
+    vendorId: "",
+    customerId: "",
     requestDate: "",
     startDate: "",
     endDate: "",
@@ -19,15 +27,31 @@ export const ContractForm = ({ initialData, onSubmit }: Props) => {
   });
 
   useEffect(() => {
-    if (initialData) setForm(initialData);
+    if (initialData) {
+      setForm({
+        vendorId: initialData.vendorId.id,
+        customerId: initialData.customerId.id,
+        requestDate: initialData.requestDate?.slice(0, 10) || "",
+        startDate: initialData.startDate?.slice(0, 10) || "",
+        endDate: initialData.endDate?.slice(0, 10) || "",
+        installmentAmount: initialData.installmentAmount || 0,
+        agreement: initialData.agreement || "weekly",
+        totalPrice: initialData.totalPrice || 0,
+      });
+    }
   }, [initialData]);
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]:
+        name === "installmentAmount" || name === "totalPrice"
+          ? parseFloat(value)
+          : value,
+    }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -38,43 +62,73 @@ export const ContractForm = ({ initialData, onSubmit }: Props) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white rounded shadow p-6 space-y-4"
+      className="bg-white rounded shadow p-6 space-y-6"
     >
+      {/* Vendedor */}
       <div>
         <label className="block text-sm mb-1">Vendedor</label>
-        <input
-          name="vendor_id"
-          value={form.vendorId?.id}
+        <select
+          name="vendorId"
+          value={form.vendorId}
           onChange={handleChange}
           className="w-full border p-2 rounded"
           required
-        />
+        >
+          <option value="">Seleccione un vendedor</option>
+          {vendors.map((v) => (
+            <option key={v.id} value={v.id}>
+              {v.firstName} {v.lastName}
+            </option>
+          ))}
+        </select>
       </div>
 
+      {/* Cliente */}
       <div>
         <label className="block text-sm mb-1">Cliente</label>
-        <input
-          name="customer_id"
-          value={form.customerId?.id}
+        <select
+          name="customerId"
+          value={form.customerId}
           onChange={handleChange}
           className="w-full border p-2 rounded"
-        />
+          required
+        >
+          <option value="">Seleccione un cliente</option>
+          {customers.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.firstName} {c.lastName}
+            </option>
+          ))}
+        </select>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      {/* Fechas */}
+      <div className="grid grid-cols-3 gap-4">
         <div>
-          <label className="block text-sm mb-1">Fecha Solicitud</label>
+          <label className="block text-sm mb-1">Fecha de solicitud</label>
           <input
             type="date"
-            name="request_date"
+            name="requestDate"
             value={form.requestDate}
+            onChange={handleChange}
+            className="w-full border p-2 rounded"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm mb-1">Fecha de inicio</label>
+          <input
+            type="date"
+            name="startDate"
+            value={form.startDate}
             onChange={handleChange}
             className="w-full border p-2 rounded"
           />
         </div>
 
-        {/* <div>
-          <label className="block text-sm mb-1">Fecha fin</label>
+        <div>
+          <label className="block text-sm mb-1">Fecha de fin</label>
           <input
             type="date"
             name="endDate"
@@ -82,27 +136,58 @@ export const ContractForm = ({ initialData, onSubmit }: Props) => {
             onChange={handleChange}
             className="w-full border p-2 rounded"
           />
-        </div> */}
+        </div>
       </div>
 
+      {/* Monto de cuota y total */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm mb-1">Monto por cuota ($)</label>
+          <input
+            type="number"
+            step="0.01"
+            name="installmentAmount"
+            value={form.installmentAmount}
+            onChange={handleChange}
+            className="w-full border p-2 rounded"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm mb-1">Precio total ($)</label>
+          <input
+            type="number"
+            step="0.01"
+            name="totalPrice"
+            value={form.totalPrice}
+            onChange={handleChange}
+            className="w-full border p-2 rounded"
+            required
+          />
+        </div>
+      </div>
+
+      {/* Acuerdo */}
       <div>
-        <label className="block text-sm mb-1">Acuerdo</label>
+        <label className="block text-sm mb-1">Frecuencia de pago</label>
         <select
           name="agreement"
-          value={form.agreement}
+          value={form.agreement ?? ""}
           onChange={handleChange}
           className="w-full border p-2 rounded"
+          required
         >
-          <option value="active">Semanal</option>
+          <option value="weekly">Semanal</option>
           <option value="fortnightly">Quincenal</option>
         </select>
       </div>
 
+      {/* Botón */}
       <button
         type="submit"
         className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
       >
-        Guardar
+        Guardar contrato
       </button>
     </form>
   );

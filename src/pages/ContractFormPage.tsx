@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ContractApi, type Contract } from "../api/contract";
+import {
+  ContractApi,
+  type Contract,
+  type CreateContract,
+} from "../api/contract";
 import { ContractForm } from "../components/ContractForm";
 
 export default function ContractFormPage() {
@@ -16,7 +20,7 @@ export default function ContractFormPage() {
     }
   }, [id, isEdit]);
 
-  const handleSubmit = async (data: Partial<Contract>) => {
+  const handleSubmit = async (data: CreateContract) => {
     try {
       if (isEdit) {
         await ContractApi.update(id!, data);

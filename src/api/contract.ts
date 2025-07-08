@@ -1,6 +1,17 @@
 import { api } from "./api";
 import type { User } from "./user";
 
+export type CreateContract = {
+  vendorId: string;
+  customerId: string;
+  requestDate: string;
+  startDate?: string;
+  endDate?: string;
+  installmentAmount: number;
+  agreement?: "weekly" | "fortnightly" | null;
+  totalPrice: number;
+};
+
 export type Contract = {
   id: string;
   vendorId: User;
@@ -38,7 +49,7 @@ export const ContractApi = {
     }
   },
 
-  create: async (data: Partial<Contract>): Promise<Contract> => {
+  create: async (data: CreateContract): Promise<Contract> => {
     try {
       const res = await api.post("/contract", data);
       return res.data;
@@ -48,7 +59,7 @@ export const ContractApi = {
     }
   },
 
-  update: async (id: string, data: Partial<Contract>) => {
+  update: async (id: string, data: CreateContract) => {
     try {
       const res = await api.patch(`/contract/${id}`, data);
       return res.data;
