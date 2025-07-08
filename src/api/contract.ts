@@ -8,8 +8,19 @@ export type CreateContract = {
   startDate?: string;
   endDate?: string;
   installmentAmount: number;
-  agreement?: "weekly" | "fortnightly" | null;
+  agreement: "weekly" | "fortnightly";
   totalPrice: number;
+};
+
+// TODO: move to product api
+export type Product = {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+  name: string;
+  description: string | null;
+  price: number;
 };
 
 export type Contract = {
@@ -23,9 +34,18 @@ export type Contract = {
   installmentAmount: number;
   agreement: "weekly" | "fortnightly";
   totalPrice: number;
+  products: {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date | null;
+    product: Product;
+    deliveryDate: Date | null;
+    status: "to_buy" | "to_dispatch" | "dispatched";
+  };
   createdAt: Date;
   updatedAt: Date;
-  deletedAt: Date;
+  deletedAt: Date | null;
 };
 
 export const ContractApi = {
