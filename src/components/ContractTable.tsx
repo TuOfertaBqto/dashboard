@@ -30,9 +30,9 @@ export const ContractTable = ({ contracts, onEdit, onDelete }: Props) => {
             contracts.map((contract) => (
               <tr key={contract.id} className="border-t">
                 <td className="p-3">{contract.code}</td>
-                <td className="p-3 capitalize">{contract.vendor_id}</td>
-                <td className="p-3">{contract.customer_id}</td>
-                <td className="p-3">{contract.request_date}</td>
+                <td className="p-3 ">{contract.vendorId.firstName}</td>
+                <td className="p-3">{contract.customerId.firstName}</td>
+                <td className="p-3">{contract.requestDate}</td>
                 <td className="p-3 space-x-2">
                   <button
                     onClick={() => onEdit(contract)}

@@ -1,19 +1,20 @@
 import { api } from "./api";
+import type { User } from "./user";
 
 export type Contract = {
   id: string;
-  vendor_id: string;
-  customer_id: string;
+  vendorId: User;
+  customerId: User;
   code: number;
-  request_date: string;
-  start_date: string;
-  end_date: string;
-  installment_amount: number;
+  requestDate: string;
+  startDate: string;
+  endDate: string;
+  installmentAmount: number;
   agreement: "weekly" | "fortnightly";
-  total_price: number;
-  created_at: Date;
-  updated_at: Date;
-  deleted_at: Date;
+  totalPrice: number;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date;
 };
 
 export const ContractApi = {

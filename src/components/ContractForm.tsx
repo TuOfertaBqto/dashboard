@@ -8,14 +8,14 @@ interface Props {
 
 export const ContractForm = ({ initialData, onSubmit }: Props) => {
   const [form, setForm] = useState<Partial<Contract>>({
-    vendor_id: "",
-    customer_id: "",
-    request_date: "",
-    start_date: "",
-    end_date: "",
-    installment_amount: 0,
+    // vendorId: "",
+    // customerId: "",
+    requestDate: "",
+    startDate: "",
+    endDate: "",
+    installmentAmount: 0,
     agreement: "weekly",
-    total_price: 0,
+    totalPrice: 0,
   });
 
   useEffect(() => {
@@ -44,7 +44,7 @@ export const ContractForm = ({ initialData, onSubmit }: Props) => {
         <label className="block text-sm mb-1">Vendedor</label>
         <input
           name="vendor_id"
-          value={form.vendor_id}
+          value={form.vendorId?.id}
           onChange={handleChange}
           className="w-full border p-2 rounded"
           required
@@ -55,7 +55,7 @@ export const ContractForm = ({ initialData, onSubmit }: Props) => {
         <label className="block text-sm mb-1">Cliente</label>
         <input
           name="customer_id"
-          value={form.customer_id}
+          value={form.customerId?.id}
           onChange={handleChange}
           className="w-full border p-2 rounded"
         />
@@ -67,7 +67,7 @@ export const ContractForm = ({ initialData, onSubmit }: Props) => {
           <input
             type="date"
             name="request_date"
-            value={form.request_date}
+            value={form.requestDate}
             onChange={handleChange}
             className="w-full border p-2 rounded"
           />

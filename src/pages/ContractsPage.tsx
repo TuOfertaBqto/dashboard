@@ -13,6 +13,7 @@ export default function ContractsPage() {
 
   const fetchContracts = async () => {
     const data = await ContractApi.getAll();
+    console.log("Fetched contracts:", data);
     setContracts(data);
   };
 
