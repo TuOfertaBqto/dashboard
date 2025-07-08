@@ -6,6 +6,8 @@ import { PrivateRoute } from "./auth/PrivateRoute";
 import UsersPage from "./pages/Users";
 import UserFormPage from "./pages/UserFormPage";
 import Layout from "./components/Layout";
+import ContractsPage from "./pages/ContractsPage";
+import ContractFormPage from "./pages/ContractFormPage";
 
 function App() {
   return (
@@ -26,6 +28,9 @@ function App() {
             <Route path="users" element={<UsersPage />} />
             <Route path="users/new" element={<UserFormPage />} />
             <Route path="users/:id/edit" element={<UserFormPage />} />
+            <Route path="contracts" element={<ContractsPage />} />
+            <Route path="contracts/new" element={<ContractFormPage />} />
+            <Route path="contracts/:id/edit" element={<ContractFormPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

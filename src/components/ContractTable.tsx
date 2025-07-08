@@ -1,0 +1,57 @@
+import type { Contract } from "../api/contract";
+
+interface Props {
+  contracts: Contract[];
+  onEdit: (contract: Contract) => void;
+  onDelete: (id: string) => void;
+}
+
+export const ContractTable = ({ contracts, onEdit, onDelete }: Props) => {
+  return (
+    <div className="overflow-x-auto bg-white rounded-lg shadow">
+      <table className="w-full table-auto">
+        <thead className="bg-gray-100 text-gray-700 text-left">
+          <tr>
+            <th className="p-3">Cod</th>
+            <th className="p-3">Vendedor</th>
+            <th className="p-3">Cliente</th>
+            <th className="p-3">Fecha Solicitud</th>
+            <th className="p-3">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {contracts.length === 0 ? (
+            <tr>
+              <td colSpan={5} className="text-center py-6 text-gray-400">
+                No hay contratos registrados.
+              </td>
+            </tr>
+          ) : (
+            contracts.map((contract) => (
+              <tr key={contract.id} className="border-t">
+                <td className="p-3">{contract.code}</td>
+                <td className="p-3 capitalize">{contract.vendor_id}</td>
+                <td className="p-3">{contract.customer_id}</td>
+                <td className="p-3">{contract.request_date}</td>
+                <td className="p-3 space-x-2">
+                  <button
+                    onClick={() => onEdit(contract)}
+                    className="text-blue-600 hover:underline"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => onDelete(contract.id)}
+                    className="text-red-600 hover:underline"
+                  >
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+};
