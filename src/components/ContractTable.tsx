@@ -15,17 +15,15 @@ export const ContractTable = ({ contracts, onEdit, onDelete }: Props) => {
             <th className="p-3">Cod</th>
             <th className="p-3">Vendedor</th>
             <th className="p-3">Cliente</th>
-            <th className="p-3">Fecha Solicitud</th>
-            <th className="p-3">Fecha Despacho</th>
-            <th className="p-3">Fecha Finalización</th>
-            <th className="p-3">Precio de venta</th>
+            <th className="p-3">Producto</th>
+            <th className="p-3">Precio Total</th>
             <th className="p-3">Acciones</th>
           </tr>
         </thead>
         <tbody>
           {contracts.length === 0 ? (
             <tr>
-              <td colSpan={7} className="text-center py-6 text-gray-400">
+              <td colSpan={6} className="text-center py-6 text-gray-400">
                 No hay contratos registrados.
               </td>
             </tr>
@@ -36,10 +34,16 @@ export const ContractTable = ({ contracts, onEdit, onDelete }: Props) => {
                 <td className="p-3 ">
                   C{contract.vendorId.code} {contract.vendorId.firstName}
                 </td>
-                <td className="p-3">{contract.customerId.firstName}</td>
-                <td className="p-3">{contract.requestDate.split("T")[0]}</td>
-                <td className="p-3">{contract.startDate?.split("T")[0]}</td>
-                <td className="p-3">{contract.endDate?.split("T")[0]}</td>
+                <td className="p-3">
+                  {contract.customerId.firstName} {contract.customerId.lastName}
+                </td>
+                <td className="p-3">
+                  <ul className="list-disc list-inside space-y-1">
+                    {contract.products.map((cp) => (
+                      <li key={cp.id}>{cp.product.name}</li>
+                    ))}
+                  </ul>
+                </td>
                 <td className="p-3">{contract.totalPrice}</td>
                 <td className="p-3 space-x-2">
                   <button
