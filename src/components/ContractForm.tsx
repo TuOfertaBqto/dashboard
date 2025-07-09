@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Contract, CreateContract } from "../api/contract";
 import type { User } from "../api/user";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   initialData?: Contract | null;
@@ -15,6 +16,8 @@ export const ContractForm = ({
   vendors = [],
   customers = [],
 }: Props) => {
+  const navigate = useNavigate();
+
   const [form, setForm] = useState<CreateContract>({
     vendorId: "",
     customerId: "",
@@ -206,13 +209,21 @@ export const ContractForm = ({
         </select>
       </div>
 
-      {/* Botón */}
-      <button
-        type="submit"
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-      >
-        Guardar contrato
-      </button>
+      <div className="flex justify-end gap-2">
+        <button
+          type="button"
+          onClick={() => navigate("/contracts")}
+          className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Guardar
+        </button>
+      </div>
     </form>
   );
 };
