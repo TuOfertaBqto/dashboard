@@ -1,5 +1,11 @@
 import { api } from "./api";
+import type { Product } from "./product";
 import type { User } from "./user";
+
+type ContractProduct = {
+  productId: string;
+  quantity: number;
+};
 
 export type CreateContract = {
   vendorId: string;
@@ -10,17 +16,7 @@ export type CreateContract = {
   installmentAmount: number;
   agreement: "weekly" | "fortnightly";
   totalPrice: number;
-};
-
-// TODO: move to product api
-export type Product = {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date | null;
-  name: string;
-  description: string | null;
-  price: number;
+  products: ContractProduct[];
 };
 
 export type Contract = {

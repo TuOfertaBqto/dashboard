@@ -7,6 +7,7 @@ import {
 } from "../api/contract";
 import { ContractForm } from "../components/ContractForm";
 import { userApi, type User } from "../api/user";
+import { ProductApi, type Product } from "../api/product";
 
 export default function ContractFormPage() {
   const { id } = useParams();
@@ -14,19 +15,22 @@ export default function ContractFormPage() {
 
   const [contract, setContract] = useState<Contract | null>(null);
   const [vendors, setVendors] = useState<User[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [customers, setCustomers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [vendorRes, customerRes] = await Promise.all([
+        const [vendorRes, customerRes, productRes] = await Promise.all([
           userApi.getAll("vendor"),
           userApi.getAll("customer"),
+          ProductApi.getAll(),
         ]);
 
         setVendors(vendorRes);
         setCustomers(customerRes);
+        setProducts(productRes);
 
         if (id) {
           const contractRes = await ContractApi.getById(id);
@@ -67,6 +71,7 @@ export default function ContractFormPage() {
         onSubmit={handleSubmit}
         vendors={vendors}
         customers={customers}
+        products={products}
       />
     </div>
   );

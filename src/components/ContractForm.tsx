@@ -8,13 +8,15 @@ interface Props {
   onSubmit: (data: CreateContract) => void;
   vendors?: User[];
   customers?: User[];
+  products?: { id: string; name: string }[];
 }
 
 export const ContractForm = ({
   initialData,
-  onSubmit,
+  //onSubmit,
   vendors = [],
   customers = [],
+  products = [],
 }: Props) => {
   const navigate = useNavigate();
 
@@ -26,6 +28,7 @@ export const ContractForm = ({
     installmentAmount: 0,
     agreement: "weekly",
     totalPrice: 0,
+    products: [],
   });
 
   useEffect(() => {
@@ -38,6 +41,10 @@ export const ContractForm = ({
         installmentAmount: initialData.installmentAmount || 0,
         agreement: initialData.agreement || "weekly",
         totalPrice: initialData.totalPrice || 0,
+        products: initialData.products.map((p) => ({
+          productId: p.product.id,
+          quantity: 1, // Default quantity, TODO: fix as needed
+        })),
       });
     }
   }, [initialData]);
@@ -57,7 +64,8 @@ export const ContractForm = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(form);
+    //onSubmit(form);
+    console.log("Submitting contract form with data:", form);
   };
 
   return (
@@ -156,7 +164,7 @@ export const ContractForm = ({
         </div>
       </div>
 
-      {/* Monto de cuota y total */}
+      {/* Monto de cuota y Acuerdo */}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label htmlFor="installmentAmount" className="block text-sm mb-1">
@@ -174,38 +182,104 @@ export const ContractForm = ({
           />
         </div>
         <div>
-          <label htmlFor="totalPrice" className="block text-sm mb-1">
-            Precio total ($)
+          <label htmlFor="agreement" className="block text-sm mb-1">
+            Frecuencia de pago
           </label>
-          <input
-            id="totalPrice"
-            type="number"
-            step="0.01"
-            name="totalPrice"
-            value={form.totalPrice}
+          <select
+            id="agreement"
+            name="agreement"
+            value={form.agreement ?? ""}
             onChange={handleChange}
             className="w-full border p-2 rounded"
             required
-          />
+          >
+            <option value="weekly">Semanal</option>
+            <option value="fortnightly">Quincenal</option>
+          </select>
         </div>
       </div>
 
       {/* Acuerdo */}
       <div>
-        <label htmlFor="agreement" className="block text-sm mb-1">
-          Frecuencia de pago
+        <label htmlFor="totalPrice" className="block text-sm mb-1">
+          Precio total ($)
         </label>
-        <select
-          id="agreement"
-          name="agreement"
-          value={form.agreement ?? ""}
+        <input
+          id="totalPrice"
+          type="number"
+          step="0.01"
+          name="totalPrice"
+          value={form.totalPrice}
           onChange={handleChange}
           className="w-full border p-2 rounded"
           required
+        />
+      </div>
+
+      <div className="space-y-4">
+        <h3 className="font-medium text-gray-700">Productos</h3>
+
+        {form.products.map((p, index) => (
+          <div key={index} className="grid grid-cols-4 gap-4 items-center">
+            <select
+              value={p.productId}
+              onChange={(e) => {
+                const updated = [...form.products];
+                updated[index].productId = e.target.value;
+                setForm({ ...form, products: updated });
+              }}
+              className="border p-2 rounded"
+              required
+            >
+              <option value="">Producto</option>
+              {products.map((prod) => (
+                <option key={prod.id} value={prod.id}>
+                  {prod.name}
+                </option>
+              ))}
+            </select>
+
+            <input
+              type="number"
+              placeholder="Cantidad"
+              value={p.quantity}
+              onChange={(e) => {
+                const updated = [...form.products];
+                updated[index].quantity = parseInt(e.target.value);
+                setForm({ ...form, products: updated });
+              }}
+              className="border p-2 rounded"
+              required
+            />
+
+            {/* Si tienes un campo de precio opcional, agrégalo aquí también */}
+
+            <button
+              type="button"
+              onClick={() => {
+                const updated = [...form.products];
+                updated.splice(index, 1); // elimina el producto
+                setForm({ ...form, products: updated });
+              }}
+              className="text-red-600 hover:underline text-sm"
+            >
+              Eliminar
+            </button>
+          </div>
+        ))}
+
+        <button
+          type="button"
+          className="text-blue-600 hover:underline text-sm"
+          onClick={() =>
+            setForm({
+              ...form,
+              products: [...form.products, { productId: "", quantity: 1 }],
+            })
+          }
         >
-          <option value="weekly">Semanal</option>
-          <option value="fortnightly">Quincenal</option>
-        </select>
+          + Agregar producto
+        </button>
       </div>
 
       <div className="flex justify-end gap-2">
