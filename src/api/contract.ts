@@ -5,8 +5,8 @@ export type CreateContract = {
   vendorId: string;
   customerId: string;
   requestDate: string;
-  startDate?: string;
-  endDate?: string;
+  startDate?: string | null;
+  endDate?: string | null;
   installmentAmount: number;
   agreement: "weekly" | "fortnightly";
   totalPrice: number;

@@ -5,8 +5,8 @@ import type { User } from "../api/user";
 interface Props {
   initialData?: Contract | null;
   onSubmit: (data: CreateContract) => void;
-  vendors?: User[]; // Lista de usuarios rol vendedor
-  customers?: User[]; // Lista de clientes
+  vendors?: User[];
+  customers?: User[];
 }
 
 export const ContractForm = ({
@@ -18,9 +18,8 @@ export const ContractForm = ({
   const [form, setForm] = useState<CreateContract>({
     vendorId: "",
     customerId: "",
-    requestDate: "",
-    startDate: "",
-    endDate: "",
+    requestDate: new Date().toISOString().slice(0, 10),
+    startDate: null,
     installmentAmount: 0,
     agreement: "weekly",
     totalPrice: 0,
@@ -32,7 +31,7 @@ export const ContractForm = ({
         vendorId: initialData.vendorId.id,
         customerId: initialData.customerId.id,
         requestDate: initialData.requestDate?.slice(0, 10) || "",
-        startDate: initialData.startDate?.slice(0, 10) || "",
+        startDate: initialData.startDate?.slice(0, 10) || null,
         endDate: initialData.endDate?.slice(0, 10) || "",
         installmentAmount: initialData.installmentAmount || 0,
         agreement: initialData.agreement || "weekly",
@@ -66,8 +65,11 @@ export const ContractForm = ({
     >
       {/* Vendedor */}
       <div>
-        <label className="block text-sm mb-1">Vendedor</label>
+        <label htmlFor="vendorId" className="block text-sm mb-1">
+          Vendedor
+        </label>
         <select
+          id="vendorId"
           name="vendorId"
           value={form.vendorId}
           onChange={handleChange}
@@ -85,8 +87,11 @@ export const ContractForm = ({
 
       {/* Cliente */}
       <div>
-        <label className="block text-sm mb-1">Cliente</label>
+        <label htmlFor="customerId" className="block text-sm mb-1">
+          Cliente
+        </label>
         <select
+          id="customerId"
           name="customerId"
           value={form.customerId}
           onChange={handleChange}
@@ -105,8 +110,11 @@ export const ContractForm = ({
       {/* Fechas */}
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <label className="block text-sm mb-1">Fecha de solicitud</label>
+          <label htmlFor="requestDate" className="block text-sm mb-1">
+            Fecha de solicitud
+          </label>
           <input
+            id="requestDate"
             type="date"
             name="requestDate"
             value={form.requestDate}
@@ -117,24 +125,31 @@ export const ContractForm = ({
         </div>
 
         <div>
-          <label className="block text-sm mb-1">Fecha de inicio</label>
+          <label htmlFor="startDate" className="block text-sm mb-1">
+            Fecha de inicio
+          </label>
           <input
+            id="startDate"
             type="date"
             name="startDate"
-            value={form.startDate}
+            value={form.startDate || ""}
             onChange={handleChange}
             className="w-full border p-2 rounded"
           />
         </div>
 
         <div>
-          <label className="block text-sm mb-1">Fecha de fin</label>
+          <label htmlFor="endDate" className="block text-sm mb-1">
+            Fecha de fin
+          </label>
           <input
+            id="endDate"
             type="date"
             name="endDate"
-            value={form.endDate}
+            value={form.endDate || ""}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded disabled:opacity-70 disabled:cursor-not-allowed disabled:bg-gray-100"
+            disabled
           />
         </div>
       </div>
@@ -142,8 +157,11 @@ export const ContractForm = ({
       {/* Monto de cuota y total */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm mb-1">Monto por cuota ($)</label>
+          <label htmlFor="endDate" className="block text-sm mb-1">
+            Monto por cuota ($)
+          </label>
           <input
+            id="installmentAmount"
             type="number"
             step="0.01"
             name="installmentAmount"
@@ -154,8 +172,11 @@ export const ContractForm = ({
           />
         </div>
         <div>
-          <label className="block text-sm mb-1">Precio total ($)</label>
+          <label htmlFor="totalPrice" className="block text-sm mb-1">
+            Precio total ($)
+          </label>
           <input
+            id="totalPrice"
             type="number"
             step="0.01"
             name="totalPrice"
@@ -169,8 +190,11 @@ export const ContractForm = ({
 
       {/* Acuerdo */}
       <div>
-        <label className="block text-sm mb-1">Frecuencia de pago</label>
+        <label htmlFor="agreement" className="block text-sm mb-1">
+          Frecuencia de pago
+        </label>
         <select
+          id="agreement"
           name="agreement"
           value={form.agreement ?? ""}
           onChange={handleChange}
