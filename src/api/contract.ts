@@ -39,6 +39,7 @@ export type Contract = {
       product: Product;
       deliveryDate: Date | null;
       status: "to_buy" | "to_dispatch" | "dispatched";
+      quantity: number;
     }
   ];
   createdAt: Date;
