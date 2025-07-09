@@ -212,71 +212,110 @@ export const ContractForm = ({
       </div>
       <div className="bg-white rounded shadow p-6 space-y-6 my-6">
         <div className="space-y-4">
-          <h3 className="font-medium text-gray-700">Productos</h3>
+          <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">
+            Productos del contrato
+          </h3>
 
-          {form.products.map((p, index) => (
-            <div key={index} className="grid grid-cols-4 gap-4 items-center">
-              <select
-                value={p.productId}
-                onChange={(e) => {
-                  const updated = [...form.products];
-                  updated[index].productId = e.target.value;
-                  setForm({ ...form, products: updated });
-                }}
-                className="border p-2 rounded"
-                required
+          {form.products.map((p, index) => {
+            const selected = products.find((prod) => prod.id === p.productId);
+
+            return (
+              <div
+                key={index}
+                className="grid grid-cols-12 gap-4 items-center border-b pb-4"
               >
-                <option value="">Producto</option>
-                {products.map((prod) => (
-                  <option key={prod.id} value={prod.id}>
-                    {prod.name}
-                  </option>
-                ))}
-              </select>
+                {/* Producto */}
+                <div className="col-span-5">
+                  <label className="block text-sm text-gray-600 mb-1">
+                    Producto
+                  </label>
+                  <select
+                    value={p.productId}
+                    onChange={(e) => {
+                      const updated = [...form.products];
+                      updated[index].productId = e.target.value;
+                      setForm({ ...form, products: updated });
+                    }}
+                    className="w-full border p-2 rounded"
+                    required
+                  >
+                    <option value="">Seleccione un producto</option>
+                    {products.map((prod) => (
+                      <option key={prod.id} value={prod.id}>
+                        {prod.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              <input
-                type="number"
-                placeholder="Cantidad"
-                value={p.quantity}
-                onChange={(e) => {
-                  const updated = [...form.products];
-                  updated[index].quantity = parseInt(e.target.value);
-                  setForm({ ...form, products: updated });
-                }}
-                className="border p-2 rounded"
-                required
-              />
+                {/* Cantidad */}
+                <div className="col-span-3">
+                  <label className="block text-sm text-gray-600 mb-1">
+                    Cantidad
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    className="w-full border p-2 rounded"
+                    value={p.quantity}
+                    onChange={(e) => {
+                      const updated = [...form.products];
+                      updated[index].quantity = parseInt(e.target.value);
+                      setForm({ ...form, products: updated });
+                    }}
+                    required
+                  />
+                </div>
 
-              {/* Si tienes un campo de precio opcional, agrégalo aquí también */}
+                {/* Precio unitario */}
+                <div className="col-span-3">
+                  <label className="block text-sm text-gray-600 mb-1">
+                    Precio unitario ($)
+                  </label>
+                  <input
+                    type="number"
+                    className="w-full border p-2 rounded bg-gray-100"
+                    value={selected?.price ?? 0}
+                    readOnly
+                  />
+                </div>
 
-              <button
-                type="button"
-                onClick={() => {
-                  const updated = [...form.products];
-                  updated.splice(index, 1); // elimina el producto
-                  setForm({ ...form, products: updated });
-                }}
-                className="text-red-600 hover:underline text-sm"
-              >
-                Eliminar
-              </button>
-            </div>
-          ))}
+                {/* Botón eliminar */}
+                <div className="col-span-1 flex justify-center pt-6">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const updated = [...form.products];
+                      updated.splice(index, 1);
+                      setForm({ ...form, products: updated });
+                    }}
+                    className="text-red-600 hover:text-red-800 text-sm"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </div>
+            );
+          })}
 
-          <button
-            type="button"
-            className="text-blue-600 hover:underline text-sm"
-            onClick={() =>
-              setForm({
-                ...form,
-                products: [...form.products, { productId: "", quantity: 1 }],
-              })
-            }
-          >
-            + Agregar producto
-          </button>
+          {/* Botón agregar */}
+          <div>
+            <button
+              type="button"
+              className="text-blue-600 hover:underline text-sm"
+              onClick={() =>
+                setForm({
+                  ...form,
+                  products: [...form.products, { productId: "", quantity: 1 }],
+                })
+              }
+            >
+              + Agregar producto
+            </button>
+          </div>
         </div>
       </div>
+
       <div className="bg-white rounded shadow p-6 space-y-6">
         {/* Precio total */}
         <div>
