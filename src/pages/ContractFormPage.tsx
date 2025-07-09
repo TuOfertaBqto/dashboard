@@ -60,7 +60,7 @@ export default function ContractFormPage() {
   return (
     <div className="max-w-3xl mx-auto mt-8">
       <h1 className="text-2xl font-semibold mb-6">
-        {id ? "Editar contrato" : "Crear contrato"}
+        {id ? `Editar contrato C#${contract?.code}` : "Crear contrato"}
       </h1>
       <ContractForm
         initialData={contract}

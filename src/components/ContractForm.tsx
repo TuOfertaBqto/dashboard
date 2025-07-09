@@ -35,7 +35,6 @@ export const ContractForm = ({
         customerId: initialData.customerId.id,
         requestDate: initialData.requestDate?.slice(0, 10) || "",
         startDate: initialData.startDate?.slice(0, 10) || null,
-        endDate: initialData.endDate?.slice(0, 10) || "",
         installmentAmount: initialData.installmentAmount || 0,
         agreement: initialData.agreement || "weekly",
         totalPrice: initialData.totalPrice || 0,
@@ -51,7 +50,7 @@ export const ContractForm = ({
       ...prev,
       [name]:
         name === "installmentAmount" || name === "totalPrice"
-          ? parseFloat(value)
+          ? parseInt(value)
           : value,
     }));
   };
@@ -160,7 +159,7 @@ export const ContractForm = ({
       {/* Monto de cuota y total */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label htmlFor="endDate" className="block text-sm mb-1">
+          <label htmlFor="installmentAmount" className="block text-sm mb-1">
             Monto por cuota ($)
           </label>
           <input
