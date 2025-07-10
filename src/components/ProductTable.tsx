@@ -1,4 +1,5 @@
 import type { Product } from "../api/product";
+import { DeleteButton, EditButton } from "./ActionButtons";
 
 interface Props {
   products: Product[];
@@ -30,18 +31,8 @@ export const ProductTable = ({ products, onEdit, onDelete }: Props) => {
                 <td className="p-3">{product.name}</td>
                 <td className="p-3">${product.price}</td>
                 <td className="p-3 space-x-2">
-                  <button
-                    onClick={() => onEdit(product)}
-                    className="text-blue-600 hover:underline"
-                  >
-                    Editar
-                  </button>
-                  <button
-                    onClick={() => onDelete(product)}
-                    className="text-red-600 hover:underline"
-                  >
-                    Eliminar
-                  </button>
+                  <EditButton onClick={() => onEdit(product)} />
+                  <DeleteButton onClick={() => onDelete(product)} />
                 </td>
               </tr>
             ))
