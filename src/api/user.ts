@@ -1,5 +1,7 @@
 import { api } from "./api";
 
+export type UserRole = "main" | "super_admin" | "admin" | "vendor" | "customer";
+
 export type User = {
   id: string;
   createdAt: string;
@@ -12,13 +14,15 @@ export type User = {
   email: string;
   phoneNumber: string;
   adress: string;
-  role: string;
+  role: UserRole;
 };
 
 export const userApi = {
-  getAll: async (): Promise<User[]> => {
+  getAll: async (role?: UserRole): Promise<User[]> => {
     try {
-      const res = await api.get("/user");
+      const res = await api.get("/user", {
+        params: role ? { role } : {},
+      });
       return res.data;
     } catch (error) {
       console.error("Error fetching users:", error);
