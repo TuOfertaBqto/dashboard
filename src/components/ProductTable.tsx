@@ -28,7 +28,7 @@ export const ProductTable = ({ products, onEdit, onDelete }: Props) => {
             products.map((product) => (
               <tr key={product.id} className="border-t">
                 <td className="p-3">{product.name}</td>
-                <td className="p-3">${product.price.toFixed(2)}</td>
+                <td className="p-3">${product.price}</td>
                 <td className="p-3 space-x-2">
                   <button
                     onClick={() => onEdit(product)}
