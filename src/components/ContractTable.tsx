@@ -1,4 +1,5 @@
 import type { Contract } from "../api/contract";
+import { DeleteButton, DispatchButton, EditButton } from "./ActionButtons";
 
 interface Props {
   contracts: Contract[];
@@ -62,32 +63,21 @@ export const ContractTable = ({
                 </td>
                 <td className="p-3">{contract.totalPrice}</td>
                 <td className="p-3">{contract.startDate?.split("T")[0]}</td>
-                <td className="p-3 space-x-2">
-                  {!contract.startDate && (
-                    <button
-                      onClick={() =>
-                        onDispatch({
-                          ...contract,
-                          startDate: new Date().toISOString(),
-                        })
-                      }
-                      className="text-green-600 hover:underline text-sm"
-                    >
-                      Despachar
-                    </button>
-                  )}
-                  <button
-                    onClick={() => onEdit(contract)}
-                    className="text-blue-600 hover:underline"
-                  >
-                    Editar
-                  </button>
-                  <button
-                    onClick={() => onDelete(contract.id)}
-                    className="text-red-600 hover:underline"
-                  >
-                    Eliminar
-                  </button>
+                <td className="p-3">
+                  <div className="flex flex-col gap-1">
+                    {!contract.startDate && (
+                      <DispatchButton
+                        onClick={() =>
+                          onDispatch({
+                            ...contract,
+                            startDate: new Date().toISOString(),
+                          })
+                        }
+                      />
+                    )}
+                    <EditButton onClick={() => onEdit(contract)} />
+                    <DeleteButton onClick={() => onDelete(contract.id)} />
+                  </div>
                 </td>
               </tr>
             ))
