@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
 import type { CreateProduct, Product } from "../api/product";
+import type { Category } from "../api/category";
 
 interface Props {
   initialData?: Product;
   onSubmit: (data: CreateProduct) => void;
+  categories: Category[];
 }
 
-export const ProductForm = ({ initialData, onSubmit }: Props) => {
+export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
   const [form, setForm] = useState<CreateProduct>({
     name: "",
     description: null,
     price: 0,
+    categoryId: "",
   });
 
   useEffect(() => {
@@ -19,12 +22,15 @@ export const ProductForm = ({ initialData, onSubmit }: Props) => {
         name: initialData.name,
         description: initialData.description || null,
         price: initialData.price,
+        categoryId: initialData.categoryId.id,
       });
     }
   }, [initialData]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({
@@ -62,6 +68,27 @@ export const ProductForm = ({ initialData, onSubmit }: Props) => {
           onChange={handleChange}
           className="w-full border p-2 rounded"
         />
+      </div>
+
+      <div>
+        <label htmlFor="categoryId" className="block text-sm mb-1">
+          Categoría
+        </label>
+        <select
+          id="categoryId"
+          name="categoryId"
+          value={form.categoryId}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          required
+        >
+          <option value="">Seleccione una categoría</option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div>

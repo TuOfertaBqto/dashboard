@@ -2,11 +2,17 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ProductApi, type CreateProduct, type Product } from "../api/product";
 import { ProductForm } from "../components/ProductForm";
+import { CategoryApi, type Category } from "../api/category";
 
 export const ProductFormPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [initialData, setInitialData] = useState<Product | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    CategoryApi.getAll().then(setCategories);
+  }, []);
 
   useEffect(() => {
     if (id) {
@@ -37,6 +43,7 @@ export const ProductFormPage = () => {
       <ProductForm
         initialData={initialData ?? undefined}
         onSubmit={handleSubmit}
+        categories={categories}
       />
     </div>
   );

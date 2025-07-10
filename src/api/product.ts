@@ -1,4 +1,5 @@
 import { api } from "./api";
+import type { Category } from "./category";
 
 export type Product = {
   id: string;
@@ -8,11 +9,13 @@ export type Product = {
   name: string;
   description: string | null;
   price: number;
+  categoryId: Category;
 };
 export type CreateProduct = {
   name: string;
   description: string | null;
   price: number;
+  categoryId: string;
 };
 
 export const ProductApi = {
