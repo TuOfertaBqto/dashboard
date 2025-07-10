@@ -3,7 +3,7 @@ import type { Product } from "../api/product";
 interface Props {
   products: Product[];
   onEdit: (product: Product) => void;
-  onDelete: (id: string) => void;
+  onDelete: (p: Product) => void;
 }
 
 export const ProductTable = ({ products, onEdit, onDelete }: Props) => {
@@ -37,7 +37,7 @@ export const ProductTable = ({ products, onEdit, onDelete }: Props) => {
                     Editar
                   </button>
                   <button
-                    onClick={() => onDelete(product.id)}
+                    onClick={() => onDelete(product)}
                     className="text-red-600 hover:underline"
                   >
                     Eliminar
