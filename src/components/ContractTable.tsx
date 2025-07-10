@@ -8,6 +8,19 @@ interface Props {
   onDispatch: (updated: Contract) => void;
 }
 
+const translateStatus = (status: string): string => {
+  switch (status) {
+    case "to_buy":
+      return "Por comprar";
+    case "to_dispatch":
+      return "Por despachar";
+    case "dispatched":
+      return "Despachado";
+    default:
+      return status;
+  }
+};
+
 export const ContractTable = ({
   contracts,
   onEdit,
@@ -56,7 +69,7 @@ export const ContractTable = ({
                 <td className="p-3">
                   {contract.products.map((cp, index) => (
                     <span key={index}>
-                      {cp.status}
+                      {translateStatus(cp.status)}
                       {index < contract.products.length - 1 && <br />}
                     </span>
                   ))}
