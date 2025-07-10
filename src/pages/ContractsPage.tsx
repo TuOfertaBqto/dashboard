@@ -10,6 +10,9 @@ export default function ContractsPage() {
   const [contractToDelete, setContractToDelete] = useState<Contract | null>(
     null
   );
+  const [contractToDispatch, setContractToDispatch] = useState<Contract | null>(
+    null
+  );
 
   const fetchContracts = async () => {
     const data = await ContractApi.getAll();
@@ -26,6 +29,22 @@ export default function ContractsPage() {
     await ContractApi.remove(contractToDelete.id);
     fetchContracts();
     setContractToDelete(null);
+  };
+
+  const handleDispatch = async () => {
+    if (!contractToDispatch) return;
+
+    try {
+      await ContractApi.update(contractToDispatch.id, {
+        startDate: contractToDispatch.startDate,
+      });
+
+      fetchContracts();
+    } catch (error) {
+      console.error("Error al despachar contrato:", error);
+    } finally {
+      setContractToDispatch(null);
+    }
   };
 
   return (
@@ -47,6 +66,7 @@ export default function ContractsPage() {
           const selected = contracts.find((c) => c.id === id);
           if (selected) setContractToDelete(selected);
         }}
+        onDispatch={(contract) => setContractToDispatch(contract)}
       />
 
       <ConfirmModal
@@ -55,6 +75,14 @@ export default function ContractsPage() {
         message={`¿Estás seguro que deseas eliminar el contrato "${contractToDelete?.code}"?`}
         onCancel={() => setContractToDelete(null)}
         onConfirm={handleDelete}
+      />
+
+      <ConfirmModal
+        open={!!contractToDispatch}
+        title="Despachar contrato"
+        message={`¿Deseas despachar el contrato "${contractToDispatch?.code}"? Esto asignará la fecha de inicio como la fecha actual.`}
+        onCancel={() => setContractToDispatch(null)}
+        onConfirm={handleDispatch}
       />
     </div>
   );

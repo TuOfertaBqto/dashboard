@@ -78,7 +78,7 @@ export const ContractApi = {
     }
   },
 
-  update: async (id: string, data: CreateContract) => {
+  update: async (id: string, data: Partial<CreateContract>) => {
     try {
       const res = await api.patch(`/contract/${id}`, data);
       return res.data;

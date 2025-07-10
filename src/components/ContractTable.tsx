@@ -4,9 +4,15 @@ interface Props {
   contracts: Contract[];
   onEdit: (contract: Contract) => void;
   onDelete: (id: string) => void;
+  onDispatch: (updated: Contract) => void;
 }
 
-export const ContractTable = ({ contracts, onEdit, onDelete }: Props) => {
+export const ContractTable = ({
+  contracts,
+  onEdit,
+  onDelete,
+  onDispatch,
+}: Props) => {
   return (
     <div className="overflow-x-auto bg-white rounded-lg shadow">
       <table className="w-full table-auto">
@@ -55,6 +61,19 @@ export const ContractTable = ({ contracts, onEdit, onDelete }: Props) => {
                 </td>
                 <td className="p-3">{contract.totalPrice}</td>
                 <td className="p-3 space-x-2">
+                  {!contract.startDate && (
+                    <button
+                      onClick={() =>
+                        onDispatch({
+                          ...contract,
+                          startDate: new Date().toISOString(),
+                        })
+                      }
+                      className="text-green-600 hover:underline text-sm"
+                    >
+                      Despachar
+                    </button>
+                  )}
                   <button
                     onClick={() => onEdit(contract)}
                     className="text-blue-600 hover:underline"
