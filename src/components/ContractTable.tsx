@@ -21,6 +21,19 @@ const translateStatus = (status: string): string => {
   }
 };
 
+const statusStyles = (status: string): string => {
+  switch (status) {
+    case "to_buy":
+      return "bg-red-100 text-red-800";
+    case "to_dispatch":
+      return "bg-yellow-100 text-yellow-800";
+    case "dispatched":
+      return "bg-green-100 text-green-800";
+    default:
+      return "bg-gray-100 text-gray-800";
+  }
+};
+
 export const ContractTable = ({
   contracts,
   onEdit,
@@ -68,10 +81,14 @@ export const ContractTable = ({
                 </td>
                 <td className="p-3">
                   {contract.products.map((cp, index) => (
-                    <span key={index}>
+                    <div
+                      key={index}
+                      className={`mb-1 px-2 py-1 rounded text-xs font-medium w-fit ${statusStyles(
+                        cp.status
+                      )}`}
+                    >
                       {translateStatus(cp.status)}
-                      {index < contract.products.length - 1 && <br />}
-                    </span>
+                    </div>
                   ))}
                 </td>
                 <td className="p-3">{contract.totalPrice}</td>
