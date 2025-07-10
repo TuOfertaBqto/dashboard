@@ -16,6 +16,7 @@ export const ContractTable = ({ contracts, onEdit, onDelete }: Props) => {
             <th className="p-3">Vendedor</th>
             <th className="p-3">Cliente</th>
             <th className="p-3">Producto</th>
+            <th className="p-3">Status</th>
             <th className="p-3">Precio Total</th>
             <th className="p-3">Acciones</th>
           </tr>
@@ -43,6 +44,14 @@ export const ContractTable = ({ contracts, onEdit, onDelete }: Props) => {
                       <li key={cp.id}>{cp.product.name}</li>
                     ))}
                   </ul>
+                </td>
+                <td className="p-3">
+                  {contract.products.map((cp, index) => (
+                    <span key={index}>
+                      {cp.status}
+                      {index < contract.products.length - 1 && <br />}
+                    </span>
+                  ))}
                 </td>
                 <td className="p-3">{contract.totalPrice}</td>
                 <td className="p-3 space-x-2">
