@@ -39,6 +39,10 @@ export default function ContractsPage() {
         startDate: contractToDispatch.startDate,
       });
 
+      contractToDispatch.products.map(
+        async (p) => await ContractApi.updateProducts(p.id, "dispatched")
+      );
+
       fetchContracts();
     } catch (error) {
       console.error("Error al despachar contrato:", error);

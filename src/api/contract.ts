@@ -88,6 +88,19 @@ export const ContractApi = {
     }
   },
 
+  updateProducts: async (
+    id: string,
+    status: "to_buy" | "to_dispatch" | "dispatched"
+  ) => {
+    try {
+      const res = await api.patch(`/contract-product/${id}`, { status });
+      return res.data;
+    } catch (error) {
+      console.error("Error updating contract products:", error);
+      return { msg: "error updating contract products" };
+    }
+  },
+
   remove: async (id: string) => {
     try {
       const res = await api.delete(`/contract/${id}`);
