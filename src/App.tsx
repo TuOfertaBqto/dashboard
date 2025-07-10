@@ -8,6 +8,9 @@ import UserFormPage from "./pages/UserFormPage";
 import Layout from "./components/Layout";
 import ContractsPage from "./pages/ContractsPage";
 import ContractFormPage from "./pages/ContractFormPage";
+import { ProductListPage } from "./pages/ProductListPage";
+import { ProductFormPage } from "./pages/ProductFormPage";
+import { NotFoundPage } from "./pages/NotFoundPage";
 
 function App() {
   return (
@@ -31,6 +34,11 @@ function App() {
             <Route path="contracts" element={<ContractsPage />} />
             <Route path="contracts/new" element={<ContractFormPage />} />
             <Route path="contracts/:id/edit" element={<ContractFormPage />} />
+            <Route path="/products" element={<ProductListPage />} />
+            <Route path="/products/new" element={<ProductFormPage />} />
+            <Route path="/products/:id/edit" element={<ProductFormPage />} />
+
+            <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
