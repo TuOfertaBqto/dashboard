@@ -24,6 +24,7 @@ export const ContractTable = ({
             <th className="p-3">Producto</th>
             <th className="p-3">Status</th>
             <th className="p-3">Precio Total</th>
+            <th className="p-3">Fecha despacho</th>
             <th className="p-3">Acciones</th>
           </tr>
         </thead>
@@ -60,6 +61,7 @@ export const ContractTable = ({
                   ))}
                 </td>
                 <td className="p-3">{contract.totalPrice}</td>
+                <td className="p-3">{contract.startDate?.split("T")[0]}</td>
                 <td className="p-3 space-x-2">
                   {!contract.startDate && (
                     <button
