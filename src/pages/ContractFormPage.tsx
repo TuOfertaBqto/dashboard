@@ -8,6 +8,7 @@ import {
 import { ContractForm } from "../components/ContractForm";
 import { userApi, type User } from "../api/user";
 import { ProductApi, type Product } from "../api/product";
+import { InventoryApi } from "../api/inventory";
 
 export default function ContractFormPage() {
   const { id } = useParams();
@@ -51,8 +52,21 @@ export default function ContractFormPage() {
       if (id) {
         await ContractApi.update(id, data);
       } else {
+        await Promise.all(
+          data.products.map(async (p) => {
+            const toDesp = await ContractApi.getToDispatchQuantity(p.productId);
+            const stock = await InventoryApi.getStockByProductId(p.productId);
+
+            const isAvailable = stock >= p.quantity + toDesp;
+            p.status = isAvailable ? "to_dispatch" : "to_buy";
+          })
+        );
+
+        console.log(data);
+
         await ContractApi.create(data);
       }
+
       navigate("/contracts");
     } catch (err) {
       console.error("Error guardando contrato", err);

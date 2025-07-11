@@ -5,6 +5,7 @@ import type { User } from "./user";
 type ContractProduct = {
   productId: string;
   quantity: number;
+  status?: "to_buy" | "to_dispatch" | "dispatched";
 };
 
 export type CreateContract = {
