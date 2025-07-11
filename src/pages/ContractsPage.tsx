@@ -35,15 +35,17 @@ export default function ContractsPage() {
     if (!contractToDispatch) return;
 
     try {
-      await ContractApi.update(contractToDispatch.id, {
-        startDate: contractToDispatch.startDate,
-      });
+      // await ContractApi.update(contractToDispatch.id, {
+      //   startDate: contractToDispatch.startDate,
+      // });
+      //TODO: CREAR MOVIMIENTO DEL INVENTARIO POR CADA PRODUCTO, SI EL ESTATUS ES TO_BUY HAY QUE CREAR LA ENTRADA Y SALIDA
+      // contractToDispatch.products.map(
+      //   async (p) => await ContractApi.updateProducts(p.id, "dispatched")
+      // );
 
-      contractToDispatch.products.map(
-        async (p) => await ContractApi.updateProducts(p.id, "dispatched")
-      );
+      //fetchContracts();
 
-      fetchContracts();
+      console.log("Despachando contrato:", contractToDispatch);
     } catch (error) {
       console.error("Error al despachar contrato:", error);
     } finally {
