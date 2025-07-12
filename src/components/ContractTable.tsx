@@ -49,6 +49,7 @@ export const ContractTable = ({
             <th className="p-3">Vendedor</th>
             <th className="p-3">Cliente</th>
             <th className="p-3">Producto</th>
+            <th className="p-3">Cant.</th>
             <th className="p-3">Status</th>
             <th className="p-3">Precio Total</th>
             <th className="p-3">Fecha despacho</th>
@@ -78,6 +79,11 @@ export const ContractTable = ({
                       <li key={cp.id}>{cp.product.name}</li>
                     ))}
                   </ul>
+                </td>
+                <td className="p-3">
+                  {contract.products.map((cp, index) => (
+                    <span key={index}> {cp.quantity}</span>
+                  ))}
                 </td>
                 <td className="p-3">
                   {contract.products.map((cp, index) => (
