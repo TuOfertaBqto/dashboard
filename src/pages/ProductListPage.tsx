@@ -3,15 +3,16 @@ import { ProductApi, type Product } from "../api/product";
 import { useNavigate } from "react-router-dom";
 import { ProductTable } from "../components/ProductTable";
 import { ConfirmModal } from "../components/ConfirmModal";
+import { InventoryApi, type Inventory } from "../api/inventory";
 
 export const ProductListPage = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [inventory, setInventory] = useState<Inventory[]>([]);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const navigate = useNavigate();
 
   const fetchProducts = async () => {
-    const res = await ProductApi.getAll();
-    setProducts(res);
+    const res = await InventoryApi.getAll();
+    setInventory(res);
   };
 
   const handleDelete = async () => {
@@ -43,7 +44,7 @@ export const ProductListPage = () => {
       </div>
 
       <ProductTable
-        products={products}
+        inventory={inventory}
         onEdit={(p) => navigate(`/products/${p.id}/edit`)}
         onDelete={(product) => setProductToDelete(product)}
       />
