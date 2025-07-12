@@ -1,7 +1,9 @@
+import type { ReactNode } from "react";
+
 interface ConfirmModalProps {
   open: boolean;
   title?: string;
-  message: string;
+  message: ReactNode;
   onCancel: () => void;
   onConfirm: () => void;
   confirmText?: string;
@@ -27,7 +29,12 @@ export const ConfirmModal = ({
       {/* Contenido del modal */}
       <div className="relative z-10 bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
         <h2 className="text-xl font-semibold mb-4">{title}</h2>
-        <p className="text-gray-700 mb-6">{message}</p>
+        {typeof message === "string" ? (
+          <p className="text-gray-700 mb-6">{message}</p>
+        ) : (
+          message
+        )}
+
         <div className="flex justify-end gap-3">
           <button
             onClick={onCancel}
