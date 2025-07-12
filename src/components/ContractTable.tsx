@@ -81,9 +81,16 @@ export const ContractTable = ({
                   </ul>
                 </td>
                 <td className="p-3">
-                  {contract.products.map((cp, index) => (
-                    <span key={index}> {cp.quantity}</span>
-                  ))}
+                  <ul className="space-y-1">
+                    {contract.products.map((cp) => (
+                      <li
+                        key={cp.id}
+                        className="px-2 py-1 rounded bg-gray-100 text-sm text-gray-700 w-fit"
+                      >
+                        <span className="font-medium">{cp.quantity}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </td>
                 <td className="p-3">
                   {contract.products.map((cp, index) => (
