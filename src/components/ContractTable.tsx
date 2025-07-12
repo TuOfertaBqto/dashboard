@@ -58,7 +58,7 @@ export const ContractTable = ({
         <tbody>
           {contracts.length === 0 ? (
             <tr>
-              <td colSpan={6} className="text-center py-6 text-gray-400">
+              <td colSpan={8} className="text-center py-6 text-gray-400">
                 No hay contratos registrados.
               </td>
             </tr>

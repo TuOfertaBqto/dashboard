@@ -3,6 +3,7 @@ import { ConfirmModal } from "../components/ConfirmModal";
 import { ContractTable } from "../components/ContractTable";
 import { ContractApi, type Contract } from "../api/contract";
 import { useNavigate } from "react-router-dom";
+import { InventoryMovApi } from "../api/inventory-movement";
 
 export default function ContractsPage() {
   const navigate = useNavigate();
@@ -35,15 +36,29 @@ export default function ContractsPage() {
     if (!contractToDispatch) return;
 
     try {
-      // await ContractApi.update(contractToDispatch.id, {
-      //   startDate: contractToDispatch.startDate,
-      // });
-      //TODO: CREAR MOVIMIENTO DEL INVENTARIO POR CADA PRODUCTO, SI EL ESTATUS ES TO_BUY HAY QUE CREAR LA ENTRADA Y SALIDA
-      // contractToDispatch.products.map(
-      //   async (p) => await ContractApi.updateProducts(p.id, "dispatched")
-      // );
+      await ContractApi.update(contractToDispatch.id, {
+        startDate: contractToDispatch.startDate,
+      });
 
-      //fetchContracts();
+      for (const p of contractToDispatch.products) {
+        if (p.status === "to_buy") {
+          await InventoryMovApi.create({
+            productId: p.product.id,
+            quantity: p.quantity,
+            type: "in",
+          });
+        }
+
+        await InventoryMovApi.create({
+          productId: p.product.id,
+          quantity: p.quantity,
+          type: "out",
+        });
+
+        await ContractApi.updateProducts(p.id, "dispatched");
+      }
+
+      fetchContracts();
 
       console.log("Despachando contrato:", contractToDispatch);
     } catch (error) {
