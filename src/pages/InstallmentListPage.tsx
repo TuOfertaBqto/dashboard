@@ -40,6 +40,7 @@ export const InstallmentListPage = () => {
               <th className="p-3 text-left">Monto ($)</th>
               <th className="p-3 text-left">Fecha de vencimiento</th>
               <th className="p-3 text-left">Estado</th>
+              <th className="p-3 text-left"></th>
             </tr>
           </thead>
           <tbody>

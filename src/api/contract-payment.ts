@@ -16,6 +16,14 @@ export type ContractPayment = {
   paidAt: null;
 };
 
+export type CreateContractPayment = {
+  contractId: string;
+  startContract: string;
+  installmentAmountContract: number;
+  agreementContract: "weekly" | "fortnightly";
+  totalPriceContract: number;
+};
+
 export type UpdateContractPayment = {
   contract?: string;
 
@@ -33,6 +41,16 @@ export type UpdateContractPayment = {
 };
 
 export const ContractPaymentApi = {
+  create: async (data: CreateContractPayment): Promise<ContractPayment> => {
+    try {
+      const res = await api.post("/contract-payment", data);
+      return res.data;
+    } catch (error) {
+      console.error("Error creating contract-payment:", error);
+      return {} as ContractPayment;
+    }
+  },
+
   getAll: async (): Promise<ContractPayment[]> => {
     try {
       const res = await api.get("/contract-payment");
@@ -59,7 +77,7 @@ export const ContractPaymentApi = {
       return res.data;
     } catch (error) {
       console.error("Error updating contract-payment:", error);
-      return {} as Contract;
+      return {};
     }
   },
 };

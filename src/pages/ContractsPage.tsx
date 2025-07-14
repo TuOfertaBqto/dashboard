@@ -4,6 +4,7 @@ import { ContractTable } from "../components/ContractTable";
 import { ContractApi, type Contract } from "../api/contract";
 import { useNavigate } from "react-router-dom";
 import { InventoryMovApi } from "../api/inventory-movement";
+import { ContractPaymentApi } from "../api/contract-payment";
 
 export default function ContractsPage() {
   const navigate = useNavigate();
@@ -17,7 +18,6 @@ export default function ContractsPage() {
 
   const fetchContracts = async () => {
     const data = await ContractApi.getAll();
-    console.log("Fetched contracts:", data);
     setContracts(data);
   };
 
@@ -59,6 +59,13 @@ export default function ContractsPage() {
       }
 
       // TODO: Crear los contract Payments
+      await ContractPaymentApi.create({
+        contractId: contractToDispatch.id,
+        agreementContract: contractToDispatch.agreement,
+        installmentAmountContract: contractToDispatch.installmentAmount,
+        startContract: contractToDispatch.startDate.split("T")[0],
+        totalPriceContract: contractToDispatch.totalPrice,
+      });
 
       fetchContracts();
 

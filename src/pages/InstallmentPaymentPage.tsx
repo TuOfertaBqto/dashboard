@@ -31,7 +31,7 @@ export const InstallmentPaymentPage = () => {
 
           setForm((prev) => ({
             ...prev,
-            contractId: data.contract.id,
+            contract: data.contract.id,
           }));
         })
         .catch(() => navigate("/installments"));
