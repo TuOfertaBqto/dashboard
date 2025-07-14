@@ -16,6 +16,22 @@ export type ContractPayment = {
   paidAt: null;
 };
 
+export type UpdateContractPayment = {
+  contract?: string;
+
+  paymentMethod: "zelle" | "mobile_payment" | "bank_transfer" | "cash";
+
+  referenceNumber: number;
+
+  photo?: string | null;
+
+  owner?: string;
+
+  amountPaid: number;
+
+  paidAt: string;
+};
+
 export const ContractPaymentApi = {
   getAll: async (): Promise<ContractPayment[]> => {
     try {
@@ -24,6 +40,26 @@ export const ContractPaymentApi = {
     } catch (error) {
       console.error("Error fetching contract-payment:", error);
       return [];
+    }
+  },
+
+  getById: async (id: string): Promise<ContractPayment> => {
+    try {
+      const res = await api.get(`/contract-payment/${id}`);
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching contract-payment by ID:", error);
+      return {} as ContractPayment;
+    }
+  },
+
+  update: async (id: string, data: UpdateContractPayment) => {
+    try {
+      const res = await api.patch(`/contract-payment/${id}`, data);
+      return res.data;
+    } catch (error) {
+      console.error("Error updating contract-payment:", error);
+      return {} as Contract;
     }
   },
 };

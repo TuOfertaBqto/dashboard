@@ -5,9 +5,11 @@ import {
   ContractPaymentApi,
   type ContractPayment,
 } from "../api/contract-payment";
+import { useNavigate } from "react-router-dom";
 
 export const InstallmentListPage = () => {
   const [installments, setInstallments] = useState<ContractPayment[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,6 +61,14 @@ export const InstallmentListPage = () => {
                       ? "Vence hoy"
                       : "Pendiente"}
                   </span>
+                </td>
+                <td>
+                  <button
+                    onClick={() => navigate(`/installments/${i.id}/pay`)}
+                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm"
+                  >
+                    Registrar pago
+                  </button>
                 </td>
               </tr>
             ))}

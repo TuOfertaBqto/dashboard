@@ -12,6 +12,7 @@ import { ProductListPage } from "./pages/ProductListPage";
 import { ProductFormPage } from "./pages/ProductFormPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { InstallmentListPage } from "./pages/InstallmentListPage";
+import { InstallmentPaymentPage } from "./pages/InstallmentPaymentPage";
 
 function App() {
   return (
@@ -39,6 +40,10 @@ function App() {
             <Route path="/products/new" element={<ProductFormPage />} />
             <Route path="/products/:id/edit" element={<ProductFormPage />} />
             <Route path="/installments" element={<InstallmentListPage />} />
+            <Route
+              path="/installments/:id/pay"
+              element={<InstallmentPaymentPage />}
+            />
 
             <Route path="*" element={<NotFoundPage />} />
           </Route>
