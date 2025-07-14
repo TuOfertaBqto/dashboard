@@ -58,6 +58,8 @@ export default function ContractsPage() {
         await ContractApi.updateProducts(p.id, "dispatched");
       }
 
+      // TODO: Crear los contract Payments
+
       fetchContracts();
 
       console.log("Despachando contrato:", contractToDispatch);

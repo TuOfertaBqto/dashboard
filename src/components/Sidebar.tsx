@@ -7,6 +7,7 @@ import {
   UsersIcon,
   ArrowRightEndOnRectangleIcon,
   DocumentTextIcon,
+  CurrencyDollarIcon,
 } from "@heroicons/react/24/outline";
 
 import { useState } from "react";
@@ -44,6 +45,11 @@ export const Sidebar = () => {
       name: "Dashboard",
       icon: <SquaresPlusIcon className="h-5 w-5" />,
       route: "/",
+    },
+    {
+      name: "Pagos",
+      icon: <CurrencyDollarIcon className="h-5 w-5" />,
+      route: "/installments",
     },
     {
       name: "Contratos",

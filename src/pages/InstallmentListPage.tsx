@@ -1,0 +1,76 @@
+import classNames from "classnames";
+import dayjs from "dayjs";
+import { useEffect, useState } from "react";
+import {
+  ContractPaymentApi,
+  type ContractPayment,
+} from "../api/contract-payment";
+
+export const InstallmentListPage = () => {
+  const [installments, setInstallments] = useState<ContractPayment[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await ContractPaymentApi.getAll(); // Asegúrate que este método exista
+      setInstallments(res);
+    };
+    fetchData();
+  }, []);
+
+  const getDueDateColor = (dueDate: string) => {
+    const today = dayjs().startOf("day");
+    const due = dayjs(dueDate).startOf("day");
+
+    if (due.isBefore(today)) return "bg-red-100 text-red-700";
+    if (due.isSame(today)) return "bg-yellow-100 text-yellow-800";
+    return "bg-green-100 text-green-800";
+  };
+
+  return (
+    <div className="space-y-6">
+      <h1 className="text-xl font-semibold">Cuotas por cobrar</h1>
+
+      <div className="bg-white rounded shadow p-4 overflow-auto">
+        <table className="w-full table-auto">
+          <thead className="bg-gray-100 text-gray-700">
+            <tr>
+              <th className="p-3 text-left">Contrato</th>
+              <th className="p-3 text-left">Monto ($)</th>
+              <th className="p-3 text-left">Fecha de vencimiento</th>
+              <th className="p-3 text-left">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {installments.map((i) => (
+              <tr key={i.id} className="border-t">
+                <td className="p-3">#{i.contract.code}</td>
+                <td className="p-3">${i.contract.installmentAmount}</td>
+                <td className="p-3">{dayjs(i.dueDate).format("DD/MM/YYYY")}</td>
+                <td className="p-3">
+                  <span
+                    className={classNames(
+                      "text-sm px-2 py-1 rounded font-medium",
+                      getDueDateColor(i.dueDate)
+                    )}
+                  >
+                    {dayjs(i.dueDate).isBefore(dayjs(), "day")
+                      ? "Vencida"
+                      : dayjs(i.dueDate).isSame(dayjs(), "day")
+                      ? "Vence hoy"
+                      : "Pendiente"}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {installments.length === 0 && (
+          <div className="text-center text-gray-500 py-6">
+            No hay cuotas pendientes.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
