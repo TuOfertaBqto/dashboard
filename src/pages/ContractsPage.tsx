@@ -4,7 +4,11 @@ import { ContractTable } from "../components/ContractTable";
 import { ContractApi, type Contract } from "../api/contract";
 import { useNavigate } from "react-router-dom";
 import { InventoryMovApi } from "../api/inventory-movement";
-import { ContractPaymentApi } from "../api/contract-payment";
+import {
+  ContractPaymentApi,
+  type ContractPayment,
+} from "../api/contract-payment";
+import { InstallmentModal } from "../components/InstallmentModal";
 
 export default function ContractsPage() {
   const navigate = useNavigate();
@@ -15,6 +19,24 @@ export default function ContractsPage() {
   const [contractToDispatch, setContractToDispatch] = useState<Contract | null>(
     null
   );
+  const [contractSelected, setContractSelected] = useState<Contract | null>(
+    null
+  );
+  const [installments, setInstallments] = useState<ContractPayment[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleRowClick = async (contract: Contract) => {
+    setContractSelected(contract);
+    try {
+      const res = await ContractPaymentApi.getAllByContractId(contract.id);
+      console.log(res);
+
+      setInstallments(res);
+      setIsModalOpen(true);
+    } catch (err) {
+      console.error("Error al obtener cuotas:", err);
+    }
+  };
 
   const fetchContracts = async () => {
     const data = await ContractApi.getAll();
@@ -97,6 +119,14 @@ export default function ContractsPage() {
           if (selected) setContractToDelete(selected);
         }}
         onDispatch={(contract) => setContractToDispatch(contract)}
+        onRowClick={handleRowClick}
+      />
+
+      <InstallmentModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        payments={installments}
+        contractCode={contractSelected?.code}
       />
 
       <ConfirmModal

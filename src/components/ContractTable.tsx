@@ -6,6 +6,7 @@ interface Props {
   onEdit: (contract: Contract) => void;
   onDelete: (id: string) => void;
   onDispatch: (updated: Contract) => void;
+  onRowClick?: (contract: Contract) => void;
 }
 
 const translateStatus = (status: string): string => {
@@ -39,6 +40,7 @@ export const ContractTable = ({
   onEdit,
   onDelete,
   onDispatch,
+  onRowClick,
 }: Props) => {
   return (
     <div className="overflow-x-auto bg-white rounded-lg shadow">
@@ -65,7 +67,11 @@ export const ContractTable = ({
             </tr>
           ) : (
             contracts.map((contract) => (
-              <tr key={contract.id} className="border-t">
+              <tr
+                key={contract.id}
+                className="border-t hover:bg-gray-50 cursor-pointer"
+                onClick={() => onRowClick?.(contract)}
+              >
                 <td className="p-3">C#{contract.code}</td>
                 <td className="p-3 ">
                   C{contract.vendorId.code} {contract.vendorId.firstName}
@@ -110,16 +116,27 @@ export const ContractTable = ({
                   <div className="flex flex-col gap-1">
                     {!contract.startDate && (
                       <DispatchButton
-                        onClick={() =>
+                        onClick={(e) => {
+                          e.stopPropagation();
                           onDispatch({
                             ...contract,
                             startDate: new Date().toISOString(),
-                          })
-                        }
+                          });
+                        }}
                       />
                     )}
-                    <EditButton onClick={() => onEdit(contract)} />
-                    <DeleteButton onClick={() => onDelete(contract.id)} />
+                    <EditButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEdit(contract);
+                      }}
+                    />
+                    <DeleteButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(contract.id);
+                      }}
+                    />
                   </div>
                 </td>
               </tr>

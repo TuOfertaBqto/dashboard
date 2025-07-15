@@ -13,7 +13,7 @@ export const InstallmentListPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await ContractPaymentApi.getAll(); // Asegúrate que este método exista
+      const res = await ContractPaymentApi.getAll();
       setInstallments(res);
     };
     fetchData();

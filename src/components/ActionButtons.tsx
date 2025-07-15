@@ -5,7 +5,7 @@ import {
 } from "@heroicons/react/24/solid";
 
 interface ActionButtonProps {
-  onClick: () => void;
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
   label: string;
   icon: React.ReactNode;
   color?: string;
@@ -19,7 +19,7 @@ const ActionButton = ({
 }: ActionButtonProps) => {
   return (
     <button
-      onClick={onClick}
+      onClick={(e) => onClick(e)}
       className={`inline-flex items-center gap-1 text-sm ${color} hover:underline cursor-pointer`}
     >
       <span className="w-4 h-4">{icon}</span>
@@ -28,7 +28,11 @@ const ActionButton = ({
   );
 };
 
-export const EditButton = ({ onClick }: { onClick: () => void }) => (
+export const EditButton = ({
+  onClick,
+}: {
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
+}) => (
   <ActionButton
     onClick={onClick}
     label="Editar"
@@ -36,7 +40,11 @@ export const EditButton = ({ onClick }: { onClick: () => void }) => (
   />
 );
 
-export const DeleteButton = ({ onClick }: { onClick: () => void }) => (
+export const DeleteButton = ({
+  onClick,
+}: {
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
+}) => (
   <ActionButton
     onClick={onClick}
     label="Eliminar"
@@ -45,7 +53,11 @@ export const DeleteButton = ({ onClick }: { onClick: () => void }) => (
   />
 );
 
-export const DispatchButton = ({ onClick }: { onClick: () => void }) => (
+export const DispatchButton = ({
+  onClick,
+}: {
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
+}) => (
   <ActionButton
     onClick={onClick}
     label="Despachar"

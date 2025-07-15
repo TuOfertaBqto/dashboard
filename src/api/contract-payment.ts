@@ -13,7 +13,8 @@ export type ContractPayment = {
   owner: null;
   dueDate: string;
   amountPaid: null;
-  paidAt: null;
+  paidAt?: string;
+  debt?: string;
 };
 
 export type CreateContractPayment = {
@@ -58,6 +59,16 @@ export const ContractPaymentApi = {
     } catch (error) {
       console.error("Error fetching contract-payment:", error);
       return [];
+    }
+  },
+
+  getAllByContractId: async (id: string): Promise<ContractPayment[]> => {
+    try {
+      const res = await api.get(`/contract-payment/contract/${id}`);
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching contract-payment by ContractId:", error);
+      return [] as ContractPayment[];
     }
   },
 
