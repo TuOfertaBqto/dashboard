@@ -1,11 +1,11 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 interface ConfirmModalProps {
   open: boolean;
   title?: string;
   message: ReactNode;
   onCancel: () => void;
-  onConfirm: () => void;
+  onConfirm: () => Promise<void>;
   confirmText?: string;
   cancelText?: string;
 }
@@ -19,6 +19,18 @@ export const ConfirmModal = ({
   confirmText = "Sí, confirmar",
   cancelText = "Cancelar",
 }: ConfirmModalProps) => {
+  const [loading, setLoading] = useState(false);
+
+  const handleConfirm = async () => {
+    setLoading(true);
+    try {
+      await onConfirm();
+    } catch (error) {
+      console.error("Error en confirmación:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   if (!open) return null;
 
   return (
@@ -38,15 +50,21 @@ export const ConfirmModal = ({
         <div className="flex justify-end gap-3">
           <button
             onClick={onCancel}
+            disabled={loading}
             className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
           >
             {cancelText}
           </button>
           <button
-            onClick={onConfirm}
-            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            onClick={handleConfirm}
+            disabled={loading}
+            className={`px-4 py-2 rounded text-white ${
+              loading
+                ? "bg-red-400 cursor-not-allowed"
+                : "bg-red-600 hover:bg-red-700"
+            }`}
           >
-            {confirmText}
+            {loading ? "Procesando..." : confirmText}
           </button>
         </div>
       </div>
