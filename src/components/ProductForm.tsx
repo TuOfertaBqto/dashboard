@@ -4,7 +4,7 @@ import type { Category } from "../api/category";
 
 interface Props {
   initialData?: Product;
-  onSubmit: (data: CreateProduct) => void;
+  onSubmit: (data: CreateProduct) => Promise<void>;
   categories: Category[];
 }
 
@@ -15,6 +15,7 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
     price: 0,
     categoryId: "",
   });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (initialData) {
@@ -39,9 +40,16 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(form);
+    setLoading(true);
+    try {
+      await onSubmit(form);
+    } catch (error) {
+      console.error("Error al registrar:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -57,6 +65,7 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
           onChange={handleChange}
           className="w-full border p-2 rounded"
           required
+          disabled={loading}
         />
       </div>
 
@@ -67,6 +76,7 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
           value={form.description || ""}
           onChange={handleChange}
           className="w-full border p-2 rounded"
+          disabled={loading}
         />
       </div>
 
@@ -81,6 +91,7 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
           onChange={handleChange}
           className="w-full border p-2 rounded"
           required
+          disabled={loading}
         >
           <option value="">Seleccione una categoría</option>
           {categories.map((cat) => (
@@ -101,14 +112,20 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
           onChange={handleChange}
           className="w-full border p-2 rounded"
           required
+          disabled={loading}
         />
       </div>
 
       <button
         type="submit"
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        disabled={loading}
+        className={`px-4 py-2 rounded text-white ${
+          loading
+            ? "bg-blue-400 cursor-not-allowed"
+            : "bg-blue-600 hover:bg-blue-700"
+        }`}
       >
-        Guardar
+        {loading ? "Guardando..." : "Guardar"}
       </button>
     </form>
   );
