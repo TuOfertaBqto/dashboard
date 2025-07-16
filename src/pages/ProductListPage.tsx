@@ -12,11 +12,19 @@ export const ProductListPage = () => {
   const [openInventoryModal, setOpenInventoryModal] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState("");
   const [quantity, setQuantity] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const fetchProducts = async () => {
-    const res = await InventoryApi.getAll();
-    setInventory(res);
+    setLoading(true);
+    try {
+      const res = await InventoryApi.getAll();
+      setInventory(res);
+    } catch (err) {
+      console.log("Error loading inventory", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDelete = async () => {
@@ -57,6 +65,7 @@ export const ProductListPage = () => {
 
       <ProductTable
         inventory={inventory}
+        loading={loading}
         onEdit={(p) => navigate(`/products/${p.id}/edit`)}
         onDelete={(product) => setProductToDelete(product)}
       />

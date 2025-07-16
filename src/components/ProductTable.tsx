@@ -4,11 +4,17 @@ import { DeleteButton, EditButton } from "./ActionButtons";
 
 interface Props {
   inventory: Inventory[];
+  loading: boolean;
   onEdit: (product: Product) => void;
   onDelete: (p: Product) => void;
 }
 
-export const ProductTable = ({ inventory, onEdit, onDelete }: Props) => {
+export const ProductTable = ({
+  inventory,
+  loading,
+  onEdit,
+  onDelete,
+}: Props) => {
   return (
     <div className="bg-white rounded shadow overflow-x-auto">
       <table className="w-full table-auto">
@@ -24,7 +30,7 @@ export const ProductTable = ({ inventory, onEdit, onDelete }: Props) => {
           {inventory.length === 0 ? (
             <tr>
               <td colSpan={4} className="p-4 text-center text-gray-400">
-                No hay productos registrados.
+                {loading ? "Cargando..." : "No hay productos registrados."}
               </td>
             </tr>
           ) : (
