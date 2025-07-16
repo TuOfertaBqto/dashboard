@@ -1,4 +1,3 @@
-// src/pages/Login.tsx
 import { useState } from "react";
 import { Input } from "../components/Input";
 import { AuthApi } from "../api/auth";
@@ -12,6 +11,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const isDisabled = !email || !password;
 
@@ -20,6 +20,7 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMessage("");
 
     try {
       const { access_token, user } = await AuthApi.login({ email, password });
@@ -34,7 +35,11 @@ export default function Login() {
       login(access_token, user);
       navigate("/");
     } catch (err) {
-      console.error(err);
+      if (err instanceof Error) {
+        setErrorMessage(err.message);
+      } else {
+        setErrorMessage("Error al iniciar sesión");
+      }
     } finally {
       setLoading(false);
     }
@@ -79,6 +84,12 @@ export default function Login() {
         >
           {loading ? "Cargando..." : "Ingresar"}
         </button>
+
+        {errorMessage && (
+          <div className="text-red-600 bg-red-100 border border-red-300 rounded px-3 py-2 text-sm">
+            {errorMessage}
+          </div>
+        )}
       </form>
     </div>
   );

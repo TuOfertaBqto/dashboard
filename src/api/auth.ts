@@ -1,3 +1,4 @@
+import axios from "axios";
 import { api } from "./api";
 
 interface LoginPayload {
@@ -11,9 +12,17 @@ const login = async (data: LoginPayload) => {
 
     return res.data;
   } catch (error) {
-    console.log(error);
-    return { msg: "error login" };
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status;
+      throw new Error(
+        status === 401
+          ? "Credenciales incorrectas."
+          : "Error en la autenticación."
+      );
+    }
   }
+
+  throw new Error("Error de red o desconocido.");
 };
 
 export const AuthApi = {
