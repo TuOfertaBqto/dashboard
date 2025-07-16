@@ -9,17 +9,21 @@ export default function UsersPage() {
 
   const [users, setUsers] = useState<User[]>([]);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleDeleteRequest = (user: User) => {
     setUserToDelete(user);
   };
 
   const fetchUsers = async () => {
+    setLoading(true);
     try {
       const data = await userApi.getAll();
       setUsers(data);
     } catch (err) {
       console.error("Error al cargar usuarios:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -54,6 +58,7 @@ export default function UsersPage() {
 
       <UserTable
         users={users}
+        loading={loading}
         onEdit={(user) => navigate(`/users/${user.id}/edit`)}
         onDelete={(id) => {
           const user = users.find((u) => u.id === id);

@@ -2,11 +2,12 @@ import type { User } from "../api/user";
 
 interface Props {
   users: User[];
+  loading: boolean;
   onEdit: (user: User) => void;
   onDelete: (id: string) => void;
 }
 
-export const UserTable = ({ users, onEdit, onDelete }: Props) => {
+export const UserTable = ({ users, loading, onEdit, onDelete }: Props) => {
   return (
     <div className="overflow-x-auto bg-white rounded-lg shadow">
       <table className="w-full table-auto">
@@ -23,13 +24,15 @@ export const UserTable = ({ users, onEdit, onDelete }: Props) => {
           {users.length === 0 ? (
             <tr>
               <td colSpan={5} className="text-center py-6 text-gray-400">
-                No hay usuarios registrados.
+                {loading ? "Cargando..." : "No hay usuarios registrados."}
               </td>
             </tr>
           ) : (
             users.map((user) => (
               <tr key={user.id} className="border-t">
-                <td className="p-3 w-[75px]">{user.code ? `C${user.code}` : ""}</td>
+                <td className="p-3 w-[75px]">
+                  {user.code ? `C${user.code}` : ""}
+                </td>
                 <td className="p-3">
                   {user.firstName} {user.lastName}
                 </td>
