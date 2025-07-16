@@ -6,7 +6,7 @@ export default function UserFormPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = !!id;
-
+  const [loading, setLoading] = useState<boolean>(false);
   const [form, setForm] = useState<Partial<User>>({
     firstName: "",
     lastName: "",
@@ -35,6 +35,7 @@ export default function UserFormPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       if (isEdit) {
@@ -63,6 +64,8 @@ export default function UserFormPage() {
       navigate("/users");
     } catch (err) {
       console.error("Error al guardar usuario:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -148,6 +151,7 @@ export default function UserFormPage() {
               value={form.adress}
               onChange={handleChange}
               className="w-full border p-2 rounded"
+              required
             />
           </div>
         </div>
@@ -157,14 +161,20 @@ export default function UserFormPage() {
             type="button"
             onClick={() => navigate("/users")}
             className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+            disabled={loading}
           >
             Cancelar
           </button>
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            disabled={loading}
+            className={`px-4 py-2 rounded text-white ${
+              loading
+                ? "bg-blue-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
           >
-            Guardar
+            {loading ? "Guardando..." : "Guardar"}
           </button>
         </div>
       </form>
