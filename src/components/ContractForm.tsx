@@ -155,7 +155,8 @@ export const ContractForm = ({
               name="startDate"
               value={form.startDate || ""}
               onChange={handleChange}
-              className="w-full border p-2 rounded"
+              className="w-full border p-2 rounded disabled:opacity-70 disabled:cursor-not-allowed disabled:bg-gray-100"
+              disabled
             />
           </div>
 

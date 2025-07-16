@@ -28,7 +28,13 @@ export type CreateContractPayment = {
 export type UpdateContractPayment = {
   contract?: string;
 
-  paymentMethod: "zelle" | "mobile_payment" | "bank_transfer" | "cash";
+  paymentMethod:
+    | "binance"
+    | "paypal"
+    | "zelle"
+    | "mobile_payment"
+    | "bank_transfer"
+    | "cash";
 
   referenceNumber: number;
 

@@ -43,6 +43,7 @@ export const InstallmentModal = ({
                 <th className="p-2">Fecha de vencimiento</th>
                 <th className="p-2">Monto</th>
                 <th className="p-2">Pagado</th>
+                <th className="p-2">Tipo</th>
                 <th className="p-2">Fecha de pago</th>
                 <th className="p-2">Saldo</th>
               </tr>
@@ -56,6 +57,7 @@ export const InstallmentModal = ({
                   <td className="p-2">
                     {p.amountPaid ? `$${p.amountPaid}` : "—"}
                   </td>
+                  <td className="p-2">{p.paymentMethod}</td>
                   <td className="p-2">
                     {p.paidAt ? p.paidAt.split("T")[0] : "—"}
                   </td>

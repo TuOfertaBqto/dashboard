@@ -120,6 +120,8 @@ export const InstallmentPaymentPage = () => {
           >
             <option value="">Seleccione</option>
             <option value="zelle">Zelle</option>
+            <option value="binance">Binance</option>
+            <option value="paypal">Paypal</option>
             <option value="mobile_payment">Pago móvil</option>
             <option value="bank_transfer">Transferencia</option>
             <option value="cash">Efectivo</option>
