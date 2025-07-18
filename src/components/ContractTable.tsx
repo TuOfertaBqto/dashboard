@@ -110,7 +110,7 @@ export const ContractTable = ({
                     </div>
                   ))}
                 </td>
-                <td className="p-3">{contract.totalPrice}</td>
+                <td className="p-3">${contract.totalPrice}</td>
                 <td className="p-3">{contract.startDate?.split("T")[0]}</td>
                 <td className="p-3">
                   <div className="flex flex-col gap-1">
