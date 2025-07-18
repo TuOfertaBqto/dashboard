@@ -9,12 +9,20 @@ import { useNavigate } from "react-router-dom";
 
 export const InstallmentListPage = () => {
   const [installments, setInstallments] = useState<ContractPayment[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await ContractPaymentApi.getAll();
-      setInstallments(res);
+      setLoading(true);
+      try {
+        const res = await ContractPaymentApi.getAll();
+        setInstallments(res);
+      } catch (err) {
+        console.log("Error loading installments", err);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchData();
   }, []);
@@ -32,7 +40,7 @@ export const InstallmentListPage = () => {
     <div className="space-y-6">
       <h1 className="text-xl font-semibold">Cuotas por cobrar</h1>
 
-      <div className="bg-white rounded shadow p-4 overflow-auto">
+      <div className="bg-white rounded shadow overflow-auto">
         <table className="w-full table-auto">
           <thead className="bg-gray-100 text-gray-700">
             <tr>
@@ -44,49 +52,53 @@ export const InstallmentListPage = () => {
             </tr>
           </thead>
           <tbody>
-            {installments.map((i) => (
-              <tr key={i.id} className="border-t">
-                <td className="p-3">#{i.contract.code}</td>
-                <td className="p-3">
-                  $
-                  {Math.min(
-                    i.contract.installmentAmount,
-                    parseFloat(i.debt?.toString() ?? "0")
-                  )}
-                </td>
-                <td className="p-3">{dayjs(i.dueDate).format("DD/MM/YYYY")}</td>
-                <td className="p-3">
-                  <span
-                    className={classNames(
-                      "text-sm px-2 py-1 rounded font-medium",
-                      getDueDateColor(i.dueDate)
-                    )}
-                  >
-                    {dayjs(i.dueDate).isBefore(dayjs(), "day")
-                      ? "Vencida"
-                      : dayjs(i.dueDate).isSame(dayjs(), "day")
-                      ? "Vence hoy"
-                      : "Pendiente"}
-                  </span>
-                </td>
-                <td>
-                  <button
-                    onClick={() => navigate(`/installments/${i.id}/pay`)}
-                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm"
-                  >
-                    Registrar pago
-                  </button>
+            {installments.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="text-center py-6 text-gray-400">
+                  {loading ? "Cargando..." : "No hay cuotas pendientes."}
                 </td>
               </tr>
-            ))}
+            ) : (
+              installments.map((i) => (
+                <tr key={i.id} className="border-t">
+                  <td className="p-3">#{i.contract.code}</td>
+                  <td className="p-3">
+                    $
+                    {Math.min(
+                      i.contract.installmentAmount,
+                      parseFloat(i.debt?.toString() ?? "0")
+                    )}
+                  </td>
+                  <td className="p-3">
+                    {dayjs(i.dueDate).format("DD/MM/YYYY")}
+                  </td>
+                  <td className="p-3">
+                    <span
+                      className={classNames(
+                        "text-sm px-2 py-1 rounded font-medium",
+                        getDueDateColor(i.dueDate)
+                      )}
+                    >
+                      {dayjs(i.dueDate).isBefore(dayjs(), "day")
+                        ? "Vencida"
+                        : dayjs(i.dueDate).isSame(dayjs(), "day")
+                        ? "Vence hoy"
+                        : "Pendiente"}
+                    </span>
+                  </td>
+                  <td>
+                    <button
+                      onClick={() => navigate(`/installments/${i.id}/pay`)}
+                      className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm"
+                    >
+                      Registrar pago
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
-
-        {installments.length === 0 && (
-          <div className="text-center text-gray-500 py-6">
-            No hay cuotas pendientes.
-          </div>
-        )}
       </div>
     </div>
   );
