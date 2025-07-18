@@ -47,14 +47,15 @@ export const ContractTable = ({
       <table className="w-full table-auto">
         <thead className="bg-gray-100 text-gray-700 text-left">
           <tr>
-            <th className="p-3">Cod</th>
+            <th className="p-2">Cod</th>
             <th className="p-3">Vendedor</th>
             <th className="p-3">Cliente</th>
             <th className="p-3">Producto</th>
-            <th className="p-3">Cant.</th>
+            <th className="p-2">Cant.</th>
             <th className="p-3">Status</th>
-            <th className="p-3">Precio Total</th>
-            <th className="p-3">Fecha despacho</th>
+            <th className="p-2">Precio Total</th>
+            <th className="p-2">Fecha despacho</th>
+            <th className="p-2">Fecha culminación</th>
             <th className="p-3">Acciones</th>
           </tr>
         </thead>
@@ -72,7 +73,7 @@ export const ContractTable = ({
                 className="border-t hover:bg-gray-50 cursor-pointer"
                 onClick={() => onRowClick?.(contract)}
               >
-                <td className="p-3">C#{contract.code}</td>
+                <td className="p-2">C#{contract.code}</td>
                 <td className="p-3 ">
                   C{contract.vendorId.code} {contract.vendorId.firstName}
                 </td>
@@ -86,7 +87,7 @@ export const ContractTable = ({
                     ))}
                   </ul>
                 </td>
-                <td className="p-3">
+                <td className="p-2">
                   <ul className="space-y-1">
                     {contract.products.map((cp) => (
                       <li
@@ -110,8 +111,9 @@ export const ContractTable = ({
                     </div>
                   ))}
                 </td>
-                <td className="p-3">${contract.totalPrice}</td>
-                <td className="p-3">{contract.startDate?.split("T")[0]}</td>
+                <td className="p-2">${contract.totalPrice}</td>
+                <td className="p-2">{contract.startDate?.split("T")[0]}</td>
+                <td className="p-2">{contract.endDate?.split("T")[0]}</td>
                 <td className="p-3">
                   <div className="flex flex-col gap-1">
                     {!contract.startDate && (
