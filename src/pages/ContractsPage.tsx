@@ -126,7 +126,7 @@ export default function ContractsPage() {
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         payments={installments}
-        contractCode={contractSelected?.code}
+        contract={contractSelected}
       />
 
       <ConfirmModal
