@@ -15,6 +15,10 @@ export const InstallmentModal = ({
   contract,
 }: Props) => {
   if (!open) return null;
+  const baseInstallmentAmount = contract?.installmentAmount ?? 0;
+  const total = contract?.totalPrice ?? 0;
+  const numPayments = payments.length;
+  let accumulated = 0;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -111,21 +115,31 @@ export const InstallmentModal = ({
                 </tr>
               </thead>
               <tbody>
-                {payments.map((p, index) => (
-                  <tr key={p.id} className="border-t">
-                    <td className="p-2">{index + 1}</td>
-                    <td className="p-2">{p.dueDate.split("T")[0]}</td>
-                    <td className="p-2">${p.contract.installmentAmount}</td>
-                    <td className="p-2">
-                      {p.amountPaid ? `$${p.amountPaid}` : "—"}
-                    </td>
-                    <td className="p-2">{p.paymentMethod}</td>
-                    <td className="p-2">
-                      {p.paidAt ? p.paidAt.split("T")[0] : "—"}
-                    </td>
-                    <td className="p-2">{p.debt ? "$" + p.debt : ""}</td>
-                  </tr>
-                ))}
+                {payments.map((p, index) => {
+                  let amount = baseInstallmentAmount;
+
+                  if (index === numPayments - 1) {
+                    amount = total - accumulated;
+                  }
+
+                  accumulated += amount;
+
+                  return (
+                    <tr key={p.id} className="border-t">
+                      <td className="p-2">{index + 1}</td>
+                      <td className="p-2">{p.dueDate.split("T")[0]}</td>
+                      <td className="p-2">${amount}</td>
+                      <td className="p-2">
+                        {p.amountPaid ? `$${p.amountPaid}` : "—"}
+                      </td>
+                      <td className="p-2">{p.paymentMethod}</td>
+                      <td className="p-2">
+                        {p.paidAt ? p.paidAt.split("T")[0] : "—"}
+                      </td>
+                      <td className="p-2">{p.debt ? "$" + p.debt : ""}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
