@@ -75,7 +75,6 @@ export const InstallmentPaymentPage = () => {
         paidAt: payload.paidAt,
       });
       navigate("/installments");
-      console.log("datos que se envian", payload, id);
     } catch (error) {
       console.error("Error al registrar pago:", error);
     }
