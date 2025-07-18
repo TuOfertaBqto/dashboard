@@ -24,6 +24,7 @@ export default function ContractsPage() {
   );
   const [installments, setInstallments] = useState<ContractPayment[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleRowClick = async (contract: Contract) => {
     setContractSelected(contract);
@@ -39,8 +40,15 @@ export default function ContractsPage() {
   };
 
   const fetchContracts = async () => {
-    const data = await ContractApi.getAll();
-    setContracts(data);
+    setLoading(true);
+    try {
+      const data = await ContractApi.getAll();
+      setContracts(data);
+    } catch (err) {
+      console.log("Error loading contract", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -113,6 +121,7 @@ export default function ContractsPage() {
 
       <ContractTable
         contracts={contracts}
+        loading={loading}
         onEdit={(contract) => navigate(`/contracts/${contract.id}/edit`)}
         onDelete={(id) => {
           const selected = contracts.find((c) => c.id === id);

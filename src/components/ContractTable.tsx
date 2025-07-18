@@ -3,6 +3,7 @@ import { DeleteButton, DispatchButton, EditButton } from "./ActionButtons";
 
 interface Props {
   contracts: Contract[];
+  loading: boolean;
   onEdit: (contract: Contract) => void;
   onDelete: (id: string) => void;
   onDispatch: (updated: Contract) => void;
@@ -37,6 +38,7 @@ const statusStyles = (status: string): string => {
 
 export const ContractTable = ({
   contracts,
+  loading,
   onEdit,
   onDelete,
   onDispatch,
@@ -62,8 +64,8 @@ export const ContractTable = ({
         <tbody>
           {contracts.length === 0 ? (
             <tr>
-              <td colSpan={8} className="text-center py-6 text-gray-400">
-                No hay contratos registrados.
+              <td colSpan={10} className="text-center py-6 text-gray-400">
+                {loading ? "Cargando..." : "No hay contratos registrados."}
               </td>
             </tr>
           ) : (
