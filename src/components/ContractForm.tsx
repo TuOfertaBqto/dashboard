@@ -6,7 +6,7 @@ import type { Product } from "../api/product";
 
 interface Props {
   initialData?: Contract | null;
-  onSubmit: (data: CreateContract) => void;
+  onSubmit: (data: CreateContract) => Promise<void>;
   vendors?: User[];
   customers?: User[];
   products?: Product[];
@@ -20,6 +20,7 @@ export const ContractForm = ({
   products = [],
 }: Props) => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState<CreateContract>({
     vendorId: "",
@@ -76,9 +77,16 @@ export const ContractForm = ({
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(form);
+    setLoading(true);
+    try {
+      await onSubmit(form);
+    } catch (error) {
+      console.error("Error to create contract:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -339,6 +347,7 @@ export const ContractForm = ({
         <div className="flex justify-end gap-2">
           <button
             type="button"
+            disabled={loading}
             onClick={() => navigate("/contracts")}
             className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
           >
@@ -346,9 +355,14 @@ export const ContractForm = ({
           </button>
           <button
             type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            disabled={loading}
+            className={`px-4 py-2 rounded text-white ${
+              loading
+                ? "bg-blue-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
           >
-            Guardar
+            {loading ? "Guardando..." : "Guardar"}
           </button>
         </div>
       </div>
