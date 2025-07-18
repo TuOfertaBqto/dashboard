@@ -47,7 +47,13 @@ export const InstallmentListPage = () => {
             {installments.map((i) => (
               <tr key={i.id} className="border-t">
                 <td className="p-3">#{i.contract.code}</td>
-                <td className="p-3">${i.contract.installmentAmount}</td>
+                <td className="p-3">
+                  $
+                  {Math.min(
+                    i.contract.installmentAmount,
+                    parseFloat(i.debt?.toString() ?? "0")
+                  )}
+                </td>
                 <td className="p-3">{dayjs(i.dueDate).format("DD/MM/YYYY")}</td>
                 <td className="p-3">
                   <span
