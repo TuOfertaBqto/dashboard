@@ -10,6 +10,7 @@ export const InstallmentPaymentPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [payment, setPayment] = useState<ContractPayment | null>(null);
+  const [loading, setLoading] = useState(false);
   const [, setPhoto] = useState<File | null>(null);
 
   const [form, setForm] = useState<UpdateContractPayment>({
@@ -58,6 +59,7 @@ export const InstallmentPaymentPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
 
     const payload: UpdateContractPayment = {
       ...form,
@@ -77,6 +79,8 @@ export const InstallmentPaymentPage = () => {
       navigate("/installments");
     } catch (error) {
       console.error("Error al registrar pago:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -175,6 +179,7 @@ export const InstallmentPaymentPage = () => {
         <div className="flex justify-end gap-2">
           <button
             type="button"
+            disabled={loading}
             onClick={() => navigate("/installments")}
             className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
           >
@@ -182,9 +187,14 @@ export const InstallmentPaymentPage = () => {
           </button>
           <button
             type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            disabled={loading}
+            className={`px-4 py-2 rounded text-white ${
+              loading
+                ? "bg-blue-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
           >
-            Guardar pago
+            {loading ? "Guardando..." : "Guardar pago"}
           </button>
         </div>
       </form>
