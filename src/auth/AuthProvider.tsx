@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.setItem("user", JSON.stringify(newUser));
   };
 
-  const logout = () => {
+  const logout = async () => {
     setToken(null);
     setUser(null);
     localStorage.clear();
