@@ -93,7 +93,7 @@ export const Sidebar = () => {
 
   return (
     <aside
-      className={`h-screen transition-all duration-300 ease-out bg-[#1f2937] text-white ${
+      className={`h-screen flex flex-col transition-all duration-300 ease-out bg-[#1f2937] text-white ${
         isOpen ? "w-64" : "w-20"
       }`}
     >
@@ -159,7 +159,7 @@ export const Sidebar = () => {
       </nav>
 
       {/* Otros */}
-      <nav className="mt-8 px-2">
+      <nav className="px-2 mt-auto mb-4">
         {otherMenuItems.map((item) => (
           <div
             key={item.name}
