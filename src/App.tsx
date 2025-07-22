@@ -36,12 +36,12 @@ function App() {
             <Route path="contracts" element={<ContractsPage />} />
             <Route path="contracts/new" element={<ContractFormPage />} />
             <Route path="contracts/:id/edit" element={<ContractFormPage />} />
-            <Route path="/products" element={<ProductListPage />} />
-            <Route path="/products/new" element={<ProductFormPage />} />
-            <Route path="/products/:id/edit" element={<ProductFormPage />} />
-            <Route path="/installments" element={<InstallmentListPage />} />
+            <Route path="products" element={<ProductListPage />} />
+            <Route path="products/new" element={<ProductFormPage />} />
+            <Route path="products/:id/edit" element={<ProductFormPage />} />
+            <Route path="installments" element={<InstallmentListPage />} />
             <Route
-              path="/installments/:id/pay"
+              path="installments/:id/pay"
               element={<InstallmentPaymentPage />}
             />
 
