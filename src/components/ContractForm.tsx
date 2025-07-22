@@ -3,6 +3,7 @@ import type { Contract, CreateContract } from "../api/contract";
 import type { User } from "../api/user";
 import { useNavigate } from "react-router-dom";
 import type { Product } from "../api/product";
+import Select from "react-select";
 
 interface Props {
   initialData?: Contract | null;
@@ -21,6 +22,16 @@ export const ContractForm = ({
 }: Props) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+
+  const vendorOptions = vendors.map((v) => ({
+    value: v.id,
+    label: `C${v.code} ${v.firstName} ${v.lastName}`,
+  }));
+
+  const customerOptions = customers.map((c) => ({
+    value: c.id,
+    label: `${c.documentId} ${c.firstName} ${c.lastName}`,
+  }));
 
   const [form, setForm] = useState<CreateContract>({
     vendorId: "",
@@ -68,12 +79,24 @@ export const ContractForm = ({
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
+
+    if (name === "installmentAmount" || name === "totalPrice") {
+      const intValue = parseInt(value, 10);
+
+      // Permite borrar el input o ingresar solo valores válidos mayores a 0
+      if (value === "" || (!isNaN(intValue) && intValue > 0)) {
+        setForm((prev) => ({
+          ...prev,
+          [name]: value === "" ? "" : intValue,
+        }));
+      }
+
+      return;
+    }
+
     setForm((prev) => ({
       ...prev,
-      [name]:
-        name === "installmentAmount" || name === "totalPrice"
-          ? parseInt(value)
-          : value,
+      [name]: value,
     }));
   };
 
@@ -97,21 +120,19 @@ export const ContractForm = ({
           <label htmlFor="vendorId" className="block text-sm mb-1">
             Vendedor
           </label>
-          <select
+          <Select
             id="vendorId"
-            name="vendorId"
-            value={form.vendorId}
-            onChange={handleChange}
-            className="w-full border p-2 rounded"
+            options={vendorOptions}
+            value={vendorOptions.find((opt) => opt.value === form.vendorId)}
+            onChange={(selected) =>
+              setForm((prev) => ({ ...prev, vendorId: selected?.value || "" }))
+            }
+            className="react-select-container"
+            classNamePrefix="react-select"
+            placeholder="Seleccione un vendedor"
+            isClearable
             required
-          >
-            <option value="">Seleccione un vendedor</option>
-            {vendors.map((v) => (
-              <option key={v.id} value={v.id}>
-                {v.firstName} {v.lastName}
-              </option>
-            ))}
-          </select>
+          />
         </div>
 
         {/* Cliente */}
@@ -119,21 +140,22 @@ export const ContractForm = ({
           <label htmlFor="customerId" className="block text-sm mb-1">
             Cliente
           </label>
-          <select
+          <Select
             id="customerId"
-            name="customerId"
-            value={form.customerId}
-            onChange={handleChange}
-            className="w-full border p-2 rounded"
+            options={customerOptions}
+            value={customerOptions.find((opt) => opt.value === form.customerId)}
+            onChange={(selected) =>
+              setForm((prev) => ({
+                ...prev,
+                customerId: selected?.value || "",
+              }))
+            }
+            className="react-select-container"
+            classNamePrefix="react-select"
+            placeholder="Seleccione un cliente"
+            isClearable
             required
-          >
-            <option value="">Seleccione un cliente</option>
-            {customers.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.firstName} {c.lastName}
-              </option>
-            ))}
-          </select>
+          />
         </div>
 
         {/* Fechas */}
@@ -193,12 +215,14 @@ export const ContractForm = ({
             <input
               id="installmentAmount"
               type="number"
-              step="0.01"
               name="installmentAmount"
               value={form.installmentAmount}
               onChange={handleChange}
-              className="w-full border p-2 rounded"
+              onWheel={(e) => e.currentTarget.blur()}
+              min={1}
+              step={1}
               required
+              className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             />
           </div>
           <div>
@@ -264,12 +288,23 @@ export const ContractForm = ({
                   </label>
                   <input
                     type="number"
-                    min="0"
-                    className="w-full border p-2 rounded"
-                    value={p.quantity}
+                    min="1"
+                    step="1"
+                    className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                    value={p.quantity === 0 ? "" : p.quantity}
+                    onWheel={(e) => e.currentTarget.blur()}
                     onChange={(e) => {
+                      const value = e.target.value;
+                      const intValue = parseInt(value, 10);
+
                       const updated = [...form.products];
-                      updated[index].quantity = parseInt(e.target.value);
+
+                      if (value === "") {
+                        updated[index].quantity = 0;
+                      } else if (!isNaN(intValue) && intValue > 0) {
+                        updated[index].quantity = intValue;
+                      }
+
                       setForm({ ...form, products: updated });
                     }}
                     required

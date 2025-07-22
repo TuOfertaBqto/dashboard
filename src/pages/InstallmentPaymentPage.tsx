@@ -28,7 +28,6 @@ export const InstallmentPaymentPage = () => {
       ContractPaymentApi.getById(id)
         .then((data) => {
           setPayment(data);
-          console.log(data);
 
           setForm((prev) => ({
             ...prev,

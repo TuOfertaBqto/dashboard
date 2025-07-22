@@ -69,19 +69,17 @@ export const InstallmentListPage = () => {
                       parseFloat(i.debt?.toString() ?? "0")
                     )}
                   </td>
-                  <td className="p-3">
-                    {dayjs(i.dueDate).format("DD/MM/YYYY")}
-                  </td>
+                  <td className="p-3">{i.dueDate.split("T")[0]}</td>
                   <td className="p-3">
                     <span
                       className={classNames(
                         "text-sm px-2 py-1 rounded font-medium",
-                        getDueDateColor(i.dueDate)
+                        getDueDateColor(i.dueDate.split("T")[0])
                       )}
                     >
-                      {dayjs(i.dueDate).isBefore(dayjs(), "day")
+                      {dayjs(i.dueDate.split("T")[0]).isBefore(dayjs(), "day")
                         ? "Vencida"
-                        : dayjs(i.dueDate).isSame(dayjs(), "day")
+                        : dayjs(i.dueDate.split("T")[0]).isSame(dayjs(), "day")
                         ? "Vence hoy"
                         : "Pendiente"}
                     </span>

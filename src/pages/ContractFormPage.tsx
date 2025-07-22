@@ -62,8 +62,6 @@ export default function ContractFormPage() {
           })
         );
 
-        console.log(data);
-
         await ContractApi.create(data);
       }
 
