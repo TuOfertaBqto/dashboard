@@ -30,7 +30,6 @@ export default function ContractsPage() {
     setContractSelected(contract);
     try {
       const res = await ContractPaymentApi.getAllByContractId(contract.id);
-      console.log(res);
 
       setInstallments(res);
       setIsModalOpen(true);
@@ -98,8 +97,6 @@ export default function ContractsPage() {
       });
 
       fetchContracts();
-
-      console.log("Despachando contrato:", contractToDispatch);
     } catch (error) {
       console.error("Error al despachar contrato:", error);
     } finally {
