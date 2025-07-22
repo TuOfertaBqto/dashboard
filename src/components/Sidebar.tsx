@@ -13,6 +13,7 @@ import {
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/useAuth";
+import { ConfirmModal } from "./ConfirmModal";
 
 interface SubMenuItem {
   name: string;
@@ -30,6 +31,7 @@ interface MenuItem {
 export const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
+  const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
   const { logout, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -164,15 +166,22 @@ export const Sidebar = () => {
           <div
             key={item.name}
             className={`flex items-center gap-3 p-2 cursor-pointer rounded-md hover:bg-gray-700 ${item.color}`}
-            onClick={() => {
-              logout();
-              navigate("/login");
-            }}
+            onClick={() => setShowLogoutModal(true)}
           >
             {item.icon}
             {isOpen && <span>{item.name}</span>}
           </div>
         ))}
+        <ConfirmModal
+          open={showLogoutModal}
+          title="Cerrar sesión"
+          message="¿Estás seguro de que deseas cerrar sesión?"
+          onCancel={() => setShowLogoutModal(false)}
+          onConfirm={async () => {
+            logout();
+            navigate("/login");
+          }}
+        />
       </nav>
     </aside>
   );

@@ -39,7 +39,7 @@ export const ConfirmModal = ({
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
 
       {/* Contenido del modal */}
-      <div className="relative z-10 bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+      <div className="relative z-10 bg-white text-black rounded-lg shadow-lg p-6 w-full max-w-md">
         <h2 className="text-xl font-semibold mb-4">{title}</h2>
         {typeof message === "string" ? (
           <p className="text-gray-700 mb-6">{message}</p>
