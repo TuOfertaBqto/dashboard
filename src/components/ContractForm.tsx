@@ -79,12 +79,24 @@ export const ContractForm = ({
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
+
+    if (name === "installmentAmount" || name === "totalPrice") {
+      const intValue = parseInt(value, 10);
+
+      // Permite borrar el input o ingresar solo valores válidos mayores a 0
+      if (value === "" || (!isNaN(intValue) && intValue > 0)) {
+        setForm((prev) => ({
+          ...prev,
+          [name]: value === "" ? "" : intValue,
+        }));
+      }
+
+      return;
+    }
+
     setForm((prev) => ({
       ...prev,
-      [name]:
-        name === "installmentAmount" || name === "totalPrice"
-          ? parseInt(value)
-          : value,
+      [name]: value,
     }));
   };
 
@@ -92,9 +104,7 @@ export const ContractForm = ({
     e.preventDefault();
     setLoading(true);
     try {
-      console.log("este es el form: ", form);
-
-      //await onSubmit(form);
+      await onSubmit(form);
     } catch (error) {
       console.error("Error to create contract:", error);
     } finally {
@@ -205,12 +215,14 @@ export const ContractForm = ({
             <input
               id="installmentAmount"
               type="number"
-              step="0.01"
               name="installmentAmount"
               value={form.installmentAmount}
               onChange={handleChange}
-              className="w-full border p-2 rounded"
+              onWheel={(e) => e.currentTarget.blur()}
+              min={1}
+              step={1}
               required
+              className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             />
           </div>
           <div>
@@ -276,12 +288,23 @@ export const ContractForm = ({
                   </label>
                   <input
                     type="number"
-                    min="0"
-                    className="w-full border p-2 rounded"
-                    value={p.quantity}
+                    min="1"
+                    step="1"
+                    className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                    value={p.quantity === 0 ? "" : p.quantity}
+                    onWheel={(e) => e.currentTarget.blur()}
                     onChange={(e) => {
+                      const value = e.target.value;
+                      const intValue = parseInt(value, 10);
+
                       const updated = [...form.products];
-                      updated[index].quantity = parseInt(e.target.value);
+
+                      if (value === "") {
+                        updated[index].quantity = 0;
+                      } else if (!isNaN(intValue) && intValue > 0) {
+                        updated[index].quantity = intValue;
+                      }
+
                       setForm({ ...form, products: updated });
                     }}
                     required
