@@ -13,6 +13,7 @@ import {
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/useAuth";
+import { ConfirmModal } from "./ConfirmModal";
 
 interface SubMenuItem {
   name: string;
@@ -30,6 +31,7 @@ interface MenuItem {
 export const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
+  const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
   const { logout, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -41,11 +43,6 @@ export const Sidebar = () => {
   const handleNavigation = (route: string) => navigate(route);
 
   const generalMenuItems: MenuItem[] = [
-    {
-      name: "Dashboard",
-      icon: <SquaresPlusIcon className="h-5 w-5" />,
-      route: "/",
-    },
     {
       name: "Pagos",
       icon: <CurrencyDollarIcon className="h-5 w-5" />,
@@ -80,6 +77,14 @@ export const Sidebar = () => {
     });
   }
 
+  if (userRole === "main") {
+    generalMenuItems.unshift({
+      name: "Dashboard",
+      icon: <SquaresPlusIcon className="h-5 w-5" />,
+      route: "/",
+    });
+  }
+
   const otherMenuItems: MenuItem[] = [
     {
       name: "Cerrar sesión",
@@ -93,7 +98,7 @@ export const Sidebar = () => {
 
   return (
     <aside
-      className={`h-screen transition-all duration-300 ease-out bg-[#1f2937] text-white ${
+      className={`h-screen flex flex-col transition-all duration-300 ease-out bg-[#1f2937] text-white ${
         isOpen ? "w-64" : "w-20"
       }`}
     >
@@ -159,20 +164,27 @@ export const Sidebar = () => {
       </nav>
 
       {/* Otros */}
-      <nav className="mt-8 px-2">
+      <nav className="px-2 mt-auto mb-4">
         {otherMenuItems.map((item) => (
           <div
             key={item.name}
             className={`flex items-center gap-3 p-2 cursor-pointer rounded-md hover:bg-gray-700 ${item.color}`}
-            onClick={() => {
-              logout();
-              navigate("/login");
-            }}
+            onClick={() => setShowLogoutModal(true)}
           >
             {item.icon}
             {isOpen && <span>{item.name}</span>}
           </div>
         ))}
+        <ConfirmModal
+          open={showLogoutModal}
+          title="Cerrar sesión"
+          message="¿Estás seguro de que deseas cerrar sesión?"
+          onCancel={() => setShowLogoutModal(false)}
+          onConfirm={async () => {
+            logout();
+            navigate("/login");
+          }}
+        />
       </nav>
     </aside>
   );

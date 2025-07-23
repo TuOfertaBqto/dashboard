@@ -36,13 +36,13 @@ export type UpdateContractPayment = {
     | "bank_transfer"
     | "cash";
 
-  referenceNumber: number;
+  referenceNumber?: number | string;
 
   photo?: string | null;
 
   owner?: string;
 
-  amountPaid: number;
+  amountPaid: number | string;
 
   paidAt: string;
 };

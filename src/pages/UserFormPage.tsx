@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { userApi, type User } from "../api/user";
+import { useAuth } from "../auth/useAuth";
 
 export default function UserFormPage() {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = !!id;
@@ -119,9 +121,13 @@ export default function UserFormPage() {
               className="w-full border p-2 rounded"
               required
             >
-              <option value="main">Main</option>
-              <option value="super_admin">Super Admin</option>
-              <option value="admin">Admin</option>
+              {user?.role === "main" && (
+                <>
+                  <option value="main">Main</option>
+                  <option value="super_admin">Super Admin</option>
+                  <option value="admin">Admin</option>
+                </>
+              )}
               <option value="vendor">Vendedor</option>
               <option value="customer">Cliente</option>
             </select>
@@ -142,6 +148,7 @@ export default function UserFormPage() {
               value={form.documentId}
               onChange={handleChange}
               className="w-full border p-2 rounded"
+              required
             />
           </div>
           <div className="md:col-span-2">
