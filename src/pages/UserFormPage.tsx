@@ -148,6 +148,7 @@ export default function UserFormPage() {
               value={form.documentId}
               onChange={handleChange}
               className="w-full border p-2 rounded"
+              required
             />
           </div>
           <div className="md:col-span-2">
