@@ -127,7 +127,7 @@ export const ContractForm = ({
             onChange={(selected) =>
               setForm((prev) => ({ ...prev, vendorId: selected?.value || "" }))
             }
-            className="react-select-container"
+            className="react-select-container border rounded"
             classNamePrefix="react-select"
             placeholder="Seleccione un vendedor"
             isClearable
@@ -150,7 +150,7 @@ export const ContractForm = ({
                 customerId: selected?.value || "",
               }))
             }
-            className="react-select-container"
+            className="react-select-container border rounded"
             classNamePrefix="react-select"
             placeholder="Seleccione un cliente"
             isClearable
@@ -268,7 +268,7 @@ export const ContractForm = ({
                       updated[index].productId = e.target.value;
                       setForm({ ...form, products: updated });
                     }}
-                    className="w-full border p-2 rounded"
+                    className="w-full border p-2 rounded cursor-pointer"
                     required
                   >
                     <option value="">Seleccione un producto</option>
@@ -332,7 +332,7 @@ export const ContractForm = ({
                       updated.splice(index, 1);
                       setForm({ ...form, products: updated });
                     }}
-                    className="text-red-600 hover:text-red-800 text-sm"
+                    className="text-red-600 hover:text-red-800 text-sm cursor-pointer"
                   >
                     🗑️
                   </button>
@@ -345,7 +345,7 @@ export const ContractForm = ({
           <div>
             <button
               type="button"
-              className="text-blue-600 hover:underline text-sm"
+              className="text-blue-600 hover:underline text-sm cursor-pointer"
               onClick={() =>
                 setForm({
                   ...form,
@@ -383,7 +383,7 @@ export const ContractForm = ({
             type="button"
             disabled={loading}
             onClick={() => navigate("/contracts")}
-            className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+            className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400 cursor-pointer"
           >
             Cancelar
           </button>
@@ -393,7 +393,7 @@ export const ContractForm = ({
             className={`px-4 py-2 rounded text-white ${
               loading
                 ? "bg-blue-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
+                : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
             }`}
           >
             {loading ? "Guardando..." : "Guardar"}
