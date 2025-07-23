@@ -9,6 +9,8 @@ import { ContractForm } from "../components/ContractForm";
 import { userApi, type User } from "../api/user";
 import { ProductApi, type Product } from "../api/product";
 import { InventoryApi } from "../api/inventory";
+import { InventoryMovApi } from "../api/inventory-movement";
+import { ContractPaymentApi } from "../api/contract-payment";
 
 export default function ContractFormPage() {
   const { id } = useParams();
@@ -48,6 +50,7 @@ export default function ContractFormPage() {
   }, [id]);
 
   const handleSubmit = async (data: CreateContract) => {
+    let contractToDispatch: Contract | null = null;
     try {
       if (id) {
         await ContractApi.update(id, data);
@@ -62,7 +65,35 @@ export default function ContractFormPage() {
           })
         );
 
-        await ContractApi.create(data);
+        contractToDispatch = await ContractApi.create(data);
+      }
+
+      if (data.startDate && contractToDispatch) {
+        for (const p of contractToDispatch.products) {
+          if (p.status === "to_buy") {
+            await InventoryMovApi.create({
+              productId: p.product.id,
+              quantity: p.quantity,
+              type: "in",
+            });
+          }
+
+          await InventoryMovApi.create({
+            productId: p.product.id,
+            quantity: p.quantity,
+            type: "out",
+          });
+
+          await ContractApi.updateProducts(p.id, "dispatched");
+        }
+
+        await ContractPaymentApi.create({
+          contractId: contractToDispatch.id,
+          agreementContract: contractToDispatch.agreement,
+          installmentAmountContract: contractToDispatch.installmentAmount,
+          startContract: contractToDispatch.startDate.split("T")[0],
+          totalPriceContract: contractToDispatch.totalPrice,
+        });
       }
 
       navigate("/contracts");
