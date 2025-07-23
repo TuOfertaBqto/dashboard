@@ -1,4 +1,5 @@
 import type { Contract } from "../api/contract";
+import { useAuth } from "../auth/useAuth";
 import { DeleteButton, DispatchButton, EditButton } from "./ActionButtons";
 
 interface Props {
@@ -44,6 +45,8 @@ export const ContractTable = ({
   onDispatch,
   onRowClick,
 }: Props) => {
+  const { user } = useAuth();
+  const userRole = user?.role ?? "";
   return (
     <div className="overflow-x-auto bg-white rounded-lg shadow">
       <table className="w-full table-auto">
@@ -129,18 +132,23 @@ export const ContractTable = ({
                         }}
                       />
                     )}
-                    <EditButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEdit(contract);
-                      }}
-                    />
-                    <DeleteButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDelete(contract.id);
-                      }}
-                    />
+                    {userRole === "main" && (
+                      <EditButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEdit(contract);
+                        }}
+                      />
+                    )}
+
+                    {!contract.startDate && (
+                      <DeleteButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDelete(contract.id);
+                        }}
+                      />
+                    )}
                   </div>
                 </td>
               </tr>
