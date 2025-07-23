@@ -1,4 +1,5 @@
 import type { User } from "../api/user";
+import { useAuth } from "../auth/useAuth";
 
 interface Props {
   users: User[];
@@ -8,6 +9,8 @@ interface Props {
 }
 
 export const UserTable = ({ users, loading, onEdit, onDelete }: Props) => {
+  const { user } = useAuth();
+  const userRole = user?.role ?? "";
   return (
     <div className="overflow-x-auto bg-white rounded-lg shadow">
       <table className="w-full table-auto">
@@ -17,7 +20,7 @@ export const UserTable = ({ users, loading, onEdit, onDelete }: Props) => {
             <th className="p-3">Nombre</th>
             <th className="p-3">Correo</th>
             <th className="p-3">Rol</th>
-            <th className="p-3">Acciones</th>
+            {userRole === "main" && <th className="p-3">Acciones</th>}
           </tr>
         </thead>
         <tbody>
@@ -38,20 +41,22 @@ export const UserTable = ({ users, loading, onEdit, onDelete }: Props) => {
                 </td>
                 <td className="p-3">{user.email}</td>
                 <td className="p-3">{user.role}</td>
-                <td className="p-3 space-x-2">
-                  <button
-                    onClick={() => onEdit(user)}
-                    className="text-blue-600 hover:underline"
-                  >
-                    Editar
-                  </button>
-                  <button
-                    onClick={() => onDelete(user.id)}
-                    className="text-red-600 hover:underline"
-                  >
-                    Eliminar
-                  </button>
-                </td>
+                {userRole === "main" && (
+                  <td className="p-3 space-x-2">
+                    <button
+                      onClick={() => onEdit(user)}
+                      className="text-blue-600 hover:underline"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => onDelete(user.id)}
+                      className="text-red-600 hover:underline"
+                    >
+                      Eliminar
+                    </button>
+                  </td>
+                )}
               </tr>
             ))
           )}
