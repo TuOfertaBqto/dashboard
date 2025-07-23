@@ -104,7 +104,7 @@ export const ContractForm = ({
     e.preventDefault();
     setLoading(true);
     try {
-      await onSubmit(form);
+      await onSubmit({ ...form, startDate: form.startDate || null });
     } catch (error) {
       console.error("Error to create contract:", error);
     } finally {
@@ -177,7 +177,7 @@ export const ContractForm = ({
 
           <div>
             <label htmlFor="startDate" className="block text-sm mb-1">
-              Fecha de inicio
+              Fecha de despacho
             </label>
             <input
               id="startDate"
@@ -186,7 +186,6 @@ export const ContractForm = ({
               value={form.startDate || ""}
               onChange={handleChange}
               className="w-full border p-2 rounded disabled:opacity-70 disabled:cursor-not-allowed disabled:bg-gray-100"
-              disabled
             />
           </div>
 

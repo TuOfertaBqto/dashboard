@@ -66,7 +66,10 @@ export const InstallmentListPage = () => {
                     $
                     {Math.min(
                       i.contract.installmentAmount,
-                      parseFloat(i.debt?.toString() ?? "0")
+                      parseFloat(
+                        i.debt?.toString() ??
+                          i.contract.installmentAmount.toString()
+                      )
                     )}
                   </td>
                   <td className="p-3">{i.dueDate.split("T")[0]}</td>
