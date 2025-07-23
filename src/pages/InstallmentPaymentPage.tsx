@@ -11,13 +11,13 @@ export const InstallmentPaymentPage = () => {
   const navigate = useNavigate();
   const [payment, setPayment] = useState<ContractPayment | null>(null);
   const [loading, setLoading] = useState(false);
-  const [, setPhoto] = useState<File | null>(null);
+  //const [, setPhoto] = useState<File | null>(null);
 
   const [form, setForm] = useState<UpdateContractPayment>({
     contract: "",
     amountPaid: 0,
     paymentMethod: "cash",
-    referenceNumber: 0,
+    referenceNumber: "",
     paidAt: new Date().toISOString().slice(0, 10),
     owner: "",
     photo: "",
@@ -42,19 +42,42 @@ export const InstallmentPaymentPage = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
+    if (name === "amountPaid") {
+      if (
+        value === "" ||
+        (!isNaN(parseFloat(value)) && parseFloat(value) >= 0)
+      ) {
+        setForm((prev) => ({
+          ...prev,
+          [name]: value === "" ? "" : parseFloat(value),
+        }));
+      }
+      return;
+    }
+
+    if (name === "referenceNumber") {
+      const intValue = parseInt(value, 10);
+
+      if (value === "" || (!isNaN(intValue) && intValue > 0)) {
+        setForm((prev) => ({
+          ...prev,
+          [name]: value === "" ? "" : intValue,
+        }));
+      }
+
+      return;
+    }
+
     setForm((prev) => ({
       ...prev,
-      [name]:
-        name === "referenceNumber" || name === "amountPaid"
-          ? Number(value)
-          : value,
+      [name]: value,
     }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    setPhoto(file);
-  };
+  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0] || null;
+  //   setPhoto(file);
+  // };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,6 +86,8 @@ export const InstallmentPaymentPage = () => {
     const payload: UpdateContractPayment = {
       ...form,
       photo: null,
+      referenceNumber: form.referenceNumber || undefined,
+      owner: form.owner || undefined,
     };
 
     // If photo upload is supported, handle it separately in the API or add logic here
@@ -74,6 +99,7 @@ export const InstallmentPaymentPage = () => {
         referenceNumber: payload.referenceNumber,
         amountPaid: payload.amountPaid,
         paidAt: payload.paidAt,
+        owner: payload.owner,
       });
       navigate("/installments");
     } catch (error) {
@@ -104,10 +130,14 @@ export const InstallmentPaymentPage = () => {
           <input
             type="number"
             name="amountPaid"
+            min="0.01"
+            step="0.01"
             value={form.amountPaid}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             required
+            onWheel={(e) => e.currentTarget.blur()}
+            inputMode="decimal"
           />
         </div>
 
@@ -115,7 +145,7 @@ export const InstallmentPaymentPage = () => {
           <label className="block text-sm mb-1">Método de pago</label>
           <select
             name="paymentMethod"
-            value={form.paymentMethod}
+            value={form.paymentMethod || ""}
             onChange={handleChange}
             className="w-full border p-2 rounded"
             required
@@ -137,8 +167,11 @@ export const InstallmentPaymentPage = () => {
             name="referenceNumber"
             value={form.referenceNumber}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
-            required
+            onWheel={(e) => e.currentTarget.blur()}
+            min={1}
+            step={1}
+            required={form.paymentMethod !== "cash"}
+            className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           />
         </div>
 
@@ -165,7 +198,7 @@ export const InstallmentPaymentPage = () => {
           />
         </div>
 
-        <div>
+        {/* <div>
           <label className="block text-sm mb-1">Comprobante (opcional)</label>
           <input
             type="file"
@@ -173,7 +206,7 @@ export const InstallmentPaymentPage = () => {
             onChange={handleFileChange}
             className="w-full"
           />
-        </div>
+        </div> */}
 
         <div className="flex justify-end gap-2">
           <button
