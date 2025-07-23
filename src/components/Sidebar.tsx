@@ -78,7 +78,7 @@ export const Sidebar = () => {
   }
 
   if (userRole === "main") {
-    generalMenuItems.push({
+    generalMenuItems.unshift({
       name: "Dashboard",
       icon: <SquaresPlusIcon className="h-5 w-5" />,
       route: "/",
