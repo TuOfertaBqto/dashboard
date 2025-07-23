@@ -44,11 +44,6 @@ export const Sidebar = () => {
 
   const generalMenuItems: MenuItem[] = [
     {
-      name: "Dashboard",
-      icon: <SquaresPlusIcon className="h-5 w-5" />,
-      route: "/",
-    },
-    {
       name: "Pagos",
       icon: <CurrencyDollarIcon className="h-5 w-5" />,
       route: "/installments",
@@ -79,6 +74,14 @@ export const Sidebar = () => {
       name: "Usuarios",
       icon: <UsersIcon className="h-5 w-5" />,
       route: "/users",
+    });
+  }
+
+  if (userRole === "main") {
+    generalMenuItems.push({
+      name: "Dashboard",
+      icon: <SquaresPlusIcon className="h-5 w-5" />,
+      route: "/",
     });
   }
 
