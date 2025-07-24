@@ -1,5 +1,6 @@
 import type { User } from "../api/user";
 import { useAuth } from "../auth/useAuth";
+import { translateUserRole } from "../utils/translations";
 
 interface Props {
   users: User[];
@@ -40,7 +41,7 @@ export const UserTable = ({ users, loading, onEdit, onDelete }: Props) => {
                   {user.firstName} {user.lastName}
                 </td>
                 <td className="p-3">{user.email}</td>
-                <td className="p-3">{user.role}</td>
+                <td className="p-3">{translateUserRole(user.role)}</td>
                 {userRole === "main" && (
                   <td className="p-3 space-x-2">
                     <button
