@@ -102,6 +102,16 @@ export const ContractForm = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const hasValidProduct = form.products.some(
+      (p) => p.productId && p.quantity > 0
+    );
+
+    if (!hasValidProduct) {
+      alert("Debe agregar al menos un producto válido al contrato.");
+      return;
+    }
+
     setLoading(true);
     try {
       await onSubmit({ ...form, startDate: form.startDate || null });
