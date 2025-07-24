@@ -1,5 +1,6 @@
 import type { Contract } from "../api/contract";
 import type { ContractPayment } from "../api/contract-payment";
+import { translatePaymentMethod } from "../utils/translations";
 
 interface Props {
   open: boolean;
@@ -132,7 +133,9 @@ export const InstallmentModal = ({
                       <td className="p-2">
                         {p.amountPaid ? `$${p.amountPaid}` : "—"}
                       </td>
-                      <td className="p-2">{p.paymentMethod}</td>
+                      <td className="p-2">
+                        {translatePaymentMethod(p.paymentMethod ?? "")}
+                      </td>
                       <td className="p-2">
                         {p.paidAt ? p.paidAt.split("T")[0] : "—"}
                       </td>

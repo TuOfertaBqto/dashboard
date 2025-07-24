@@ -53,7 +53,27 @@ export default function ContractFormPage() {
     let contractToDispatch: Contract | null = null;
     try {
       if (id) {
-        await ContractApi.update(id, data);
+        const {
+          agreement,
+          installmentAmount,
+          requestDate,
+          totalPrice,
+          customerId,
+          vendorId,
+          //endDate,
+          //startDate,
+        } = data;
+
+        await ContractApi.update(id, {
+          agreement,
+          installmentAmount,
+          requestDate,
+          totalPrice,
+          customerId,
+          vendorId,
+          //endDate,
+          //startDate,
+        });
       } else {
         await Promise.all(
           data.products.map(async (p) => {
