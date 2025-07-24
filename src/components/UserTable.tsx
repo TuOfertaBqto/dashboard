@@ -1,6 +1,7 @@
 import type { User } from "../api/user";
 import { useAuth } from "../auth/useAuth";
 import { translateUserRole } from "../utils/translations";
+import { DeleteButton, EditButton } from "./ActionButtons";
 
 interface Props {
   users: User[];
@@ -21,7 +22,7 @@ export const UserTable = ({ users, loading, onEdit, onDelete }: Props) => {
             <th className="p-3">Nombre</th>
             <th className="p-3">Correo</th>
             <th className="p-3">Rol</th>
-            {userRole === "main" && <th className="p-3">Acciones</th>}
+            <th className="p-3">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -42,20 +43,22 @@ export const UserTable = ({ users, loading, onEdit, onDelete }: Props) => {
                 </td>
                 <td className="p-3">{user.email}</td>
                 <td className="p-3">{translateUserRole(user.role)}</td>
-                {userRole === "main" && (
+                {(userRole === "main" ||
+                  user.role === "vendor" ||
+                  user.role === "customer") && (
                   <td className="p-3 space-x-2">
-                    <button
-                      onClick={() => onEdit(user)}
-                      className="text-blue-600 hover:underline"
-                    >
-                      Editar
-                    </button>
-                    <button
-                      onClick={() => onDelete(user.id)}
-                      className="text-red-600 hover:underline"
-                    >
-                      Eliminar
-                    </button>
+                    <EditButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEdit(user);
+                      }}
+                    />
+                    <DeleteButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(user.id);
+                      }}
+                    />
                   </td>
                 )}
               </tr>
