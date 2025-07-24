@@ -4,6 +4,7 @@ import type { User } from "../api/user";
 import { useNavigate } from "react-router-dom";
 import type { Product } from "../api/product";
 import Select from "react-select";
+import { PlusCircleIcon, TrashIcon } from "@heroicons/react/24/outline";
 
 interface Props {
   initialData?: Contract | null;
@@ -22,6 +23,7 @@ export const ContractForm = ({
 }: Props) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [dispatched, setDispatched] = useState<boolean | null>(null);
 
   const vendorOptions = vendors.map((v) => ({
     value: v.id,
@@ -114,7 +116,7 @@ export const ContractForm = ({
 
     setLoading(true);
     try {
-      await onSubmit({ ...form, startDate: form.startDate || null });
+      await onSubmit(form);
     } catch (error) {
       console.error("Error to create contract:", error);
     } finally {
@@ -185,34 +187,54 @@ export const ContractForm = ({
             />
           </div>
 
-          <div>
-            <label htmlFor="startDate" className="block text-sm mb-1">
-              Fecha de despacho
-            </label>
-            <input
-              id="startDate"
-              type="date"
-              name="startDate"
-              value={form.startDate || ""}
-              onChange={handleChange}
-              className="w-full border p-2 rounded disabled:opacity-70 disabled:cursor-not-allowed disabled:bg-gray-100"
-            />
+          <div className="flex flex-col items-center text-center">
+            <label className="block text-sm mb-1">¿Fue despachado?</label>
+            <div className="flex gap-4 mt-2">
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="wasDispatched"
+                  checked={dispatched === true}
+                  onChange={() => setDispatched(true)}
+                  required
+                />
+                Sí
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="wasDispatched"
+                  checked={dispatched === false}
+                  onChange={() => {
+                    setDispatched(false);
+                    setForm((prev) => ({
+                      ...prev,
+                      startDate: null,
+                    }));
+                  }}
+                  required
+                />
+                No
+              </label>
+            </div>
           </div>
 
-          <div>
-            <label htmlFor="endDate" className="block text-sm mb-1">
-              Fecha de fin
-            </label>
-            <input
-              id="endDate"
-              type="date"
-              name="endDate"
-              value={form.endDate || ""}
-              onChange={handleChange}
-              className="w-full border p-2 rounded disabled:opacity-70 disabled:cursor-not-allowed disabled:bg-gray-100"
-              disabled
-            />
-          </div>
+          {dispatched && (
+            <div>
+              <label htmlFor="startDate" className="block text-sm mb-1">
+                Fecha de despacho
+              </label>
+              <input
+                id="startDate"
+                type="date"
+                name="startDate"
+                value={form.startDate || ""}
+                onChange={handleChange}
+                required={dispatched === true}
+                className="w-full border p-2 rounded disabled:opacity-70 disabled:cursor-not-allowed disabled:bg-gray-100"
+              />
+            </div>
+          )}
         </div>
 
         {/* Monto de cuota y Acuerdo */}
@@ -342,9 +364,10 @@ export const ContractForm = ({
                       updated.splice(index, 1);
                       setForm({ ...form, products: updated });
                     }}
-                    className="text-red-600 hover:text-red-800 text-sm cursor-pointer"
+                    className="text-white bg-red-600 hover:bg-red-700 p-2 rounded-full cursor-pointer"
+                    title="Eliminar producto"
                   >
-                    🗑️
+                    <TrashIcon className="h-5 w-5" />
                   </button>
                 </div>
               </div>
@@ -355,7 +378,8 @@ export const ContractForm = ({
           <div>
             <button
               type="button"
-              className="text-blue-600 hover:underline text-sm cursor-pointer"
+              title="Agregar un producto al contrato"
+              className="flex items-center gap-2 text-sm text-white bg-blue-600 hover:bg-blue-700 px-2 py-2 rounded cursor-pointer"
               onClick={() =>
                 setForm({
                   ...form,
@@ -363,7 +387,8 @@ export const ContractForm = ({
                 })
               }
             >
-              + Agregar producto
+              <PlusCircleIcon className="h-5 w-5" />
+              <span>Agregar un producto</span>
             </button>
           </div>
         </div>
