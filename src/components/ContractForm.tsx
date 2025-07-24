@@ -61,6 +61,7 @@ export const ContractForm = ({
           quantity: p.quantity,
         })),
       });
+      setDispatched(false);
     }
   }, [initialData]);
 
@@ -129,9 +130,7 @@ export const ContractForm = ({
       <div className="bg-white rounded shadow p-6 space-y-6">
         {/* Vendedor */}
         <div>
-          <label htmlFor="vendorId" className="block text-sm mb-1">
-            Vendedor
-          </label>
+          <label className="block text-sm mb-1">Vendedor</label>
           <Select
             id="vendorId"
             options={vendorOptions}
@@ -149,9 +148,7 @@ export const ContractForm = ({
 
         {/* Cliente */}
         <div>
-          <label htmlFor="customerId" className="block text-sm mb-1">
-            Cliente
-          </label>
+          <label className="block text-sm mb-1">Cliente</label>
           <Select
             id="customerId"
             options={customerOptions}
@@ -190,18 +187,21 @@ export const ContractForm = ({
           <div className="flex flex-col items-center text-center">
             <label className="block text-sm mb-1">¿Fue despachado?</label>
             <div className="flex gap-4 mt-2">
-              <label className="flex items-center gap-2">
+              <label htmlFor="dispatched1" className="flex items-center gap-2">
                 <input
+                  id="dispatched1"
                   type="radio"
                   name="wasDispatched"
                   checked={dispatched === true}
                   onChange={() => setDispatched(true)}
                   required
+                  disabled={initialData?.id ? true : false}
                 />
                 Sí
               </label>
-              <label className="flex items-center gap-2">
+              <label htmlFor="dispatched2" className="flex items-center gap-2">
                 <input
+                  id="dispatched2"
                   type="radio"
                   name="wasDispatched"
                   checked={dispatched === false}
@@ -213,6 +213,7 @@ export const ContractForm = ({
                     }));
                   }}
                   required
+                  disabled={initialData?.id ? true : false}
                 />
                 No
               </label>
@@ -290,10 +291,14 @@ export const ContractForm = ({
               >
                 {/* Producto */}
                 <div className="col-span-5">
-                  <label className="block text-sm text-gray-600 mb-1">
+                  <label
+                    htmlFor={`product-${index}`}
+                    className="block text-sm text-gray-600 mb-1"
+                  >
                     Producto
                   </label>
                   <select
+                    id={`product-${index}`}
                     value={p.productId}
                     onChange={(e) => {
                       const updated = [...form.products];
@@ -302,6 +307,7 @@ export const ContractForm = ({
                     }}
                     className="w-full border p-2 rounded cursor-pointer"
                     required
+                    disabled={initialData?.id ? true : false}
                   >
                     <option value="">Seleccione un producto</option>
                     {products.map((prod) => (
@@ -314,10 +320,14 @@ export const ContractForm = ({
 
                 {/* Cantidad */}
                 <div className="col-span-3">
-                  <label className="block text-sm text-gray-600 mb-1">
+                  <label
+                    htmlFor={`quantity-${index}`}
+                    className="block text-sm text-gray-600 mb-1"
+                  >
                     Cantidad
                   </label>
                   <input
+                    id={`quantity-${index}`}
                     type="number"
                     min="1"
                     step="1"
@@ -339,15 +349,20 @@ export const ContractForm = ({
                       setForm({ ...form, products: updated });
                     }}
                     required
+                    disabled={initialData?.id ? true : false}
                   />
                 </div>
 
                 {/* Precio unitario */}
                 <div className="col-span-3">
-                  <label className="block text-sm text-gray-600 mb-1">
+                  <label
+                    htmlFor={`price-${index}`}
+                    className="block text-sm text-gray-600 mb-1"
+                  >
                     Precio unitario ($)
                   </label>
                   <input
+                    id={`price-${index}`}
                     type="number"
                     className="w-full border p-2 rounded bg-gray-100"
                     value={selected?.price ?? 0}
@@ -366,6 +381,7 @@ export const ContractForm = ({
                     }}
                     className="text-white bg-red-600 hover:bg-red-700 p-2 rounded-full cursor-pointer"
                     title="Eliminar producto"
+                    disabled={initialData?.id ? true : false}
                   >
                     <TrashIcon className="h-5 w-5" />
                   </button>
@@ -386,6 +402,7 @@ export const ContractForm = ({
                   products: [...form.products, { productId: "", quantity: 1 }],
                 })
               }
+              disabled={initialData?.id ? true : false}
             >
               <PlusCircleIcon className="h-5 w-5" />
               <span>Agregar un producto</span>

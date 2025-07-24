@@ -1,5 +1,4 @@
 import type { Contract } from "../api/contract";
-import { useAuth } from "../auth/useAuth";
 import { DeleteButton, DispatchButton, EditButton } from "./ActionButtons";
 
 interface Props {
@@ -45,8 +44,6 @@ export const ContractTable = ({
   onDispatch,
   onRowClick,
 }: Props) => {
-  const { user } = useAuth();
-  const userRole = user?.role ?? "";
   return (
     <div className="overflow-x-auto bg-white rounded-lg shadow">
       <table className="w-full table-auto">
@@ -132,7 +129,7 @@ export const ContractTable = ({
                         }}
                       />
                     )}
-                    {userRole === "main" && (
+                    {!contract.startDate && (
                       <EditButton
                         onClick={(e) => {
                           e.stopPropagation();
