@@ -11,7 +11,6 @@ export const InstallmentListPage = () => {
   const [installments, setInstallments] = useState<ContractPayment[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
-  const [enabledIds, setEnabledIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const fetchData = async () => {
@@ -19,30 +18,6 @@ export const InstallmentListPage = () => {
       try {
         const res = await ContractPaymentApi.getAll();
         setInstallments(res);
-        const installments = res;
-
-        const groupedByContract = installments.reduce<
-          Record<string, ContractPayment[]>
-        >((acc, installment) => {
-          const contractId = installment.contract.id;
-          if (!acc[contractId]) acc[contractId] = [];
-          acc[contractId].push(installment);
-          return acc;
-        }, {});
-
-        const allowedIds = new Set<string>();
-        Object.values(groupedByContract).forEach((group) => {
-          const unpaid = group.filter((i) => !i.paidAt);
-          if (unpaid.length === 0) return;
-
-          const oldest = unpaid.reduce((a, b) =>
-            dayjs(a.dueDate).isBefore(dayjs(b.dueDate)) ? a : b
-          );
-
-          allowedIds.add(oldest.id);
-        });
-
-        setEnabledIds(allowedIds);
       } catch (err) {
         console.log("Error loading installments", err);
       } finally {
@@ -94,7 +69,8 @@ export const InstallmentListPage = () => {
                       parseFloat(
                         i.debt?.toString() ??
                           i.contract.installmentAmount.toString()
-                      )
+                      ),
+                      i.contract.installmentAmount - (i.amountPaid ?? 0)
                     )}
                   </td>
                   <td className="p-3">{i.dueDate.split("T")[0]}</td>
@@ -114,11 +90,11 @@ export const InstallmentListPage = () => {
                   </td>
                   <td>
                     <button
-                      disabled={!enabledIds.has(i.id)}
+                      disabled={!i.debt}
                       onClick={() => navigate(`/installments/${i.id}/pay`)}
                       className={classNames(
                         "px-3 py-1 rounded text-sm",
-                        enabledIds.has(i.id)
+                        i.debt
                           ? "bg-blue-500 text-white hover:bg-blue-600"
                           : "bg-gray-300 text-gray-500 cursor-not-allowed"
                       )}
