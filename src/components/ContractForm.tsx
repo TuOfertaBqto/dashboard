@@ -3,7 +3,7 @@ import type { Contract, CreateContract } from "../api/contract";
 import type { User } from "../api/user";
 import { useNavigate } from "react-router-dom";
 import type { Product } from "../api/product";
-import Select from "react-select";
+import Select, { type SingleValue } from "react-select";
 import { PlusCircleIcon, TrashIcon } from "@heroicons/react/24/outline";
 
 interface Props {
@@ -130,9 +130,12 @@ export const ContractForm = ({
       <div className="bg-white rounded shadow p-6 space-y-6">
         {/* Vendedor */}
         <div>
-          <label className="block text-sm mb-1">Vendedor</label>
+          <label htmlFor="vendorId" className="block text-sm mb-1">
+            Vendedor
+          </label>
           <Select
-            id="vendorId"
+            inputId="vendorId"
+            name="vendorId"
             options={vendorOptions}
             value={vendorOptions.find((opt) => opt.value === form.vendorId)}
             onChange={(selected) =>
@@ -148,9 +151,12 @@ export const ContractForm = ({
 
         {/* Cliente */}
         <div>
-          <label className="block text-sm mb-1">Cliente</label>
+          <label htmlFor="customerId" className="block text-sm mb-1">
+            Cliente
+          </label>
           <Select
-            id="customerId"
+            inputId="customerId"
+            name="customerId"
             options={customerOptions}
             value={customerOptions.find((opt) => opt.value === form.customerId)}
             onChange={(selected) =>
@@ -185,23 +191,21 @@ export const ContractForm = ({
           </div>
 
           <div className="flex flex-col items-center text-center">
-            <label className="block text-sm mb-1">¿Fue despachado?</label>
+            <span className="block text-sm mb-1">¿Fue despachado?</span>
             <div className="flex gap-4 mt-2">
-              <label htmlFor="dispatched1" className="flex items-center gap-2">
+              <label className="flex items-center gap-2">
                 <input
-                  id="dispatched1"
                   type="radio"
                   name="wasDispatched"
                   checked={dispatched === true}
                   onChange={() => setDispatched(true)}
                   required
-                  disabled={initialData?.id ? true : false}
+                  disabled={!!initialData?.id}
                 />
                 Sí
               </label>
-              <label htmlFor="dispatched2" className="flex items-center gap-2">
+              <label className="flex items-center gap-2">
                 <input
-                  id="dispatched2"
                   type="radio"
                   name="wasDispatched"
                   checked={dispatched === false}
@@ -213,7 +217,7 @@ export const ContractForm = ({
                     }));
                   }}
                   required
-                  disabled={initialData?.id ? true : false}
+                  disabled={!!initialData?.id}
                 />
                 No
               </label>
@@ -297,25 +301,31 @@ export const ContractForm = ({
                   >
                     Producto
                   </label>
-                  <select
-                    id={`product-${index}`}
-                    value={p.productId}
-                    onChange={(e) => {
+                  <Select
+                    inputId={`product-${index}`}
+                    value={
+                      products
+                        .map((prod) => ({ value: prod.id, label: prod.name }))
+                        .find((opt) => opt.value === p.productId) || null
+                    }
+                    onChange={(
+                      selected: SingleValue<{ value: string; label: string }>
+                    ) => {
                       const updated = [...form.products];
-                      updated[index].productId = e.target.value;
+                      updated[index].productId = selected?.value || "";
                       setForm({ ...form, products: updated });
                     }}
-                    className="w-full border p-2 rounded cursor-pointer"
+                    options={products.map((prod) => ({
+                      value: prod.id,
+                      label: prod.name,
+                    }))}
+                    placeholder="Seleccione un producto"
+                    isClearable
+                    isDisabled={!!initialData?.id}
+                    className="react-select-container"
+                    classNamePrefix="react-select"
                     required
-                    disabled={initialData?.id ? true : false}
-                  >
-                    <option value="">Seleccione un producto</option>
-                    {products.map((prod) => (
-                      <option key={prod.id} value={prod.id}>
-                        {prod.name}
-                      </option>
-                    ))}
-                  </select>
+                  />
                 </div>
 
                 {/* Cantidad */}

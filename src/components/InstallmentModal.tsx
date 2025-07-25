@@ -1,5 +1,6 @@
 import type { Contract } from "../api/contract";
 import type { ContractPayment } from "../api/contract-payment";
+import { generateInstallmentsFromContract } from "../utils/generateInstallments";
 import { translatePaymentMethod } from "../utils/translations";
 
 interface Props {
@@ -16,9 +17,14 @@ export const InstallmentModal = ({
   contract,
 }: Props) => {
   if (!open) return null;
+  const effectivePayments =
+    payments.length === 0 && contract
+      ? generateInstallmentsFromContract(contract)
+      : payments;
+
   const baseInstallmentAmount = contract?.installmentAmount ?? 0;
   const total = contract?.totalPrice ?? 0;
-  const numPayments = payments.length;
+  const numPayments = payments.length || effectivePayments.length;
   let accumulated = 0;
 
   return (
@@ -116,7 +122,7 @@ export const InstallmentModal = ({
                 </tr>
               </thead>
               <tbody>
-                {payments.map((p, index) => {
+                {effectivePayments.map((p, index) => {
                   let amount = baseInstallmentAmount;
 
                   if (index === numPayments - 1) {
