@@ -34,9 +34,22 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
     >
   ) => {
     const { name, value } = e.target;
+    if (["price"].includes(name)) {
+      const intValue = parseInt(value, 10);
+
+      if (value === "" || (!isNaN(intValue) && intValue > 0)) {
+        setForm((prev) => ({
+          ...prev,
+          [name]: value === "" ? "" : intValue,
+        }));
+      }
+
+      return;
+    }
+
     setForm((prev) => ({
       ...prev,
-      [name]: name === "price" ? parseFloat(value) : value,
+      [name]: value,
     }));
   };
 
@@ -117,12 +130,13 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
           id="price"
           name="price"
           type="number"
-          step="0.01"
+          min={1}
+          step={1}
           value={form.price}
           onChange={handleChange}
-          className="w-full border p-2 rounded"
+          className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           required
-          disabled={loading}
+          onWheel={(e) => e.currentTarget.blur()}
         />
       </div>
 
