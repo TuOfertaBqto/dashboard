@@ -167,7 +167,7 @@ export default function UserFormPage() {
           <button
             type="button"
             onClick={() => navigate("/users")}
-            className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+            className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400 cursor-pointer"
             disabled={loading}
           >
             Cancelar
@@ -178,7 +178,7 @@ export default function UserFormPage() {
             className={`px-4 py-2 rounded text-white ${
               loading
                 ? "bg-blue-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
+                : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
             }`}
           >
             {loading ? "Guardando..." : "Guardar"}

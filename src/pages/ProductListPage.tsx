@@ -50,13 +50,13 @@ export const ProductListPage = () => {
         <div className="flex gap-2">
           <button
             onClick={() => setOpenInventoryModal(true)}
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 cursor-pointer"
           >
             Ingreso de inventario
           </button>
           <button
             onClick={() => navigate("/products/new")}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer"
           >
             Nuevo producto
           </button>
