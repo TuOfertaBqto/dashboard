@@ -95,7 +95,7 @@ export const InstallmentListPage = () => {
                       className={classNames(
                         "px-3 py-1 rounded text-sm",
                         i.debt
-                          ? "bg-blue-500 text-white hover:bg-blue-600"
+                          ? "bg-blue-500 text-white hover:bg-blue-600 cursor-pointer"
                           : "bg-gray-300 text-gray-500 cursor-not-allowed"
                       )}
                     >

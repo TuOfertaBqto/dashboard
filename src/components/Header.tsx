@@ -27,7 +27,7 @@ export const Header = () => {
           className="p-2 rounded hover:bg-gray-100 transition"
           title="Cerrar sesión"
         >
-          <ArrowRightOnRectangleIcon className="w-6 h-6 text-gray-600" />
+          <ArrowRightOnRectangleIcon className="w-6 h-6 text-gray-600 cursor-pointer" />
         </button>
       </div>
 

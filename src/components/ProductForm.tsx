@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { CreateProduct, Product } from "../api/product";
 import type { Category } from "../api/category";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   initialData?: Product;
@@ -16,6 +17,7 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
     categoryId: "",
   });
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (initialData) {
@@ -34,9 +36,22 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
     >
   ) => {
     const { name, value } = e.target;
+    if (["price"].includes(name)) {
+      const intValue = parseInt(value, 10);
+
+      if (value === "" || (!isNaN(intValue) && intValue > 0)) {
+        setForm((prev) => ({
+          ...prev,
+          [name]: value === "" ? "" : intValue,
+        }));
+      }
+
+      return;
+    }
+
     setForm((prev) => ({
       ...prev,
-      [name]: name === "price" ? parseFloat(value) : value,
+      [name]: value,
     }));
   };
 
@@ -58,20 +73,27 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
       className="bg-white p-6 rounded shadow space-y-4"
     >
       <div>
-        <label className="block mb-1 text-sm">Nombre del producto</label>
+        <label htmlFor="name" className="block mb-1 text-sm">
+          Nombre del producto
+        </label>
         <input
+          id="name"
           name="name"
           value={form.name}
           onChange={handleChange}
           className="w-full border p-2 rounded"
           required
           disabled={loading}
+          autoComplete="off"
         />
       </div>
 
       <div>
-        <label className="block mb-1 text-sm">Descripción</label>
+        <label htmlFor="description" className="block mb-1 text-sm">
+          Descripción
+        </label>
         <textarea
+          id="description"
           name="description"
           value={form.description || ""}
           onChange={handleChange}
@@ -103,30 +125,44 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
       </div>
 
       <div>
-        <label className="block mb-1 text-sm">Precio</label>
+        <label htmlFor="price" className="block mb-1 text-sm">
+          Precio
+        </label>
         <input
+          id="price"
           name="price"
           type="number"
-          step="0.01"
+          min={1}
+          step={1}
           value={form.price}
           onChange={handleChange}
-          className="w-full border p-2 rounded"
+          className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           required
-          disabled={loading}
+          onWheel={(e) => e.currentTarget.blur()}
         />
       </div>
 
-      <button
-        type="submit"
-        disabled={loading}
-        className={`px-4 py-2 rounded text-white ${
-          loading
-            ? "bg-blue-400 cursor-not-allowed"
-            : "bg-blue-600 hover:bg-blue-700"
-        }`}
-      >
-        {loading ? "Guardando..." : "Guardar"}
-      </button>
+      <div className="flex justify-end gap-2">
+        <button
+          type="button"
+          disabled={loading}
+          onClick={() => navigate("/products")}
+          className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 cursor-pointer"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          disabled={loading}
+          className={`px-4 py-2 rounded text-white ${
+            loading
+              ? "bg-blue-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+          }`}
+        >
+          {loading ? "Guardando..." : "Guardar"}
+        </button>
+      </div>
     </form>
   );
 };

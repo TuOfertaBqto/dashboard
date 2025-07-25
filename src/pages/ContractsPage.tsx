@@ -110,7 +110,7 @@ export default function ContractsPage() {
         <h1 className="text-2xl font-bold">Contratos</h1>
         <button
           onClick={() => navigate("/contracts/new")}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer"
         >
           Crear contrato
         </button>

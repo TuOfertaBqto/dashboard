@@ -107,9 +107,9 @@ export const Sidebar = () => {
         {isOpen && <h1 className="text-xl font-bold">Admin</h1>}
         <button onClick={toggleSidebar}>
           {isOpen ? (
-            <Bars3BottomLeftIcon className="h-5 w-5" />
+            <Bars3BottomLeftIcon className="h-5 w-5 cursor-pointer" />
           ) : (
-            <Bars3BottomRightIcon className="h-5 w-5" />
+            <Bars3BottomRightIcon className="h-5 w-5 cursor-pointer" />
           )}
         </button>
       </div>

@@ -13,6 +13,8 @@ export const ProductListPage = () => {
   const [selectedProductId, setSelectedProductId] = useState("");
   const [quantity, setQuantity] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
+  const [formError, setFormError] = useState<string>("");
+
   const navigate = useNavigate();
 
   const fetchProducts = async () => {
@@ -50,13 +52,13 @@ export const ProductListPage = () => {
         <div className="flex gap-2">
           <button
             onClick={() => setOpenInventoryModal(true)}
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 cursor-pointer"
           >
             Ingreso de inventario
           </button>
           <button
             onClick={() => navigate("/products/new")}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer"
           >
             Nuevo producto
           </button>
@@ -84,11 +86,18 @@ export const ProductListPage = () => {
         message={
           <div className="space-y-4 pb-5">
             <div>
-              <label className="block text-sm mb-1">Producto</label>
+              <label htmlFor="product" className="block text-sm mb-1">
+                Producto
+              </label>
               <select
+                id="product"
                 value={selectedProductId}
-                onChange={(e) => setSelectedProductId(e.target.value)}
+                onChange={(e) => {
+                  setSelectedProductId(e.target.value);
+                  setFormError("");
+                }}
                 className="w-full border rounded p-2"
+                required
               >
                 <option value="">Seleccione un producto</option>
                 {inventory.map((inv) => (
@@ -99,16 +108,37 @@ export const ProductListPage = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm mb-1">Cantidad</label>
+              <label htmlFor="quantity" className="block text-sm mb-1">
+                Cantidad
+              </label>
               <input
+                id="quantity"
                 type="number"
-                min={1}
-                value={quantity}
-                onChange={(e) => setQuantity(Number(e.target.value))}
-                className="w-full border rounded p-2"
-                placeholder="Ej: 10"
+                min="1"
+                step="1"
+                className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                value={quantity > 0 ? quantity : ""}
+                onWheel={(e) => e.currentTarget.blur()}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const intValue = parseInt(value, 10);
+
+                  if (
+                    value === "" ||
+                    (!isNaN(intValue) &&
+                      intValue >= 1 &&
+                      value === intValue.toString())
+                  ) {
+                    setQuantity(value === "" ? 0 : intValue);
+                    setFormError("");
+                  }
+                }}
+                required
               />
             </div>
+            {formError && (
+              <p className="text-red-600 text-sm mt-2">{formError}</p>
+            )}
           </div>
         }
         onCancel={() => {
@@ -117,6 +147,17 @@ export const ProductListPage = () => {
           setQuantity(0);
         }}
         onConfirm={async () => {
+          if (!selectedProductId) {
+            setFormError("Debe seleccionar un producto.");
+            return;
+          }
+
+          if (quantity <= 0) {
+            setFormError("Debe seleccionar una cantidad válida.");
+            return;
+          }
+
+          setFormError("");
           try {
             if (!selectedProductId || quantity <= 0) return;
             await InventoryMovApi.create({

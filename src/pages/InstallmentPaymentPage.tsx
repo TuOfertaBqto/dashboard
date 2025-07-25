@@ -221,7 +221,7 @@ export const InstallmentPaymentPage = () => {
             type="button"
             disabled={loading}
             onClick={() => navigate("/installments")}
-            className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+            className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 cursor-pointer"
           >
             Cancelar
           </button>
@@ -231,7 +231,7 @@ export const InstallmentPaymentPage = () => {
             className={`px-4 py-2 rounded text-white ${
               loading
                 ? "bg-blue-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
+                : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
             }`}
           >
             {loading ? "Guardando..." : "Guardar pago"}
