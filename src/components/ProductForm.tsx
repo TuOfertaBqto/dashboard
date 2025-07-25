@@ -58,20 +58,27 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
       className="bg-white p-6 rounded shadow space-y-4"
     >
       <div>
-        <label className="block mb-1 text-sm">Nombre del producto</label>
+        <label htmlFor="name" className="block mb-1 text-sm">
+          Nombre del producto
+        </label>
         <input
+          id="name"
           name="name"
           value={form.name}
           onChange={handleChange}
           className="w-full border p-2 rounded"
           required
           disabled={loading}
+          autoComplete="off"
         />
       </div>
 
       <div>
-        <label className="block mb-1 text-sm">Descripción</label>
+        <label htmlFor="description" className="block mb-1 text-sm">
+          Descripción
+        </label>
         <textarea
+          id="description"
           name="description"
           value={form.description || ""}
           onChange={handleChange}
@@ -103,8 +110,11 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
       </div>
 
       <div>
-        <label className="block mb-1 text-sm">Precio</label>
+        <label htmlFor="price" className="block mb-1 text-sm">
+          Precio
+        </label>
         <input
+          id="price"
           name="price"
           type="number"
           step="0.01"
