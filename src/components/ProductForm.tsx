@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { CreateProduct, Product } from "../api/product";
 import type { Category } from "../api/category";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   initialData?: Product;
@@ -16,6 +17,7 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
     categoryId: "",
   });
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (initialData) {
@@ -140,17 +142,27 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
         />
       </div>
 
-      <button
-        type="submit"
-        disabled={loading}
-        className={`px-4 py-2 rounded text-white ${
-          loading
-            ? "bg-blue-400 cursor-not-allowed"
-            : "bg-blue-600 hover:bg-blue-700"
-        }`}
-      >
-        {loading ? "Guardando..." : "Guardar"}
-      </button>
+      <div className="flex justify-end gap-2">
+        <button
+          type="button"
+          disabled={loading}
+          onClick={() => navigate("/products")}
+          className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          disabled={loading}
+          className={`px-4 py-2 rounded text-white ${
+            loading
+              ? "bg-blue-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
+          }`}
+        >
+          {loading ? "Guardando..." : "Guardar"}
+        </button>
+      </div>
     </form>
   );
 };
