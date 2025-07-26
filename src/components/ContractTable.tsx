@@ -77,7 +77,7 @@ export const ContractTable = ({
               >
                 <td className="p-2">C#{contract.code}</td>
                 <td className="p-3 ">
-                  C{contract.vendorId.code} {contract.vendorId.firstName}
+                  T{contract.vendorId.code} {contract.vendorId.firstName}
                 </td>
                 <td className="p-3">
                   {contract.customerId.firstName} {contract.customerId.lastName}

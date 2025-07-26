@@ -27,7 +27,7 @@ export const ContractForm = ({
 
   const vendorOptions = vendors.map((v) => ({
     value: v.id,
-    label: `C${v.code} ${v.firstName} ${v.lastName}`,
+    label: `T${v.code} ${v.firstName} ${v.lastName}`,
   }));
 
   const customerOptions = customers.map((c) => ({
