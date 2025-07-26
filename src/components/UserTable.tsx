@@ -36,7 +36,7 @@ export const UserTable = ({ users, loading, onEdit, onDelete }: Props) => {
             users.map((user) => (
               <tr key={user.id} className="border-t">
                 <td className="p-3 w-[75px]">
-                  {user.code ? `C${user.code}` : ""}
+                  {user.code ? `T${user.code}` : ""}
                 </td>
                 <td className="p-3">
                   {user.firstName} {user.lastName}
