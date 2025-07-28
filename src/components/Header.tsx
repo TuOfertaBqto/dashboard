@@ -5,40 +5,118 @@ import {
 import { useAuth } from "../auth/useAuth";
 import { useState } from "react";
 import { ConfirmModal } from "./ConfirmModal";
+import { useNavigate } from "react-router-dom";
 
 export const Header = () => {
   const { user, logout } = useAuth();
-  const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
+  const navigate = useNavigate();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className="w-full bg-white shadow px-6 py-4 flex justify-between items-center">
-      <div className="hidden md:flex text-xl font-semibold text-gray-800">
-        Panel Administrativo
-      </div>
+    <>
+      <header className="w-full bg-white shadow px-6 py-4 flex justify-between items-center relative z-50">
+        <div className="hidden md:flex text-xl font-semibold text-gray-800">
+          Panel Administrativo
+        </div>
 
-      <div className="md:hidden">
-        <button onClick={() => console.log("gg")}>
-          <Bars3Icon className="h-6 w-6 text-gray-700" />
-        </button>
-      </div>
+        <div className="md:hidden">
+          {isMenuOpen ? (
+            <button
+              onClick={() => setIsMenuOpen(false)}
+              className="h-6 w-6 text-gray-70"
+              title="Cerrar"
+            >
+              ✕
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                setIsMenuOpen(true);
+              }}
+            >
+              <Bars3Icon className="h-6 w-6 text-gray-700" />
+            </button>
+          )}
+        </div>
 
-      <div className="flex items-center gap-4">
-        {user && (
-          <div className="text-right">
-            <div className="font-medium text-gray-800">{user.email}</div>
-            <div className="text-sm text-gray-500 capitalize">
-              {user.role.replace("_", " ")}
+        <div className="flex items-center gap-4">
+          {user && (
+            <div className="text-right">
+              <div className="font-medium text-gray-800">{user.email}</div>
+              <div className="text-sm text-gray-500 capitalize">
+                {user.role.replace("_", " ")}
+              </div>
             </div>
+          )}
+          <button
+            onClick={() => setShowLogoutModal(true)}
+            className="p-2 rounded hover:bg-gray-100 transition"
+            title="Cerrar sesión"
+          >
+            <ArrowRightOnRectangleIcon className="w-6 h-6 text-gray-600 cursor-pointer" />
+          </button>
+        </div>
+      </header>
+
+      {isMenuOpen && (
+        <div className="md:hidden">
+          <div
+            onClick={() => setIsMenuOpen(false)}
+            className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
+          />
+
+          <div className="absolute top-16 left-0 w-full bg-white shadow-md z-50 animate-slide-down md:hidden">
+            <ul className="flex flex-col divide-y divide-gray-200">
+              <li
+                className="p-4 hover:bg-gray-100"
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  navigate("/installments");
+                }}
+              >
+                Pagos
+              </li>
+              <li
+                className="p-4 hover:bg-gray-100"
+                onClick={() => {
+                  setIsMenuOpen(false);
+
+                  navigate("/contracts");
+                }}
+              >
+                Contratos
+              </li>
+              <li
+                className="p-4 hover:bg-gray-100"
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  navigate("/products");
+                }}
+              >
+                Productos
+              </li>
+              <li
+                className="p-4 hover:bg-gray-100"
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  navigate("/users");
+                }}
+              >
+                Usuarios
+              </li>
+              <li
+                className="p-4 hover:bg-gray-100 text-red-600"
+                onClick={() => {
+                  setShowLogoutModal(true);
+                }}
+              >
+                Cerrar sesión
+              </li>
+            </ul>
           </div>
-        )}
-        <button
-          onClick={() => setShowLogoutModal(true)}
-          className="p-2 rounded hover:bg-gray-100 transition"
-          title="Cerrar sesión"
-        >
-          <ArrowRightOnRectangleIcon className="w-6 h-6 text-gray-600 cursor-pointer" />
-        </button>
-      </div>
+        </div>
+      )}
 
       <ConfirmModal
         open={showLogoutModal}
@@ -47,6 +125,6 @@ export const Header = () => {
         onCancel={() => setShowLogoutModal(false)}
         onConfirm={logout}
       />
-    </header>
+    </>
   );
 };
