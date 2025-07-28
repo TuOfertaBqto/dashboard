@@ -1,4 +1,7 @@
-import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowRightOnRectangleIcon,
+  Bars3Icon,
+} from "@heroicons/react/24/outline";
 import { useAuth } from "../auth/useAuth";
 import { useState } from "react";
 import { ConfirmModal } from "./ConfirmModal";
@@ -9,8 +12,14 @@ export const Header = () => {
 
   return (
     <header className="w-full bg-white shadow px-6 py-4 flex justify-between items-center">
-      <div className="text-xl font-semibold text-gray-800">
+      <div className="hidden md:flex text-xl font-semibold text-gray-800">
         Panel Administrativo
+      </div>
+
+      <div className="md:hidden">
+        <button onClick={() => console.log("gg")}>
+          <Bars3Icon className="h-6 w-6 text-gray-700" />
+        </button>
       </div>
 
       <div className="flex items-center gap-4">
