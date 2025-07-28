@@ -1,6 +1,12 @@
 import {
+  ArrowRightEndOnRectangleIcon,
   ArrowRightOnRectangleIcon,
   Bars3Icon,
+  CubeIcon,
+  CurrencyDollarIcon,
+  DocumentTextIcon,
+  UsersIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { useAuth } from "../auth/useAuth";
 import { useState } from "react";
@@ -25,9 +31,8 @@ export const Header = () => {
             <button
               onClick={() => setIsMenuOpen(false)}
               className="h-6 w-6 text-gray-70"
-              title="Cerrar"
             >
-              ✕
+              <XMarkIcon className="h-6 w-6 text-gray-700" />
             </button>
           ) : (
             <button
@@ -51,7 +56,7 @@ export const Header = () => {
           )}
           <button
             onClick={() => setShowLogoutModal(true)}
-            className="p-2 rounded hover:bg-gray-100 transition"
+            className="p-2 rounded  transition"
             title="Cerrar sesión"
           >
             <ArrowRightOnRectangleIcon className="w-6 h-6 text-gray-600 cursor-pointer" />
@@ -66,51 +71,55 @@ export const Header = () => {
             className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
           />
 
-          <div className="absolute top-16 left-0 w-full bg-white shadow-md z-50 animate-slide-down md:hidden">
+          <div className="absolute top-16 left-0 w-full bg-[#1f2937] text-white shadow-md z-50 animate-slide-down md:hidden">
             <ul className="flex flex-col divide-y divide-gray-200">
               <li
-                className="p-4 hover:bg-gray-100"
+                className="p-4 flex items-center gap-2 active:bg-[#111827]"
                 onClick={() => {
                   setIsMenuOpen(false);
                   navigate("/installments");
                 }}
               >
+                <CurrencyDollarIcon className="h-5 w-5" />
                 Pagos
               </li>
               <li
-                className="p-4 hover:bg-gray-100"
+                className="p-4 flex items-center gap-2 active:bg-[#111827]"
                 onClick={() => {
                   setIsMenuOpen(false);
-
                   navigate("/contracts");
                 }}
               >
+                <DocumentTextIcon className="h-5 w-5" />
                 Contratos
               </li>
               <li
-                className="p-4 hover:bg-gray-100"
+                className="p-4 flex items-center gap-2 active:bg-[#111827]"
                 onClick={() => {
                   setIsMenuOpen(false);
                   navigate("/products");
                 }}
               >
+                <CubeIcon className="w-5 h-5" />
                 Productos
               </li>
               <li
-                className="p-4 hover:bg-gray-100"
+                className="p-4 flex items-center gap-2 active:bg-[#111827]"
                 onClick={() => {
                   setIsMenuOpen(false);
                   navigate("/users");
                 }}
               >
+                <UsersIcon className="h-5 w-5" />
                 Usuarios
               </li>
               <li
-                className="p-4 hover:bg-gray-100 text-red-600"
+                className="p-4 text-red-600 flex items-center gap-2 active:bg-[#111827]"
                 onClick={() => {
                   setShowLogoutModal(true);
                 }}
               >
+                <ArrowRightEndOnRectangleIcon className="h-5 w-5" />
                 Cerrar sesión
               </li>
             </ul>
