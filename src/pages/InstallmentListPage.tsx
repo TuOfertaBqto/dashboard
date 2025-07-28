@@ -45,6 +45,7 @@ export const InstallmentListPage = () => {
           <thead className="bg-gray-100 text-gray-700">
             <tr>
               <th className="p-3 text-left">Contrato</th>
+              <th className="p-3 text-left">Cliente</th>
               <th className="p-3 text-left">Monto ($)</th>
               <th className="p-3 text-left">Fecha de vencimiento</th>
               <th className="p-3 text-left">Estado</th>
@@ -62,6 +63,10 @@ export const InstallmentListPage = () => {
               installments.map((i) => (
                 <tr key={i.id} className="border-t">
                   <td className="p-3">#{i.contract.code}</td>
+                  <td className="p-3">
+                    {i.contract.customerId.firstName}{" "}
+                    {i.contract.customerId.lastName}
+                  </td>
                   <td className="p-3">
                     $
                     {Math.min(
