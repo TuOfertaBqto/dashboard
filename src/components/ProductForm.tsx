@@ -3,6 +3,7 @@ import type { CreateProduct, Product } from "../api/product";
 import type { Category } from "../api/category";
 import { useNavigate, useParams } from "react-router-dom";
 import { InventoryApi } from "../api/inventory";
+import { useAuth } from "../auth/useAuth";
 
 interface Props {
   initialData?: Product;
@@ -12,6 +13,7 @@ interface Props {
 
 export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
   const { id } = useParams();
+  const { user } = useAuth();
   const [form, setForm] = useState<CreateProduct>({
     name: "",
     description: null,
@@ -164,33 +166,35 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
         />
       </div>
 
-      <div>
-        <label htmlFor="stock" className="block mb-1 text-sm">
-          Stock
-        </label>
-        <input
-          id="stock"
-          name="stock"
-          type="number"
-          value={stock === 0 ? stock : stock || ""}
-          onChange={(e) => {
-            const value = e.target.value;
-            const intValue = parseInt(value, 10);
+      {id && user?.role === "main" && (
+        <div>
+          <label htmlFor="stock" className="block mb-1 text-sm">
+            Stock
+          </label>
+          <input
+            id="stock"
+            name="stock"
+            type="number"
+            value={stock === 0 ? stock : stock || ""}
+            onChange={(e) => {
+              const value = e.target.value;
+              const intValue = parseInt(value, 10);
 
-            if (
-              value === "" ||
-              (!isNaN(intValue) &&
-                intValue >= 0 &&
-                value === intValue.toString())
-            ) {
-              setStock(intValue);
-            }
-          }}
-          className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-          required
-          onWheel={(e) => e.currentTarget.blur()}
-        />
-      </div>
+              if (
+                value === "" ||
+                (!isNaN(intValue) &&
+                  intValue >= 0 &&
+                  value === intValue.toString())
+              ) {
+                setStock(intValue);
+              }
+            }}
+            className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            required
+            onWheel={(e) => e.currentTarget.blur()}
+          />
+        </div>
+      )}
 
       <div className="flex justify-end gap-2">
         <button
