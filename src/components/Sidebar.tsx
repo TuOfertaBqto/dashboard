@@ -98,7 +98,7 @@ export const Sidebar = () => {
 
   return (
     <aside
-      className={`h-screen flex flex-col transition-all duration-300 ease-out bg-[#1f2937] text-white ${
+      className={`h-screen hidden md:flex flex-col transition-all duration-300 ease-out bg-[#1f2937] text-white  ${
         isOpen ? "w-64" : "w-20"
       }`}
     >
