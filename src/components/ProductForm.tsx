@@ -79,7 +79,11 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await onSubmit(form);
+      if (id) {
+        await onSubmit({ ...form, stockQuantity: stock ?? undefined });
+      } else {
+        await onSubmit(form);
+      }
     } catch (error) {
       console.error("Error al registrar:", error);
     } finally {
