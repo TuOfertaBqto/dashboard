@@ -71,7 +71,7 @@ export const Header = () => {
             className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
           />
 
-          <div className="absolute top-16 left-0 w-full bg-[#1f2937] text-white shadow-md z-50 animate-slide-down md:hidden">
+          <div className="absolute top-18 left-0 w-full bg-[#1f2937] text-white shadow-md z-50 animate-slide-down md:hidden">
             <ul className="flex flex-col divide-y divide-gray-200">
               <li
                 className="p-4 flex items-center gap-2 active:bg-[#111827]"
