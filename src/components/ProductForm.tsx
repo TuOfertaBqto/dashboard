@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import type { CreateProduct, Product } from "../api/product";
 import type { Category } from "../api/category";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { InventoryApi } from "../api/inventory";
+import { useAuth } from "../auth/useAuth";
 
 interface Props {
   initialData?: Product;
@@ -10,6 +12,8 @@ interface Props {
 }
 
 export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
+  const { id } = useParams();
+  const { user } = useAuth();
   const [form, setForm] = useState<CreateProduct>({
     name: "",
     description: null,
@@ -17,6 +21,8 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
     categoryId: "",
   });
   const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(true);
+  const [stock, setStock] = useState<number | "">(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,7 +34,21 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
         categoryId: initialData.categoryId.id,
       });
     }
-  }, [initialData]);
+
+    const fetchStock = async () => {
+      try {
+        if (id) {
+          const stockValue = await InventoryApi.getStockByProductId(id);
+          setStock(stockValue);
+        }
+      } catch (error) {
+        console.error("Error al obtener stock:", error);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    fetchStock();
+  }, [initialData, id]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -59,7 +79,11 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await onSubmit(form);
+      if (id) {
+        await onSubmit({ ...form, stockQuantity: stock ?? undefined });
+      } else {
+        await onSubmit(form);
+      }
     } catch (error) {
       console.error("Error al registrar:", error);
     } finally {
@@ -67,7 +91,11 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
     }
   };
 
-  return (
+  return loadingData ? (
+    <div className="bg-white p-6 rounded shadow space-y-4">
+      <p className="text-gray-400">Cargando...</p>
+    </div>
+  ) : (
     <form
       onSubmit={handleSubmit}
       className="bg-white p-6 rounded shadow space-y-4"
@@ -141,6 +169,36 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
           onWheel={(e) => e.currentTarget.blur()}
         />
       </div>
+
+      {id && user?.role === "main" && (
+        <div>
+          <label htmlFor="stock" className="block mb-1 text-sm">
+            Stock
+          </label>
+          <input
+            id="stock"
+            name="stock"
+            type="number"
+            value={stock === 0 ? stock : stock || ""}
+            onChange={(e) => {
+              const value = e.target.value;
+              const intValue = parseInt(value, 10);
+
+              if (
+                value === "" ||
+                (!isNaN(intValue) &&
+                  intValue >= 0 &&
+                  value === intValue.toString())
+              ) {
+                setStock(intValue);
+              }
+            }}
+            className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            required
+            onWheel={(e) => e.currentTarget.blur()}
+          />
+        </div>
+      )}
 
       <div className="flex justify-end gap-2">
         <button

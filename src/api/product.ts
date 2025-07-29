@@ -16,6 +16,7 @@ export type CreateProduct = {
   description: string | null;
   price: number;
   categoryId: string;
+  stockQuantity?: number | "";
 };
 
 export const ProductApi = {
