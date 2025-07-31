@@ -1,7 +1,9 @@
+import { PDFViewer } from "@react-pdf/renderer";
 import type { Contract } from "../api/contract";
 import type { ContractPayment } from "../api/contract-payment";
 import { generateInstallmentsFromContract } from "../utils/generateInstallments";
 import { translatePaymentMethod } from "../utils/translations";
+import MyPdfDocument from "./MyPdfDocument";
 
 interface Props {
   open: boolean;
@@ -161,6 +163,56 @@ export const InstallmentModal = ({
             >
               Cerrar
             </button>
+          </div>
+          <div>
+            {/* <PDFDownloadLink
+              document={
+                <MyPdfDocument
+                  cliente="CARLOS COLMENAREZ"
+                  fechaInicio="15/7/2025"
+                  descripcion="(01) Televisor Síragon 2025 de 43 pulgadas y (01) Lavadora doble tina de 9 kilogramos Soneview"
+                  fechaCulminacion="22/11/2025"
+                  montoTotal="$760,00"
+                  cuotas={payments}
+                  imageUrl="https://www.semana.com/resizer/OUDEI6w9XDzirkJC7Zn0foRogYw=/arc-anglerfish-arc2-prod-semana/public/V3EVP6ZUEZFY7AIGESM76I43GE.jpg"
+                />
+              }
+              fileName="contrato_carlos_colmenarez.pdf"
+            >
+              {({ loading }) =>
+                loading ? "Generando PDF..." : "Descargar PDF"
+              }
+            </PDFDownloadLink> */}
+            <PDFViewer width="100%" height="1000">
+              <MyPdfDocument
+                cliente={(
+                  contract?.customerId.firstName.split(" ")[0] +
+                  " " +
+                  contract?.customerId.lastName.split(" ")[0]
+                ).toLowerCase()}
+                cedula={contract?.customerId.documentId ?? ""}
+                direccion={contract?.customerId.adress ?? ""}
+                fechaInicio={
+                  contract?.startDate?.split("T")[0] ??
+                  new Date().toISOString().split("T")[0]
+                }
+                descripcion={
+                  contract?.products.map(
+                    (p) => `(${p.quantity}) ${p.product.name}`
+                  ) || ["Sin productos"]
+                }
+                fechaCulminacion=""
+                montoTotal={contract?.totalPrice ?? 0}
+                cuotas={effectivePayments}
+                cantidadProductos={
+                  contract?.products.reduce(
+                    (total, p) => total + p.quantity,
+                    0
+                  ) ?? 0
+                }
+                //imageUrl={"askjda.com/sadsdas.jpg"} // base64 preferido
+              />
+            </PDFViewer>
           </div>
         </div>
       </div>

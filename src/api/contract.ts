@@ -31,18 +31,16 @@ export type Contract = {
   installmentAmount: number;
   agreement: "weekly" | "fortnightly";
   totalPrice: number;
-  products: [
-    {
-      id: string;
-      createdAt: Date;
-      updatedAt: Date;
-      deletedAt: Date | null;
-      product: Product;
-      deliveryDate: Date | null;
-      status: "to_buy" | "to_dispatch" | "dispatched";
-      quantity: number;
-    }
-  ];
+  products: {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date | null;
+    product: Product;
+    deliveryDate: Date | null;
+    status: "to_buy" | "to_dispatch" | "dispatched";
+    quantity: number;
+  }[];
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
