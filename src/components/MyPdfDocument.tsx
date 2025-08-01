@@ -53,6 +53,7 @@ const styles = StyleSheet.create({
   section: { marginBottom: 10 },
   table: {
     width: "auto",
+    maxHeight: 490,
     borderStyle: "solid",
     borderWidth: 1,
     borderRightWidth: 0,
@@ -105,6 +106,11 @@ export const MyPdfDocument = ({
 }: Props) => {
   const cantidadLetras = numeroALetras(montoTotal).toUpperCase();
   let accumulated = 0;
+  const debt = Math.min(
+    ...cuotas
+      .map((c) => (c.debt == null ? NaN : Number(c.debt)))
+      .filter((d) => !isNaN(d))
+  );
 
   function fechaEnPalabras(fechaString: string): string {
     const [año, mes, dia] = fechaString.split("-").map(Number);
@@ -200,7 +206,6 @@ export const MyPdfDocument = ({
             </View>
           </View>
 
-          {/* Fila 2: 1 columna que ocupa todo el ancho */}
           <View style={styles.tableRow}>
             <View
               style={[
@@ -226,7 +231,6 @@ export const MyPdfDocument = ({
             </View>
           </View>
 
-          {/* Fila 3: 4 columnas */}
           <View style={[styles.tableRow, { fontWeight: "bold" }]}>
             <Text style={[styles.tableCol, { width: "20%" }]}>MONTO:</Text>
             <Text style={[styles.tableCol, { width: "20%" }]}>
@@ -239,7 +243,6 @@ export const MyPdfDocument = ({
               {cuotas[cuotas.length - 1].dueDate.split("T")[0]}
             </Text>
           </View>
-          {/* Encabezados */}
           <View style={[styles.tableRow, styles.header]}>
             <View
               style={[
@@ -303,7 +306,6 @@ export const MyPdfDocument = ({
             </View>
           </View>
 
-          {/* Filas dinámicas */}
           {cuotas.map((cuota, index) => {
             let amount = cuota.contract.installmentAmount;
 
@@ -342,6 +344,35 @@ export const MyPdfDocument = ({
               </View>
             );
           })}
+          <View style={styles.tableRow}>
+            <View
+              style={[
+                styles.tableCol,
+                {
+                  width: "40%",
+                },
+              ]}
+            ></View>
+            <View
+              style={[
+                styles.tableCol,
+                {
+                  width: "60%",
+                  fontWeight: "bold",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  paddingLeft: 55,
+                },
+              ]}
+            >
+              <View>
+                <Text>TOTAL DEUDA:</Text>
+              </View>
+              <View>
+                <Text>${debt}</Text>
+              </View>
+            </View>
+          </View>
         </View>
       </Page>
     </Document>
