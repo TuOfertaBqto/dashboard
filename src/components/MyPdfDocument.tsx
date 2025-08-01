@@ -1,6 +1,7 @@
 import {
   Document,
   Font,
+  Image,
   Page,
   StyleSheet,
   Text,
@@ -9,6 +10,7 @@ import {
 import type { ContractPayment } from "../api/contract-payment";
 import { numeroALetras } from "../utils/numero-a-letras";
 import { translatePaymentMethod } from "../utils/translations";
+import { useEffect, useState } from "react";
 
 Font.registerHyphenationCallback((word) => [word]);
 
@@ -111,6 +113,24 @@ export const MyPdfDocument = ({
       .map((c) => (c.debt == null ? NaN : Number(c.debt)))
       .filter((d) => !isNaN(d))
   );
+  const [vendorImageBase64, setVendorImageBase64] = useState<string | null>(
+    null
+  );
+
+  useEffect(() => {
+    const loadImage = async () => {
+      const response = await fetch("/vendor.png"); // desde public
+      const blob = await response.blob();
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setVendorImageBase64(reader.result as string);
+      };
+      reader.readAsDataURL(blob);
+    };
+
+    loadImage();
+  }, []);
 
   function fechaEnPalabras(fechaString: string): string {
     const [año, mes, dia] = fechaString.split("-").map(Number);
@@ -405,34 +425,49 @@ export const MyPdfDocument = ({
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
-            marginTop: 60,
+            marginTop: 30,
             marginHorizontal: 20,
           }}
         >
           <View style={{ width: "35%", alignItems: "center" }}>
+            {vendorImageBase64 && (
+              <Image
+                src={vendorImageBase64}
+                style={{ width: 60, marginBottom: -11 }}
+              />
+            )}
+
             <View
               style={{
                 borderBottom: "1px solid black",
                 width: "100%",
                 height: 1,
-                marginBottom: 4,
+                marginBottom: 8,
               }}
             />
             <Text style={{ fontWeight: "bold" }}>“EL VENDEDOR”</Text>
           </View>
 
           <View style={{ width: "35%", alignItems: "center" }}>
+            <View style={{ height: 47.6, marginBottom: 4 }} />
             <View
               style={{
                 borderBottom: "1px solid black",
                 width: "100%",
                 height: 1,
-                marginBottom: 4,
+                marginBottom: 8,
               }}
             />
             <Text style={{ fontWeight: "bold" }}>“EL CLIENTE”</Text>
           </View>
         </View>
+
+        {/* <View style={{ alignItems: "center", marginTop: 20 }}>
+          <Image
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Fronalpstock_big.jpg/800px-Fronalpstock_big.jpg"
+            style={{ width: 120, height: 120 }}
+          />
+        </View> */}
       </Page>
     </Document>
   );
