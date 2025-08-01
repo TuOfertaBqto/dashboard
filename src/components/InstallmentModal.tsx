@@ -210,7 +210,7 @@ export const InstallmentModal = ({
                     0
                   ) ?? 0
                 }
-                //imageUrl={"askjda.com/sadsdas.jpg"} // base64 preferido
+                documentIdPhoto="https://res.cloudinary.com/dglodibsi/image/upload/v1754075399/main-sample.png"
               />
             </PDFViewer>
           </div>

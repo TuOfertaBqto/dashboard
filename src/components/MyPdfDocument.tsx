@@ -94,6 +94,7 @@ interface Props {
   montoTotal: number;
   cuotas: ContractPayment[];
   cantidadProductos: number;
+  documentIdPhoto: string;
 }
 
 export const MyPdfDocument = ({
@@ -105,6 +106,7 @@ export const MyPdfDocument = ({
   montoTotal,
   cuotas,
   cantidadProductos,
+  documentIdPhoto,
 }: Props) => {
   const cantidadLetras = numeroALetras(montoTotal).toUpperCase();
   let accumulated = 0;
@@ -462,12 +464,9 @@ export const MyPdfDocument = ({
           </View>
         </View>
 
-        {/* <View style={{ alignItems: "center", marginTop: 20 }}>
-          <Image
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Fronalpstock_big.jpg/800px-Fronalpstock_big.jpg"
-            style={{ width: 120, height: 120 }}
-          />
-        </View> */}
+        <View style={{ alignItems: "center", marginTop: 50 }}>
+          <Image src={documentIdPhoto} style={{ width: 200 }} />
+        </View>
       </Page>
     </Document>
   );
