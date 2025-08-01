@@ -401,6 +401,38 @@ export const MyPdfDocument = ({
             contrato, firmando en señal de conformidad.
           </Text>
         </View>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginTop: 60,
+            marginHorizontal: 20,
+          }}
+        >
+          <View style={{ width: "35%", alignItems: "center" }}>
+            <View
+              style={{
+                borderBottom: "1px solid black",
+                width: "100%",
+                height: 1,
+                marginBottom: 4,
+              }}
+            />
+            <Text style={{ fontWeight: "bold" }}>“EL VENDEDOR”</Text>
+          </View>
+
+          <View style={{ width: "35%", alignItems: "center" }}>
+            <View
+              style={{
+                borderBottom: "1px solid black",
+                width: "100%",
+                height: 1,
+                marginBottom: 4,
+              }}
+            />
+            <Text style={{ fontWeight: "bold" }}>“EL CLIENTE”</Text>
+          </View>
+        </View>
       </Page>
     </Document>
   );
