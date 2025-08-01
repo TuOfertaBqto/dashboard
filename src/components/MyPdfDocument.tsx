@@ -375,6 +375,33 @@ export const MyPdfDocument = ({
           </View>
         </View>
       </Page>
+      <Page size="A4" style={styles.page}>
+        <View style={styles.section}>
+          <Text style={{ textAlign: "justify" }}>
+            <Text style={{ fontWeight: "bold" }}>TERCERO: </Text>
+            Obligaciones de{" "}
+            <Text style={{ fontWeight: "bold", fontStyle: "italic" }}>
+              “EL CLIENTE”, “EL CLIENTE”
+            </Text>{" "}
+            se compromete a realizar los pagos en las fechas establecidas y a
+            informar a “EL VENDEDOR” en caso de cambios de contacto o retrasos
+            justificados.
+            {"\n\n"}
+            <Text style={{ fontWeight: "bold" }}>CUARTO: </Text>
+            Obligaciones de{" "}
+            <Text style={{ fontWeight: "bold", fontStyle: "italic" }}>
+              “EL VENDEDOR”, “EL VENDEDOR”
+            </Text>{" "}
+            garantiza la entrega del producto en buen estado al momento del
+            acuerdo y brindará soporte en caso de defectos atribuibles a la
+            fabricación.
+            {"\n\n"}
+            <Text style={{ fontWeight: "bold" }}>QUINTO: </Text>
+            Aceptación, ambas partes aceptan los términos descritos en este
+            contrato, firmando en señal de conformidad.
+          </Text>
+        </View>
+      </Page>
     </Document>
   );
 };
