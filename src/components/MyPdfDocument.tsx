@@ -99,12 +99,12 @@ export const MyPdfDocument = ({
   direccion,
   fechaInicio,
   descripcion,
-  //fechaCulminacion,
   montoTotal,
   cuotas,
   cantidadProductos,
 }: Props) => {
   const cantidadLetras = numeroALetras(montoTotal).toUpperCase();
+  let accumulated = 0;
 
   function fechaEnPalabras(fechaString: string): string {
     const [año, mes, dia] = fechaString.split("-").map(Number);
@@ -304,29 +304,44 @@ export const MyPdfDocument = ({
           </View>
 
           {/* Filas dinámicas */}
-          {cuotas.map((cuota, index) => (
-            <View style={styles.tableRow} key={index}>
-              <Text style={[styles.tableCol, { width: "20%" }]}>
-                CUOTA #{index + 1}
-              </Text>
-              <Text
-                style={[styles.tableCol, { width: "20%", textAlign: "center" }]}
-              >
-                {cuota.dueDate.split("T")[0]}
-              </Text>
-              <Text
-                style={[styles.tableCol, { width: "15%", textAlign: "center" }]}
-              >
-                ${cuota.contract.installmentAmount}
-              </Text>
-              <Text style={[styles.tableCol, { width: "25%" }]}>
-                {translatePaymentMethod(cuota.paymentMethod ?? "")}
-              </Text>
-              <Text style={[styles.tableCol, { width: "20%" }]}>
-                {cuota.debt ? "$" + cuota.debt : ""}
-              </Text>
-            </View>
-          ))}
+          {cuotas.map((cuota, index) => {
+            let amount = cuota.contract.installmentAmount;
+
+            if (index === cuotas.length - 1) {
+              amount = cuota.contract.totalPrice - accumulated;
+            }
+
+            accumulated += amount;
+            return (
+              <View style={styles.tableRow} key={index}>
+                <Text style={[styles.tableCol, { width: "20%" }]}>
+                  CUOTA #{index + 1}
+                </Text>
+                <Text
+                  style={[
+                    styles.tableCol,
+                    { width: "20%", textAlign: "center" },
+                  ]}
+                >
+                  {cuota.dueDate.split("T")[0]}
+                </Text>
+                <Text
+                  style={[
+                    styles.tableCol,
+                    { width: "15%", textAlign: "center" },
+                  ]}
+                >
+                  ${amount}
+                </Text>
+                <Text style={[styles.tableCol, { width: "25%" }]}>
+                  {translatePaymentMethod(cuota.paymentMethod ?? "")}
+                </Text>
+                <Text style={[styles.tableCol, { width: "20%" }]}>
+                  {cuota.debt ? "$" + cuota.debt : ""}
+                </Text>
+              </View>
+            );
+          })}
         </View>
       </Page>
     </Document>
