@@ -230,10 +230,10 @@ export const MyPdfDocument = ({
           <View style={[styles.tableRow, { fontWeight: "bold" }]}>
             <Text style={[styles.tableCol, { width: "20%" }]}>MONTO:</Text>
             <Text style={[styles.tableCol, { width: "20%" }]}>
-              ${montoTotal}
+              ${montoTotal.toFixed(2)}
             </Text>
             <Text style={[styles.tableCol, { width: "40%" }]}>
-              FECHA DE CULMINACIÓN
+              FECHA DE CULMINACIÓN:
             </Text>
             <Text style={[styles.tableCol, { width: "20%" }]}>
               {cuotas[cuotas.length - 1].dueDate.split("T")[0]}
@@ -241,15 +241,66 @@ export const MyPdfDocument = ({
           </View>
           {/* Encabezados */}
           <View style={[styles.tableRow, styles.header]}>
-            <Text style={[styles.tableCol, { width: "20%" }]}>CUOTAS</Text>
-            <Text style={[styles.tableCol, { width: "20%" }]}>
-              FECHA DE ABONO
-            </Text>
-            <Text style={[styles.tableCol, { width: "15%" }]}>MONTO</Text>
-            <Text style={[styles.tableCol, { width: "25%" }]}>
-              TIPO DE PAGO
-            </Text>
-            <Text style={[styles.tableCol, { width: "20%" }]}>SALDO</Text>
+            <View
+              style={[
+                styles.tableCol,
+                {
+                  width: "20%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                },
+              ]}
+            >
+              <Text>CUOTAS</Text>
+            </View>
+            <View
+              style={[
+                styles.tableCol,
+                {
+                  width: "20%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                },
+              ]}
+            >
+              <Text style={{ textAlign: "center" }}>FECHA DE ABONO</Text>
+            </View>
+            <View
+              style={[
+                styles.tableCol,
+                {
+                  width: "15%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                },
+              ]}
+            >
+              <Text>MONTO</Text>
+            </View>
+            <View
+              style={[
+                styles.tableCol,
+                {
+                  width: "25%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                },
+              ]}
+            >
+              <Text>TIPO DE PAGO</Text>
+            </View>
+            <View
+              style={[
+                styles.tableCol,
+                {
+                  width: "20%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                },
+              ]}
+            >
+              <Text>SALDO</Text>
+            </View>
           </View>
 
           {/* Filas dinámicas */}
@@ -258,10 +309,14 @@ export const MyPdfDocument = ({
               <Text style={[styles.tableCol, { width: "20%" }]}>
                 CUOTA #{index + 1}
               </Text>
-              <Text style={[styles.tableCol, { width: "20%" }]}>
+              <Text
+                style={[styles.tableCol, { width: "20%", textAlign: "center" }]}
+              >
                 {cuota.dueDate.split("T")[0]}
               </Text>
-              <Text style={[styles.tableCol, { width: "15%" }]}>
+              <Text
+                style={[styles.tableCol, { width: "15%", textAlign: "center" }]}
+              >
                 ${cuota.contract.installmentAmount}
               </Text>
               <Text style={[styles.tableCol, { width: "25%" }]}>
