@@ -90,7 +90,6 @@ interface Props {
   direccion: string;
   fechaInicio: string;
   descripcion: string[];
-  fechaCulminacion: string;
   montoTotal: number;
   cuotas: ContractPayment[];
   cantidadProductos: number;

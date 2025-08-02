@@ -1,9 +1,10 @@
-import { PDFViewer } from "@react-pdf/renderer";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import type { Contract } from "../api/contract";
 import type { ContractPayment } from "../api/contract-payment";
 import { generateInstallmentsFromContract } from "../utils/generateInstallments";
 import { translatePaymentMethod } from "../utils/translations";
 import MyPdfDocument from "./MyPdfDocument";
+import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 
 interface Props {
   open: boolean;
@@ -157,62 +158,61 @@ export const InstallmentModal = ({
 
           {/* Botón de cerrar */}
           <div className="flex justify-end mt-6">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-            >
-              Cerrar
-            </button>
-          </div>
-          <div>
-            {/* <PDFDownloadLink
-              document={
-                <MyPdfDocument
-                  cliente="CARLOS COLMENAREZ"
-                  fechaInicio="15/7/2025"
-                  descripcion="(01) Televisor Síragon 2025 de 43 pulgadas y (01) Lavadora doble tina de 9 kilogramos Soneview"
-                  fechaCulminacion="22/11/2025"
-                  montoTotal="$760,00"
-                  cuotas={payments}
-                  imageUrl="https://www.semana.com/resizer/OUDEI6w9XDzirkJC7Zn0foRogYw=/arc-anglerfish-arc2-prod-semana/public/V3EVP6ZUEZFY7AIGESM76I43GE.jpg"
-                />
-              }
-              fileName="contrato_carlos_colmenarez.pdf"
-            >
-              {({ loading }) =>
-                loading ? "Generando PDF..." : "Descargar PDF"
-              }
-            </PDFDownloadLink> */}
-            <PDFViewer width="100%" height="1000">
-              <MyPdfDocument
-                cliente={(
+            <div>
+              <PDFDownloadLink
+                document={
+                  <MyPdfDocument
+                    cliente={(
+                      contract?.customerId.firstName.split(" ")[0] +
+                      " " +
+                      contract?.customerId.lastName.split(" ")[0]
+                    ).toLowerCase()}
+                    cedula={contract?.customerId.documentId ?? ""}
+                    direccion={contract?.customerId.adress ?? ""}
+                    fechaInicio={
+                      contract?.startDate?.split("T")[0] ??
+                      new Date().toISOString().split("T")[0]
+                    }
+                    descripcion={
+                      contract?.products.map(
+                        (p) => `(${p.quantity}) ${p.product.name}`
+                      ) || ["Sin productos"]
+                    }
+                    montoTotal={contract?.totalPrice ?? 0}
+                    cuotas={effectivePayments}
+                    cantidadProductos={
+                      contract?.products.reduce(
+                        (total, p) => total + p.quantity,
+                        0
+                      ) ?? 0
+                    }
+                    documentIdPhoto={contract?.customerId.documentIdPhoto ?? ""}
+                  />
+                }
+                fileName={`Contrato ${
                   contract?.customerId.firstName.split(" ")[0] +
                   " " +
                   contract?.customerId.lastName.split(" ")[0]
-                ).toLowerCase()}
-                cedula={contract?.customerId.documentId ?? ""}
-                direccion={contract?.customerId.adress ?? ""}
-                fechaInicio={
-                  contract?.startDate?.split("T")[0] ??
-                  new Date().toISOString().split("T")[0]
-                }
-                descripcion={
-                  contract?.products.map(
-                    (p) => `(${p.quantity}) ${p.product.name}`
-                  ) || ["Sin productos"]
-                }
-                fechaCulminacion=""
-                montoTotal={contract?.totalPrice ?? 0}
-                cuotas={effectivePayments}
-                cantidadProductos={
-                  contract?.products.reduce(
-                    (total, p) => total + p.quantity,
-                    0
-                  ) ?? 0
-                }
-                documentIdPhoto={contract?.customerId.documentIdPhoto ?? ""}
-              />
-            </PDFViewer>
+                }.pdf`}
+              >
+                {({ loading }) => (
+                  <button
+                    type="button"
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-all mr-2 cursor-pointer"
+                    disabled={loading}
+                  >
+                    <ArrowDownTrayIcon className="w-5 h-5" />
+                    {loading ? "Generando PDF..." : "Descargar PDF"}
+                  </button>
+                )}
+              </PDFDownloadLink>
+            </div>
+            <button
+              onClick={onClose}
+              className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 cursor-pointer"
+            >
+              Cerrar
+            </button>
           </div>
         </div>
       </div>
