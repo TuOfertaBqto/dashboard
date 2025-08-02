@@ -210,7 +210,7 @@ export const InstallmentModal = ({
                     0
                   ) ?? 0
                 }
-                documentIdPhoto="https://res.cloudinary.com/dglodibsi/image/upload/v1754075399/main-sample.png"
+                documentIdPhoto={contract?.customerId.documentIdPhoto ?? ""}
               />
             </PDFViewer>
           </div>

@@ -463,10 +463,11 @@ export const MyPdfDocument = ({
             <Text style={{ fontWeight: "bold" }}>“EL CLIENTE”</Text>
           </View>
         </View>
-
-        <View style={{ alignItems: "center", marginTop: 50 }}>
-          <Image src={documentIdPhoto} style={{ width: 200 }} />
-        </View>
+        {documentIdPhoto && (
+          <View style={{ alignItems: "center", marginTop: 50 }}>
+            <Image src={documentIdPhoto} style={{ width: 200 }} />
+          </View>
+        )}
       </Page>
     </Document>
   );

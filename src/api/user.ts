@@ -15,6 +15,7 @@ export type User = {
   phoneNumber: string;
   adress: string;
   role: UserRole;
+  documentIdPhoto?: string;
 };
 
 export const userApi = {
