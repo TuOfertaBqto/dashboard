@@ -86,7 +86,8 @@ const styles = StyleSheet.create({
 });
 
 interface Props {
-  cliente: string;
+  name: string;
+  lastName: string;
   cedula: string;
   direccion: string;
   fechaInicio: string;
@@ -98,7 +99,8 @@ interface Props {
 }
 
 export const MyPdfDocument = ({
-  cliente,
+  name,
+  lastName,
   cedula,
   direccion,
   fechaInicio,
@@ -177,8 +179,10 @@ export const MyPdfDocument = ({
             del propietario y/o representante legal que suscribe el presente
             contrato, a quien en adelante se le denominará el “EL VENDEDOR” ; y,
             por otra parte, el(la) ciudadano(a){" "}
-            <Text style={{ fontWeight: "bold" }}>{cliente.toUpperCase()}</Text>,
-            venezolano, mayor de edad, titular de la cédula de identidad{" "}
+            <Text style={{ fontWeight: "bold" }}>
+              {name} {lastName}
+            </Text>
+            , venezolano, mayor de edad, titular de la cédula de identidad{" "}
             <Text style={{ fontWeight: "bold" }}>V-{cedula}</Text>{" "}
             <Text style={{ fontWeight: "bold", fontStyle: "italic" }}>
               Domiciliado: {direccion}
@@ -211,7 +215,7 @@ export const MyPdfDocument = ({
             <Text
               style={[styles.tableCol, { width: "40%", textAlign: "center" }]}
             >
-              {cliente.toUpperCase()}
+              {name.split(" ")[0]} {lastName.split(" ")[0]}
             </Text>
             <View
               style={[

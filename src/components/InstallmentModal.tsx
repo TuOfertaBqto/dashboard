@@ -165,11 +165,12 @@ export const InstallmentModal = ({
               <PDFDownloadLink
                 document={
                   <MyPdfDocument
-                    cliente={(
-                      contract?.customerId.firstName.split(" ")[0] +
-                      " " +
-                      contract?.customerId.lastName.split(" ")[0]
-                    ).toLowerCase()}
+                    name={
+                      contract?.customerId.firstName.trim().toUpperCase() ?? ""
+                    }
+                    lastName={
+                      contract?.customerId.lastName.trim().toUpperCase() ?? ""
+                    }
                     cedula={contract?.customerId.documentId ?? ""}
                     direccion={contract?.customerId.adress ?? ""}
                     fechaInicio={
