@@ -229,7 +229,7 @@ export default function UserFormPage() {
 
           {form.role === "customer" && (
             <div>
-              <label className="block text-sm mb-1">Foto la cédula</label>
+              <label className="block text-sm mb-1">Foto de la cédula</label>
               <input
                 ref={fileInputRef}
                 type="file"
