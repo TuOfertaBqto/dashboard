@@ -15,7 +15,7 @@ export default function Login() {
 
   const isDisabled = !email || !password;
 
-  const allowedRoles = ["super_admin", "admin", "main"];
+  const allowedRoles = ["super_admin", "admin", "main", "vendor"];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

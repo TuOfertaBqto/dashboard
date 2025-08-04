@@ -11,7 +11,7 @@ export const PrivateRoute = ({
 
   if (!token || !user) return <Navigate to="/login" replace />;
 
-  const allowedRoles = ["super_admin", "admin", "main"];
+  const allowedRoles = ["super_admin", "admin", "main", "vendor"];
   if (!allowedRoles.includes(user.role))
     return <Navigate to="/login" replace />;
 
