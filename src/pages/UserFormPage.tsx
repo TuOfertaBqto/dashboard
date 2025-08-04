@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { userApi, type User } from "../api/user";
+import { userApi, type User, type UserRole } from "../api/user";
 import { useAuth } from "../auth/useAuth";
 import { TrashIcon } from "@heroicons/react/24/outline";
 
@@ -49,7 +49,21 @@ export default function UserFormPage() {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    if (name === "role" && value !== "customer") {
+      setLocalImage(null);
+      setForm((prevForm) => ({
+        ...prevForm,
+        [name]: value as UserRole,
+        documentIdPhoto: "",
+      }));
+    } else {
+      setForm((prevForm) => ({
+        ...prevForm,
+        [name]: value,
+      }));
+    }
   };
 
   const handleRemoveImage = () => {
@@ -92,9 +106,8 @@ export default function UserFormPage() {
     setLoading(true);
 
     try {
-      let documentIdPhoto = form.documentIdPhoto || "";
+      let documentIdPhoto = form.documentIdPhoto || undefined;
 
-      // Si hay imagen local nueva, subir a Cloudinary primero
       if (localImage) {
         documentIdPhoto = await uploadImageToCloudinary(localImage);
       }
