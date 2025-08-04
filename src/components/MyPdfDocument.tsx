@@ -11,6 +11,7 @@ import type { ContractPayment } from "../api/contract-payment";
 import { numeroALetras } from "../utils/numero-a-letras";
 import { translatePaymentMethod } from "../utils/translations";
 import { useEffect, useState } from "react";
+import dayjs from "dayjs";
 
 Font.registerHyphenationCallback((word) => [word]);
 
@@ -223,7 +224,7 @@ export const MyPdfDocument = ({
               ]}
             >
               <Text>FECHA INICIO:</Text>
-              <Text>{fechaInicio}</Text>
+              <Text>{dayjs(fechaInicio).format("DD-MM-YYYY")}</Text>
             </View>
           </View>
 
@@ -261,7 +262,9 @@ export const MyPdfDocument = ({
               FECHA DE CULMINACIÓN:
             </Text>
             <Text style={[styles.tableCol, { width: "20%" }]}>
-              {cuotas[cuotas.length - 1].dueDate.split("T")[0]}
+              {dayjs(cuotas[cuotas.length - 1].dueDate.split("T")[0]).format(
+                "DD-MM-YYYY"
+              )}
             </Text>
           </View>
           <View style={[styles.tableRow, styles.header]}>
@@ -346,7 +349,7 @@ export const MyPdfDocument = ({
                     { width: "20%", textAlign: "center" },
                   ]}
                 >
-                  {cuota.dueDate.split("T")[0]}
+                  {dayjs(cuota.dueDate.split("T")[0]).format("DD-MM-YYYY")}
                 </Text>
                 <Text
                   style={[

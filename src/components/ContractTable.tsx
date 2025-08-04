@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import type { Contract } from "../api/contract";
 import { DeleteButton, DispatchButton, EditButton } from "./ActionButtons";
 
@@ -114,8 +115,18 @@ export const ContractTable = ({
                   ))}
                 </td>
                 <td className="p-2">${contract.totalPrice}</td>
-                <td className="p-2">{contract.startDate?.split("T")[0]}</td>
-                <td className="p-2">{contract.endDate?.split("T")[0]}</td>
+                <td className="p-2">
+                  {dayjs(contract.startDate?.split("T")[0]).format(
+                    "DD-MM-YYYY"
+                  )}
+                </td>
+                <td className="p-2">
+                  {contract.endDate?.split("T")[0]
+                    ? dayjs(contract.endDate?.split("T")[0]).format(
+                        "DD-MM-YYYY"
+                      )
+                    : ""}
+                </td>
                 <td className="p-3">
                   <div className="flex flex-col gap-1">
                     {!contract.startDate && (

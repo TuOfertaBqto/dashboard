@@ -5,6 +5,7 @@ import { generateInstallmentsFromContract } from "../utils/generateInstallments"
 import { translatePaymentMethod } from "../utils/translations";
 import MyPdfDocument from "./MyPdfDocument";
 import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
+import dayjs from "dayjs";
 
 interface Props {
   open: boolean;
@@ -137,7 +138,9 @@ export const InstallmentModal = ({
                   return (
                     <tr key={p.id} className="border-t">
                       <td className="p-2">{index + 1}</td>
-                      <td className="p-2">{p.dueDate.split("T")[0]}</td>
+                      <td className="p-2">
+                        {dayjs(p.dueDate.split("T")[0]).format("DD-MM-YYYY")}
+                      </td>
                       <td className="p-2">${amount}</td>
                       <td className="p-2">
                         {p.amountPaid ? `$${p.amountPaid}` : "—"}
