@@ -84,7 +84,7 @@ export default function UserFormPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!form.documentIdPhoto && !localImage) {
+    if (!form.documentIdPhoto && !localImage && form.role === "customer") {
       alert("Debes seleccionar una imagen.");
       return;
     }
@@ -227,32 +227,34 @@ export default function UserFormPage() {
             />
           </div>
 
-          <div>
-            <label className="block text-sm mb-1">Foto la cédula</label>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="w-full border p-2 rounded cursor-pointer"
-            />
-            {form.documentIdPhoto && (
-              <div
-                className="relative inline-block mt-2 rounded overflow-hidden cursor-pointer transition duration-300 ease-in-out brightness-100 hover:brightness-75"
-                title="Haz click para eliminar la imagen"
-                onClick={handleRemoveImage}
-              >
-                <img
-                  src={form.documentIdPhoto}
-                  alt="Preview"
-                  className="w-full h-full object-cover"
-                />
-                <div className="w-full h-full absolute inset-0 m-auto opacity-0 hover:opacity-100 transition-opacity duration-300">
-                  <TrashIcon className="absolute inset-0 m-auto w-8 h-8 text-white " />
+          {form.role === "customer" && (
+            <div>
+              <label className="block text-sm mb-1">Foto la cédula</label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="w-full border p-2 rounded cursor-pointer"
+              />
+              {form.documentIdPhoto && (
+                <div
+                  className="relative inline-block mt-2 rounded overflow-hidden cursor-pointer transition duration-300 ease-in-out brightness-100 hover:brightness-75"
+                  title="Haz click para eliminar la imagen"
+                  onClick={handleRemoveImage}
+                >
+                  <img
+                    src={form.documentIdPhoto}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="w-full h-full absolute inset-0 m-auto opacity-0 hover:opacity-100 transition-opacity duration-300">
+                    <TrashIcon className="absolute inset-0 m-auto w-8 h-8 text-white " />
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="flex justify-end gap-2">
