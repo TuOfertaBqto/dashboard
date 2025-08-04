@@ -78,7 +78,9 @@ export const InstallmentListPage = () => {
                       i.contract.installmentAmount - (i.amountPaid ?? 0)
                     )}
                   </td>
-                  <td className="p-3">{i.dueDate.split("T")[0]}</td>
+                  <td className="p-3">
+                    {dayjs(i.dueDate.split("T")[0]).format("DD-MM-YYYY")}
+                  </td>
                   <td className="p-3">
                     <span
                       className={classNames(
