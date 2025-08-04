@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { userApi, type User } from "../api/user";
+import { userApi, type User, type UserRole } from "../api/user";
 import { useAuth } from "../auth/useAuth";
 import { TrashIcon } from "@heroicons/react/24/outline";
 
@@ -49,7 +49,21 @@ export default function UserFormPage() {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    if (name === "role" && value !== "customer") {
+      setLocalImage(null);
+      setForm((prevForm) => ({
+        ...prevForm,
+        [name]: value as UserRole,
+        documentIdPhoto: "",
+      }));
+    } else {
+      setForm((prevForm) => ({
+        ...prevForm,
+        [name]: value,
+      }));
+    }
   };
 
   const handleRemoveImage = () => {
@@ -84,7 +98,7 @@ export default function UserFormPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!form.documentIdPhoto && !localImage) {
+    if (!form.documentIdPhoto && !localImage && form.role === "customer") {
       alert("Debes seleccionar una imagen.");
       return;
     }
@@ -92,9 +106,8 @@ export default function UserFormPage() {
     setLoading(true);
 
     try {
-      let documentIdPhoto = form.documentIdPhoto || "";
+      let documentIdPhoto = form.documentIdPhoto || undefined;
 
-      // Si hay imagen local nueva, subir a Cloudinary primero
       if (localImage) {
         documentIdPhoto = await uploadImageToCloudinary(localImage);
       }
@@ -227,32 +240,34 @@ export default function UserFormPage() {
             />
           </div>
 
-          <div>
-            <label className="block text-sm mb-1">Foto la cédula</label>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="w-full border p-2 rounded cursor-pointer"
-            />
-            {form.documentIdPhoto && (
-              <div
-                className="relative inline-block mt-2 rounded overflow-hidden cursor-pointer transition duration-300 ease-in-out brightness-100 hover:brightness-75"
-                title="Haz click para eliminar la imagen"
-                onClick={handleRemoveImage}
-              >
-                <img
-                  src={form.documentIdPhoto}
-                  alt="Preview"
-                  className="w-full h-full object-cover"
-                />
-                <div className="w-full h-full absolute inset-0 m-auto opacity-0 hover:opacity-100 transition-opacity duration-300">
-                  <TrashIcon className="absolute inset-0 m-auto w-8 h-8 text-white " />
+          {form.role === "customer" && (
+            <div>
+              <label className="block text-sm mb-1">Foto de la cédula</label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="w-full border p-2 rounded cursor-pointer"
+              />
+              {form.documentIdPhoto && (
+                <div
+                  className="relative inline-block mt-2 rounded overflow-hidden cursor-pointer transition duration-300 ease-in-out brightness-100 hover:brightness-75"
+                  title="Haz click para eliminar la imagen"
+                  onClick={handleRemoveImage}
+                >
+                  <img
+                    src={form.documentIdPhoto}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="w-full h-full absolute inset-0 m-auto opacity-0 hover:opacity-100 transition-opacity duration-300">
+                    <TrashIcon className="absolute inset-0 m-auto w-8 h-8 text-white " />
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="flex justify-end gap-2">
