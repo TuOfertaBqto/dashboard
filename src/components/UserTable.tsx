@@ -21,7 +21,7 @@ export const UserTable = ({ users, loading, onEdit, onDelete }: Props) => {
             <th className="p-3 w-[75px]">Codigo</th>
             <th className="p-3">Nombre</th>
             <th className="p-3">Correo</th>
-            <th className="p-3">Rol</th>
+            {userRole !== "vendor" && <th className="p-3">Rol</th>}
             <th className="p-3">Acciones</th>
           </tr>
         </thead>
@@ -42,7 +42,9 @@ export const UserTable = ({ users, loading, onEdit, onDelete }: Props) => {
                   {user.firstName} {user.lastName}
                 </td>
                 <td className="p-3">{user.email}</td>
-                <td className="p-3">{translateUserRole(user.role)}</td>
+                {userRole !== "vendor" && (
+                  <td className="p-3">{translateUserRole(user.role)}</td>
+                )}
                 {(userRole === "main" ||
                   user.role === "vendor" ||
                   user.role === "customer") && (
@@ -53,12 +55,14 @@ export const UserTable = ({ users, loading, onEdit, onDelete }: Props) => {
                         onEdit(user);
                       }}
                     />
-                    <DeleteButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDelete(user.id);
-                      }}
-                    />
+                    {userRole !== "vendor" && (
+                      <DeleteButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDelete(user.id);
+                        }}
+                      />
+                    )}
                   </td>
                 )}
               </tr>
