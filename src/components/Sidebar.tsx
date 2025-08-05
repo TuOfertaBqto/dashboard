@@ -44,14 +44,9 @@ export const Sidebar = () => {
 
   const generalMenuItems: MenuItem[] = [
     {
-      name: "Pagos",
-      icon: <CurrencyDollarIcon className="h-5 w-5" />,
-      route: "/installments",
-    },
-    {
-      name: "Contratos",
-      icon: <DocumentTextIcon className="h-5 w-5" />,
-      route: "/contracts",
+      name: "Usuarios",
+      icon: <UsersIcon className="h-5 w-5" />,
+      route: "/users",
     },
     {
       name: "Inventario",
@@ -70,18 +65,25 @@ export const Sidebar = () => {
     userRole === "super_admin" ||
     userRole === "admin"
   ) {
-    generalMenuItems.push({
-      name: "Usuarios",
-      icon: <UsersIcon className="h-5 w-5" />,
-      route: "/users",
-    });
+    generalMenuItems.unshift(
+      {
+        name: "Pagos",
+        icon: <CurrencyDollarIcon className="h-5 w-5" />,
+        route: "/installments",
+      },
+      {
+        name: "Contratos",
+        icon: <DocumentTextIcon className="h-5 w-5" />,
+        route: "/contracts",
+      }
+    );
   }
 
   if (userRole === "main") {
     generalMenuItems.unshift({
       name: "Dashboard",
       icon: <SquaresPlusIcon className="h-5 w-5" />,
-      route: "/",
+      route: "/dashboard",
     });
   }
 

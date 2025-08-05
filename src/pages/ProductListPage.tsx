@@ -5,8 +5,10 @@ import { ProductTable } from "../components/ProductTable";
 import { ConfirmModal } from "../components/ConfirmModal";
 import { InventoryApi, type Inventory } from "../api/inventory";
 import { InventoryMovApi } from "../api/inventory-movement";
+import { useAuth } from "../auth/useAuth";
 
 export const ProductListPage = () => {
+  const { user } = useAuth();
   const [inventory, setInventory] = useState<Inventory[]>([]);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [openInventoryModal, setOpenInventoryModal] = useState(false);
@@ -49,20 +51,22 @@ export const ProductListPage = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-xl font-semibold">Productos</h1>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setOpenInventoryModal(true)}
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 cursor-pointer"
-          >
-            Ingreso de inventario
-          </button>
-          <button
-            onClick={() => navigate("/products/new")}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer"
-          >
-            Nuevo producto
-          </button>
-        </div>
+        {user?.role !== "vendor" && (
+          <div className="flex gap-2">
+            <button
+              onClick={() => setOpenInventoryModal(true)}
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 cursor-pointer"
+            >
+              Ingreso de inventario
+            </button>
+            <button
+              onClick={() => navigate("/products/new")}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer"
+            >
+              Nuevo producto
+            </button>
+          </div>
+        )}
       </div>
 
       <ProductTable

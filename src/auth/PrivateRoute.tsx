@@ -2,18 +2,19 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "./useAuth";
 
-export const PrivateRoute = ({
-  children,
-}: {
+interface PrivateRouteProps {
   children: React.ReactElement;
-}) => {
+  allowedRoles: string[];
+}
+
+export const PrivateRoute = ({ children, allowedRoles }: PrivateRouteProps) => {
   const { token, user } = useAuth();
 
   if (!token || !user) return <Navigate to="/login" replace />;
 
-  const allowedRoles = ["super_admin", "admin", "main", "vendor"];
-  if (!allowedRoles.includes(user.role))
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
     return <Navigate to="/login" replace />;
+  }
 
   return children;
 };
