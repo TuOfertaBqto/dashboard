@@ -196,7 +196,8 @@ export default function UserFormPage() {
               name="role"
               value={form.role}
               onChange={handleChange}
-              className="w-full border p-2 rounded"
+              className="w-full border p-2 rounded disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
+              disabled={user?.role === "vendor"}
               required
             >
               {user?.role === "main" && (
