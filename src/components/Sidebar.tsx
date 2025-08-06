@@ -84,7 +84,7 @@ export const Sidebar = () => {
     generalMenuItems.unshift({
       name: "Solicitudes",
       icon: <DocumentArrowUpIcon className="h-5 w-5" />,
-      route: "/request",
+      route: "/requests",
     });
   }
 

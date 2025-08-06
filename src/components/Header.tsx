@@ -4,7 +4,9 @@ import {
   Bars3Icon,
   CubeIcon,
   CurrencyDollarIcon,
+  DocumentArrowUpIcon,
   DocumentTextIcon,
+  SquaresPlusIcon,
   UsersIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
@@ -73,26 +75,54 @@ export const Header = () => {
 
           <div className="absolute top-18 left-0 w-full bg-[#1f2937] text-white shadow-md z-50 animate-slide-down md:hidden">
             <ul className="flex flex-col divide-y divide-gray-200">
-              <li
-                className="p-4 flex items-center gap-2 active:bg-[#111827]"
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  navigate("/installments");
-                }}
-              >
-                <CurrencyDollarIcon className="h-5 w-5" />
-                Pagos
-              </li>
-              <li
-                className="p-4 flex items-center gap-2 active:bg-[#111827]"
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  navigate("/contracts");
-                }}
-              >
-                <DocumentTextIcon className="h-5 w-5" />
-                Contratos
-              </li>
+              {user?.role == "main" && (
+                <li
+                  className="p-4 flex items-center gap-2 active:bg-[#111827]"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    navigate("/dashboard");
+                  }}
+                >
+                  <SquaresPlusIcon className="w-5 h-5" />
+                  Dashboard
+                </li>
+              )}
+              {(user?.role == "main" || user?.role == "vendor") && (
+                <li
+                  className="p-4 flex items-center gap-2 active:bg-[#111827]"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    navigate("/requests");
+                  }}
+                >
+                  <DocumentArrowUpIcon className="w-5 h-5" />
+                  Solicitudes
+                </li>
+              )}
+              {user?.role !== "vendor" && (
+                <>
+                  <li
+                    className="p-4 flex items-center gap-2 active:bg-[#111827]"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      navigate("/installments");
+                    }}
+                  >
+                    <CurrencyDollarIcon className="h-5 w-5" />
+                    Pagos
+                  </li>
+                  <li
+                    className="p-4 flex items-center gap-2 active:bg-[#111827]"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      navigate("/contracts");
+                    }}
+                  >
+                    <DocumentTextIcon className="h-5 w-5" />
+                    Contratos
+                  </li>
+                </>
+              )}
               <li
                 className="p-4 flex items-center gap-2 active:bg-[#111827]"
                 onClick={() => {
