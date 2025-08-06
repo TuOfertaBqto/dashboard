@@ -8,6 +8,7 @@ import {
   ArrowRightEndOnRectangleIcon,
   DocumentTextIcon,
   CurrencyDollarIcon,
+  DocumentArrowUpIcon,
 } from "@heroicons/react/24/outline";
 
 import { useState } from "react";
@@ -77,6 +78,14 @@ export const Sidebar = () => {
         route: "/contracts",
       }
     );
+  }
+
+  if (userRole === "main" || userRole === "vendor") {
+    generalMenuItems.unshift({
+      name: "Solicitudes",
+      icon: <DocumentArrowUpIcon className="h-5 w-5" />,
+      route: "/request",
+    });
   }
 
   if (userRole === "main") {
