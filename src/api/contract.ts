@@ -9,11 +9,20 @@ type ContractProduct = {
 };
 
 export type CreateContract = {
-  vendorId: string;
+  vendorId?: string;
   customerId: string;
   requestDate: string;
   startDate?: string | null;
   endDate?: string | null;
+  installmentAmount: number;
+  agreement: "weekly" | "fortnightly";
+  totalPrice: number;
+  products: ContractProduct[];
+};
+
+export type CreateContractRequest = {
+  customerId: string;
+  requestDate: string;
   installmentAmount: number;
   agreement: "weekly" | "fortnightly";
   totalPrice: number;

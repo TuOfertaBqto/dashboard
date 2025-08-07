@@ -1,8 +1,10 @@
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import "dayjs/locale/es";
 import type { Contract } from "../api/contract";
 import { DeleteButton, EditButton } from "./ActionButtons";
+import dayjs from "dayjs";
+import "dayjs/locale/es";
+import utc from "dayjs/plugin/utc";
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(utc);
 dayjs.extend(relativeTime);
 dayjs.locale("es");
 
@@ -13,21 +15,21 @@ interface Props {
 }
 
 export function RequestedCard({ contract, onEdit, onDelete }: Props) {
+  console.log(contract.createdAt);
+
   return (
     <div className="bg-white shadow-md rounded-2xl p-5 transition hover:shadow-lg space-y-4">
       <div className="flex justify-between items-start">
-        <div>
+        <div className="flex items-center space-x-2">
           <h2 className="text-xl font-semibold text-gray-800">
             Contrato #{contract.code}
           </h2>
-          <p className="text-xs text-gray-500">
-            Solicitado{" "}
-            {dayjs(contract.requestDate.split("T")[0])
-              .startOf("day")
-              .from(dayjs().startOf("day"))}
-          </p>
+          <span className="text-xs text-gray-500 font-normal">
+            {dayjs(contract.createdAt).utc().local().fromNow()}
+          </span>
         </div>
-        <div className="flex gap-2">
+
+        {/* <div className="flex gap-2">
           <EditButton
             onClick={(e) => {
               e.stopPropagation();
@@ -40,7 +42,7 @@ export function RequestedCard({ contract, onEdit, onDelete }: Props) {
               onDelete?.(contract.id);
             }}
           />
-        </div>
+        </div> */}
       </div>
 
       <div className="grid grid-cols-2 gap-4">

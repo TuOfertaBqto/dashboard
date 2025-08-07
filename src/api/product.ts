@@ -8,6 +8,7 @@ export type Product = {
   deletedAt: Date | null;
   name: string;
   description: string | null;
+  installmentAmount: number;
   price: number;
   categoryId: Category;
 };
