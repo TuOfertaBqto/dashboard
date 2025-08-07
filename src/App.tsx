@@ -14,6 +14,7 @@ import { NotFoundPage } from "./pages/NotFoundPage";
 import { InstallmentListPage } from "./pages/InstallmentListPage";
 import { InstallmentPaymentPage } from "./pages/InstallmentPaymentPage";
 import RequestedContractsPage from "./pages/RequestedContractsPage";
+import ContractRequestFormPage from "./pages/ContractRequestFormPage";
 
 function App() {
   const allowedRoles = ["super_admin", "admin", "main"];
@@ -139,6 +140,15 @@ function App() {
               element={
                 <PrivateRoute allowedRoles={onlyVendorMain}>
                   <RequestedContractsPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="requests/new"
+              element={
+                <PrivateRoute allowedRoles={onlyVendorMain}>
+                  <ContractRequestFormPage />
                 </PrivateRoute>
               }
             />
