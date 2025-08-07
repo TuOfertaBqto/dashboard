@@ -57,6 +57,16 @@ export const ContractApi = {
     }
   },
 
+  getRequested: async (): Promise<Contract[]> => {
+    try {
+      const res = await api.get("/contract/request");
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching contract:", error);
+      return [];
+    }
+  },
+
   getById: async (id: string): Promise<Contract> => {
     try {
       const res = await api.get(`/contract/${id}`);

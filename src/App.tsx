@@ -13,10 +13,12 @@ import { ProductFormPage } from "./pages/ProductFormPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { InstallmentListPage } from "./pages/InstallmentListPage";
 import { InstallmentPaymentPage } from "./pages/InstallmentPaymentPage";
+import RequestedContractsPage from "./pages/RequestedContractsPage";
 
 function App() {
   const allowedRoles = ["super_admin", "admin", "main"];
   const allowedRolesWithVendor = ["super_admin", "admin", "main", "vendor"];
+  const onlyVendorMain = ["main", "vendor"];
   return (
     <AuthProvider>
       <BrowserRouter>
@@ -128,6 +130,15 @@ function App() {
               element={
                 <PrivateRoute allowedRoles={allowedRoles}>
                   <ProductFormPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="requests"
+              element={
+                <PrivateRoute allowedRoles={onlyVendorMain}>
+                  <RequestedContractsPage />
                 </PrivateRoute>
               }
             />
