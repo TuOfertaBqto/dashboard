@@ -2,9 +2,12 @@ import { useEffect, useState } from "react";
 import { ContractApi, type Contract } from "../api/contract";
 import { RequestedCard } from "../components/RequestedCard";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/useAuth";
+import type { UserRole } from "../api/user";
 
 export default function RequestedContractsPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [, setLoading] = useState<boolean>(false);
 
@@ -24,7 +27,15 @@ export default function RequestedContractsPage() {
     fetchRequestedContracts();
   }, []);
 
-  const handleCancel = async (id: string) => {
+  const handleApprove = async (id: string): Promise<Contract> => {
+    const contractApproved = await ContractApi.update(id, {
+      status: "approved",
+    });
+    fetchRequestedContracts();
+    return contractApproved;
+  };
+
+  const handleCancel = async (id: string): Promise<Contract> => {
     const contractCanceled = await ContractApi.update(id, {
       status: "canceled",
     });
@@ -32,6 +43,11 @@ export default function RequestedContractsPage() {
     fetchRequestedContracts();
 
     return contractCanceled;
+  };
+
+  const handleDelete = async (id: string): Promise<void> => {
+    await ContractApi.remove(id);
+    fetchRequestedContracts();
   };
 
   return (
@@ -50,8 +66,11 @@ export default function RequestedContractsPage() {
         {contracts.map((contract) => (
           <RequestedCard
             key={contract.id}
+            role={user?.role as UserRole}
             contract={contract}
+            onApprove={(id) => handleApprove(id)}
             onCancel={(id) => handleCancel(id)}
+            onDelete={(id) => handleDelete(id)}
           />
         ))}
       </div>

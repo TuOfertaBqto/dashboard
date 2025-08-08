@@ -1,25 +1,34 @@
 import { type Contract } from "../api/contract";
-import { DeleteButton, EditButton } from "./ActionButtons";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
 import utc from "dayjs/plugin/utc";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import type { UserRole } from "../api/user";
 dayjs.extend(utc);
 dayjs.extend(relativeTime);
 dayjs.locale("es");
 
 interface Props {
+  role: UserRole;
   contract: Contract;
-  onEdit?: (contract: Contract) => void;
+  onApprove: (id: string) => Promise<Contract>;
   onCancel: (id: string) => Promise<Contract>;
-  onDelete?: (id: string) => void;
+  onDelete: (id: string) => Promise<void>;
 }
 
-export function RequestedCard({ contract, onEdit, onCancel }: Props) {
+export function RequestedCard({
+  role,
+  contract,
+  onApprove,
+  onCancel,
+  onDelete,
+}: Props) {
   const navigate = useNavigate();
+  const [approvingId, setApprovingId] = useState<string | null>(null);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [deletionId, setDeletionId] = useState<string | null>(null);
 
   const amount = contract.products.reduce((sum, cp) => {
     return sum + cp.product.installmentAmount * cp.quantity;
@@ -83,33 +92,67 @@ export function RequestedCard({ contract, onEdit, onCancel }: Props) {
           ${contract.totalPrice}
         </span>
         <div className="flex gap-2">
-          <button
-            className="px-3 py-1 rounded-md bg-green-600 text-white text-sm hover:bg-green-700"
-            onClick={(e) => {
-              e.stopPropagation();
-              onApprove?.(contract.id);
-            }}
-          >
-            Aprobar
-          </button>
-          <button
-            className={`px-3 py-1 rounded-md text-white text-sm transition 
+          {role == "main" && (
+            <>
+              <button
+                className={`px-3 py-1 rounded-md text-white text-sm transition ${
+                  approvingId === contract.id
+                    ? "bg-green-400 cursor-not-allowed"
+                    : "bg-green-600 hover:bg-green-700"
+                }`}
+                disabled={approvingId === contract.id}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setApprovingId(contract.id);
+                  onApprove(contract.id).finally(() => {
+                    setApprovingId(null);
+                  });
+                }}
+              >
+                {approvingId === contract.id ? "Aprobando..." : "Aprobar"}
+              </button>
+
+              <button
+                className={`px-3 py-1 rounded-md text-white text-sm transition 
     ${
       cancellingId === contract.id
         ? "bg-gray-400 cursor-not-allowed"
         : "bg-red-500 hover:bg-red-600"
     }`}
-            disabled={cancellingId === contract.id}
-            onClick={(e) => {
-              e.stopPropagation();
-              setCancellingId(contract.id); // indica que este contrato está siendo cancelado
-              onCancel(contract.id).finally(() => {
-                setCancellingId(null);
-              });
-            }}
-          >
-            {cancellingId === contract.id ? "Cancelando..." : "Cancelar"}
-          </button>
+                disabled={cancellingId === contract.id}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCancellingId(contract.id);
+                  onCancel(contract.id).finally(() => {
+                    setCancellingId(null);
+                  });
+                }}
+              >
+                {cancellingId === contract.id ? "Cancelando..." : "Cancelar"}
+              </button>
+            </>
+          )}
+
+          {role == "vendor" && (
+            <button
+              className={`px-3 py-1 rounded-md text-white text-sm transition 
+    ${
+      deletionId === contract.id
+        ? "bg-gray-400 cursor-not-allowed"
+        : "bg-red-500 hover:bg-red-600"
+    }`}
+              disabled={deletionId === contract.id}
+              onClick={(e) => {
+                e.stopPropagation();
+                setDeletionId(contract.id);
+                onDelete(contract.id).finally(() => {
+                  setDeletionId(null);
+                });
+              }}
+            >
+              {deletionId === contract.id ? "Eliminando..." : "Eliminar"}
+            </button>
+          )}
         </div>
       </div>
     </div>
