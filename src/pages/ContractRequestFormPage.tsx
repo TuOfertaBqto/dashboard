@@ -197,7 +197,9 @@ export default function ContractRequestFormPage() {
                   type="number"
                   min="1"
                   step="1"
-                  className="w-full border p-2 rounded"
+                  className={`w-full border p-2 rounded ${
+                    isEdit ? "bg-gray-100 cursor-not-allowed" : ""
+                  } `}
                   value={p.quantity === 0 ? "" : p.quantity}
                   onChange={(e) => {
                     const value = e.target.value;
@@ -207,7 +209,7 @@ export default function ContractRequestFormPage() {
                     setForm({ ...form, products: updated });
                   }}
                   required
-                  disabled={!!initialData?.id}
+                  readOnly={!!initialData?.id}
                 />
               </div>
 

@@ -153,6 +153,15 @@ function App() {
               }
             />
 
+            <Route
+              path="requests/:id/edit"
+              element={
+                <PrivateRoute allowedRoles={onlyVendorMain}>
+                  <ContractRequestFormPage />
+                </PrivateRoute>
+              }
+            />
+
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>

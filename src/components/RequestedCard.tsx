@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/es";
 import utc from "dayjs/plugin/utc";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { useNavigate } from "react-router-dom";
 dayjs.extend(utc);
 dayjs.extend(relativeTime);
 dayjs.locale("es");
@@ -15,10 +16,13 @@ interface Props {
 }
 
 export function RequestedCard({ contract, onEdit, onDelete }: Props) {
-  console.log(contract.createdAt);
+  const navigate = useNavigate();
 
   return (
-    <div className="bg-white shadow-md rounded-2xl p-5 transition hover:shadow-lg space-y-4">
+    <div
+      className="bg-white shadow-md rounded-2xl p-5 transition hover:shadow-lg space-y-4 cursor-pointer"
+      onClick={() => navigate(`/requests/${contract.id}/edit`)}
+    >
       <div className="flex justify-between items-start">
         <div className="flex items-center space-x-2">
           <h2 className="text-xl font-semibold text-gray-800">
