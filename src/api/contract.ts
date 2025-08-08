@@ -40,6 +40,7 @@ export type Contract = {
   installmentAmount: number;
   agreement: "weekly" | "fortnightly";
   totalPrice: number;
+  status: "canceled" | "pending" | "approved";
   products: {
     id: string;
     createdAt: Date;
@@ -108,7 +109,7 @@ export const ContractApi = {
     }
   },
 
-  update: async (id: string, data: Partial<CreateContract>) => {
+  update: async (id: string, data: Partial<Contract>) => {
     try {
       const res = await api.patch(`/contract/${id}`, data);
       return res.data;
