@@ -9,22 +9,26 @@ export default function RequestedContractsPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [contracts, setContracts] = useState<Contract[]>([]);
-  const [, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
-  const fetchRequestedContracts = async () => {
-    setLoading(true);
+  const fetchRequestedContracts = async (isFirstTime = false) => {
+    if (isFirstTime) setLoading(true); // solo mostrar "cargando" si es la primera vez
     try {
       const data = await ContractApi.getRequested();
       setContracts(data);
     } catch (err) {
       console.error("Error al cargar contratos solicitados:", err);
     } finally {
-      setLoading(false);
+      if (isFirstTime) {
+        setLoading(false);
+        setFirstLoad(false);
+      }
     }
   };
 
   useEffect(() => {
-    fetchRequestedContracts();
+    fetchRequestedContracts(true);
   }, []);
 
   const handleApprove = async (id: string): Promise<Contract> => {
@@ -64,18 +68,26 @@ export default function RequestedContractsPage() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {contracts.map((contract) => (
-          <RequestedCard
-            key={contract.id}
-            role={user?.role as UserRole}
-            contract={contract}
-            onApprove={(id) => handleApprove(id)}
-            onCancel={(id) => handleCancel(id)}
-            onDelete={(id) => handleDelete(id)}
-          />
-        ))}
-      </div>
+      {loading && firstLoad ? (
+        <p className="text-gray-500 text-center">Cargando contratos...</p>
+      ) : contracts.length === 0 ? (
+        <p className="text-gray-500 text-center">
+          No hay solicitudes de contrato
+        </p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {contracts.map((contract) => (
+            <RequestedCard
+              key={contract.id}
+              role={user?.role as UserRole}
+              contract={contract}
+              onApprove={(id) => handleApprove(id)}
+              onCancel={(id) => handleCancel(id)}
+              onDelete={(id) => handleDelete(id)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
