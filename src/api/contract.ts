@@ -17,6 +17,7 @@ export type CreateContract = {
   installmentAmount: number;
   agreement: "weekly" | "fortnightly";
   totalPrice: number;
+  status?: "canceled" | "pending" | "approved";
   products: ContractProduct[];
 };
 
