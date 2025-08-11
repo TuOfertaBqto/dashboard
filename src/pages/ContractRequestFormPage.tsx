@@ -14,7 +14,7 @@ import dayjs from "dayjs";
 export default function ContractRequestFormPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const isEdit = !!id;
 
   const [form, setForm] = useState<CreateContractRequest>({
@@ -87,6 +87,7 @@ export default function ContractRequestFormPage() {
       alert("Debe agregar al menos un producto válido al contrato.");
       return;
     }
+    setLoading(true);
     try {
       if (isEdit && id) {
         await ContractApi.update(id, form);
@@ -96,6 +97,8 @@ export default function ContractRequestFormPage() {
       navigate("/requests");
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -290,7 +293,9 @@ export default function ContractRequestFormPage() {
           type="button"
           disabled={loading}
           onClick={() => navigate("/requests")}
-          className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400 cursor-pointer"
+          className={`px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400  ${
+            loading ? "cursor-not-allowed" : "cursor-pointer"
+          }`}
         >
           Cancelar
         </button>
