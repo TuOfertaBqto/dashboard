@@ -40,7 +40,6 @@ export const ContractForm = ({
     customerId: "",
     requestDate: new Date().toISOString().slice(0, 10),
     startDate: null,
-    installmentAmount: 0,
     agreement: "weekly",
     totalPrice: 0,
     products: [],
@@ -53,7 +52,6 @@ export const ContractForm = ({
         customerId: initialData.customerId.id,
         requestDate: initialData.requestDate?.slice(0, 10) || "",
         startDate: initialData.startDate?.slice(0, 10) || null,
-        installmentAmount: initialData.installmentAmount || 0,
         agreement: initialData.agreement || "weekly",
         totalPrice: initialData.totalPrice || 0,
         products: initialData.products.map((p) => ({
@@ -244,23 +242,6 @@ export const ContractForm = ({
 
         {/* Monto de cuota y Acuerdo */}
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="installmentAmount" className="block text-sm mb-1">
-              Monto por cuota ($)
-            </label>
-            <input
-              id="installmentAmount"
-              type="number"
-              name="installmentAmount"
-              value={form.installmentAmount}
-              onChange={handleChange}
-              onWheel={(e) => e.currentTarget.blur()}
-              min={1}
-              step={1}
-              required
-              className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-            />
-          </div>
           <div>
             <label htmlFor="agreement" className="block text-sm mb-1">
               Frecuencia de pago

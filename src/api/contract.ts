@@ -14,7 +14,6 @@ export type CreateContract = {
   requestDate: string;
   startDate?: string | null;
   endDate?: string | null;
-  installmentAmount: number;
   agreement: "weekly" | "fortnightly";
   totalPrice: number;
   status?: "canceled" | "pending" | "approved";
