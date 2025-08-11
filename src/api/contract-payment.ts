@@ -12,6 +12,7 @@ export type ContractPayment = {
   photo: null;
   owner: null;
   dueDate: string;
+  installmentAmount: number;
   amountPaid: null;
   paidAt?: string;
   debt?: string;

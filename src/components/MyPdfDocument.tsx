@@ -111,7 +111,6 @@ export const MyPdfDocument = ({
   documentIdPhoto,
 }: Props) => {
   const cantidadLetras = numeroALetras(montoTotal).toUpperCase();
-  let accumulated = 0;
   const debt = Math.min(
     ...cuotas
       .map((c) => (c.debt == null ? NaN : Number(c.debt)))
@@ -335,13 +334,6 @@ export const MyPdfDocument = ({
           </View>
 
           {cuotas.map((cuota, index) => {
-            let amount = cuota.contract.installmentAmount;
-
-            if (index === cuotas.length - 1) {
-              amount = cuota.contract.totalPrice - accumulated;
-            }
-
-            accumulated += amount;
             return (
               <View style={styles.tableRow} key={index}>
                 <Text style={[styles.tableCol, { width: "20%" }]}>
@@ -361,7 +353,7 @@ export const MyPdfDocument = ({
                     { width: "15%", textAlign: "center" },
                   ]}
                 >
-                  ${amount}
+                  ${cuota.installmentAmount}
                 </Text>
                 <Text style={[styles.tableCol, { width: "25%" }]}>
                   {translatePaymentMethod(cuota.paymentMethod ?? "")}

@@ -53,36 +53,42 @@ export function generateInstallmentsFromContract(
 ): ContractPayment[] {
   const payments: ContractPayment[] = [];
 
-  // Definir intervalo de días según acuerdo
-  const intervalDays = contract.agreement === "fortnightly" ? 14 : 7;
+  const intervalDays = contract.agreement === "weekly" ? 7 : 14;
 
-  // Fecha inicial de pago
-  let currentDate = getNextSaturday();
+  const remainingProducts = contract.products.map((p) => {
+    let adjustedInstallment = p.product.installmentAmount * p.quantity;
 
-  // Copia de productos con info de cuotas restantes
-  const productPlans = contract.products.map((p) => {
-    const installmentAmount =
-      contract.agreement === "fortnightly"
-        ? p.product.installmentAmount * 2
-        : p.product.installmentAmount;
+    if (contract.agreement === "fortnightly") {
+      adjustedInstallment *= 2;
+    }
 
-    const totalPrice = p.product.price * p.quantity;
-    const installmentsCount = Math.ceil(totalPrice / installmentAmount);
+    const totalCost = p.product.price * p.quantity;
 
     return {
-      remainingInstallments: installmentsCount,
-      installmentAmount,
+      remainingBalance: totalCost,
+      adjustedInstallment,
     };
   });
 
-  // Mientras haya al menos un producto con cuotas pendientes
-  while (productPlans.some((p) => p.remainingInstallments > 0)) {
-    // Calcular monto de esta cuota sumando todos los productos activos
-    productPlans.forEach((p) => {
-      if (p.remainingInstallments > 0) {
-        p.remainingInstallments--;
+  let installmentIndex = 0;
+
+  while (remainingProducts.some((p) => p.remainingBalance > 0)) {
+    let periodPayment = 0;
+
+    remainingProducts.forEach((p) => {
+      if (p.remainingBalance > 0) {
+        if (p.remainingBalance >= p.adjustedInstallment) {
+          periodPayment += p.adjustedInstallment;
+          p.remainingBalance -= p.adjustedInstallment;
+        } else {
+          periodPayment += p.remainingBalance;
+          p.remainingBalance = 0;
+        }
       }
     });
+    const startDate = new Date(getNextSaturday().toString());
+    const dueDate = new Date(startDate);
+    dueDate.setDate(startDate.getDate() + installmentIndex * intervalDays);
 
     payments.push({
       id: crypto.randomUUID(),
@@ -94,16 +100,14 @@ export function generateInstallmentsFromContract(
       referenceNumber: null,
       photo: null,
       owner: null,
-      dueDate: currentDate.toISOString(),
+      dueDate: dueDate.toISOString(),
       amountPaid: null,
       debt: payments.length === 0 ? contract.totalPrice.toString() : undefined,
+      installmentAmount: periodPayment,
     });
 
-    // Avanzar fecha al siguiente pago
-    currentDate = currentDate.add(intervalDays, "day");
+    installmentIndex++;
   }
-
-  console.log(payments);
 
   return payments;
 }

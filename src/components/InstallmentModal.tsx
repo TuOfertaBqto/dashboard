@@ -26,11 +26,6 @@ export const InstallmentModal = ({
       ? generateInstallmentsFromContract(contract)
       : payments;
 
-  const baseInstallmentAmount = contract?.installmentAmount ?? 0;
-  const total = contract?.totalPrice ?? 0;
-  const numPayments = payments.length || effectivePayments.length;
-  let accumulated = 0;
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Fondo oscuro con blur */}
@@ -127,21 +122,13 @@ export const InstallmentModal = ({
               </thead>
               <tbody>
                 {effectivePayments.map((p, index) => {
-                  let amount = baseInstallmentAmount;
-
-                  if (index === numPayments - 1) {
-                    amount = total - accumulated;
-                  }
-
-                  accumulated += amount;
-
                   return (
                     <tr key={p.id} className="border-t">
                       <td className="p-2">{index + 1}</td>
                       <td className="p-2">
                         {dayjs(p.dueDate.split("T")[0]).format("DD-MM-YYYY")}
                       </td>
-                      <td className="p-2">${amount}</td>
+                      <td className="p-2">${p.installmentAmount}</td>
                       <td className="p-2">
                         {p.amountPaid ? `$${p.amountPaid}` : "—"}
                       </td>
