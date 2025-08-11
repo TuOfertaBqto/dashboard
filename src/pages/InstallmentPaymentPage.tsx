@@ -118,7 +118,7 @@ export const InstallmentPaymentPage = () => {
         Contrato: C#{payment.contract.code}
       </p>
       <p className="text-sm text-gray-600">
-        Monto a pagar: ${payment.installmentAmount}
+        Monto a pagar: ${payment.installmentAmount - (payment.amountPaid ?? 0)}
       </p>
 
       <form

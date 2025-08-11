@@ -67,7 +67,9 @@ export const InstallmentListPage = () => {
                     {i.contract.customerId.firstName}{" "}
                     {i.contract.customerId.lastName}
                   </td>
-                  <td className="p-3">${i.installmentAmount}</td>
+                  <td className="p-3">
+                    ${i.installmentAmount - (i.amountPaid ?? 0)}
+                  </td>
                   <td className="p-3">
                     {dayjs(i.dueDate.split("T")[0]).format("DD-MM-YYYY")}
                   </td>
