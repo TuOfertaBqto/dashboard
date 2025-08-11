@@ -55,7 +55,6 @@ export default function ContractFormPage() {
       if (id) {
         const {
           agreement,
-          installmentAmount,
           requestDate,
           totalPrice,
           customerId,
@@ -66,7 +65,6 @@ export default function ContractFormPage() {
 
         await ContractApi.update(id, {
           agreement,
-          installmentAmount,
           requestDate,
           totalPrice,
           customerId,
