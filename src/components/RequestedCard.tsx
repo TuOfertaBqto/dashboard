@@ -98,7 +98,7 @@ export function RequestedCard({
                 className={`px-3 py-1 rounded-md text-white text-sm transition ${
                   approvingId === contract.id
                     ? "bg-green-400 cursor-not-allowed"
-                    : "bg-green-600 hover:bg-green-700"
+                    : "bg-green-600 hover:bg-green-700 cursor-pointer"
                 }`}
                 disabled={approvingId === contract.id}
                 onClick={(e) => {
@@ -117,7 +117,7 @@ export function RequestedCard({
     ${
       cancellingId === contract.id
         ? "bg-gray-400 cursor-not-allowed"
-        : "bg-red-500 hover:bg-red-600"
+        : "bg-red-500 hover:bg-red-600 cursor-pointer"
     }`}
                 disabled={cancellingId === contract.id}
                 onClick={(e) => {
@@ -139,7 +139,7 @@ export function RequestedCard({
     ${
       deletionId === contract.id
         ? "bg-gray-400 cursor-not-allowed"
-        : "bg-red-500 hover:bg-red-600"
+        : "bg-red-500 hover:bg-red-600 cursor-pointer"
     }`}
               disabled={deletionId === contract.id}
               onClick={(e) => {
