@@ -24,6 +24,7 @@ export const ProductTable = ({
           <tr>
             <th className="p-3 text-left">Nombre</th>
             <th className="p-3 text-left">Precio</th>
+            <th className="p-3 text-left">Cuota semanal</th>
             {user?.role !== "vendor" && (
               <>
                 <th className="p-3 text-left">Stock</th>
@@ -44,6 +45,7 @@ export const ProductTable = ({
               <tr key={i.id} className="border-t">
                 <td className="p-3">{i.product.name}</td>
                 <td className="p-3">${i.product.price}</td>
+                <td className="p-3">${i.product.installmentAmount}</td>
                 {user?.role !== "vendor" && (
                   <>
                     <td className="p-3">{i.stockQuantity}</td>

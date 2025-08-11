@@ -15,6 +15,7 @@ export type Product = {
 export type CreateProduct = {
   name: string;
   description: string | null;
+  installmentAmount: number;
   price: number;
   categoryId: string;
   stockQuantity?: number | "";
