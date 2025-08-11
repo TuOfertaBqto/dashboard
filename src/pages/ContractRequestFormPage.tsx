@@ -79,6 +79,8 @@ export default function ContractRequestFormPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (loading) return;
+
     const hasValidProduct = form.products.some(
       (p) => p.productId && p.quantity > 0
     );
