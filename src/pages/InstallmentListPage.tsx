@@ -67,17 +67,7 @@ export const InstallmentListPage = () => {
                     {i.contract.customerId.firstName}{" "}
                     {i.contract.customerId.lastName}
                   </td>
-                  <td className="p-3">
-                    $
-                    {Math.min(
-                      i.contract.installmentAmount,
-                      parseFloat(
-                        i.debt?.toString() ??
-                          i.contract.installmentAmount.toString()
-                      ),
-                      i.contract.installmentAmount - (i.amountPaid ?? 0)
-                    )}
-                  </td>
+                  <td className="p-3">${i.installmentAmount}</td>
                   <td className="p-3">
                     {dayjs(i.dueDate.split("T")[0]).format("DD-MM-YYYY")}
                   </td>
