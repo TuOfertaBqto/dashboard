@@ -89,6 +89,17 @@ export default function ContractRequestFormPage() {
       alert("Debe agregar al menos un producto válido al contrato.");
       return;
     }
+
+    const allProductsHaveValidInstallment = form.products.every((p) => {
+      const product = products.find((prod) => prod.id === p.productId);
+      return product?.installmentAmount && product.installmentAmount > 0;
+    });
+
+    if (!allProductsHaveValidInstallment) {
+      alert("Todos los productos deben tener una cuota mayor que cero.");
+      return;
+    }
+
     setLoading(true);
     try {
       if (isEdit && id) {

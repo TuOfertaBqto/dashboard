@@ -126,7 +126,7 @@ export default function ContractFormPage() {
   if (loading) return <p className="p-4">Cargando...</p>;
 
   return (
-    <div className="max-w-3xl mx-auto mt-8">
+    <div className="max-w-4xl mx-auto mt-8">
       <h1 className="text-2xl font-semibold mb-6">
         {id ? `Editar contrato C#${contract?.code}` : "Crear contrato"}
       </h1>
