@@ -174,18 +174,20 @@ export const ContractForm = ({
         {/* Fechas */}
         <div className="grid grid-cols-3 gap-4">
           <div>
-            <label htmlFor="requestDate" className="block text-sm mb-1">
-              Fecha de solicitud
+            <label htmlFor="agreement" className="block text-sm mb-1">
+              Frecuencia de pago
             </label>
-            <input
-              id="requestDate"
-              type="date"
-              name="requestDate"
-              value={form.requestDate}
+            <select
+              id="agreement"
+              name="agreement"
+              value={form.agreement ?? ""}
               onChange={handleChange}
               className="w-full border p-2 rounded"
               required
-            />
+            >
+              <option value="weekly">Semanal</option>
+              <option value="fortnightly">Quincenal</option>
+            </select>
           </div>
 
           <div className="flex flex-col items-center text-center">
@@ -238,26 +240,6 @@ export const ContractForm = ({
               />
             </div>
           )}
-        </div>
-
-        {/* Monto de cuota y Acuerdo */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="agreement" className="block text-sm mb-1">
-              Frecuencia de pago
-            </label>
-            <select
-              id="agreement"
-              name="agreement"
-              value={form.agreement ?? ""}
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-              required
-            >
-              <option value="weekly">Semanal</option>
-              <option value="fortnightly">Quincenal</option>
-            </select>
-          </div>
         </div>
       </div>
       <div className="bg-white rounded shadow p-6 space-y-6 my-6">
