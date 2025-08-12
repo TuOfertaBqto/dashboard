@@ -236,6 +236,8 @@ export const ContractForm = ({
                 value={form.startDate || ""}
                 onChange={handleChange}
                 required={dispatched === true}
+                min="2025-05-01"
+                max={new Date().toISOString().split("T")[0]}
                 className="w-full border p-2 rounded disabled:opacity-70 disabled:cursor-not-allowed disabled:bg-gray-100"
               />
             </div>

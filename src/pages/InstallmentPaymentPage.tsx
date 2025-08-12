@@ -193,6 +193,8 @@ export const InstallmentPaymentPage = () => {
             name="paidAt"
             value={form.paidAt}
             onChange={handleChange}
+            min="2025-05-01"
+            max={new Date().toISOString().split("T")[0]}
             className="w-full border p-2 rounded"
             required
           />
