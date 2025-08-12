@@ -92,7 +92,12 @@ export default function ContractRequestFormPage() {
     setLoading(true);
     try {
       if (isEdit && id) {
-        await ContractApi.update(id, form);
+        const { agreement, customerId, totalPrice } = form;
+        await ContractApi.update(id, {
+          agreement,
+          customerId,
+          totalPrice,
+        });
       } else {
         await ContractApi.create(form);
       }
