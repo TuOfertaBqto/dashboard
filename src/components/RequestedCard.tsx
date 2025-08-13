@@ -36,18 +36,38 @@ export function RequestedCard({
 
   return (
     <div
-      className="bg-white shadow-md rounded-2xl p-5 transition hover:shadow-lg space-y-4 cursor-pointer"
+      className="bg-white shadow-md rounded-2xl p-5 transition hover:shadow-lg space-y-4 cursor-pointer h-full flex flex-col"
       onClick={() => navigate(`/requests/${contract.id}/edit`)}
     >
-      <div className="flex justify-between items-start">
-        <div className="flex items-center space-x-2">
-          <h2 className="text-xl font-semibold text-gray-800">
+      <div>
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-800">
             Contrato #{contract.code}
           </h2>
-          <span className="text-xs text-gray-500 font-normal">
-            {dayjs(contract.createdAt).utc().local().fromNow()}
+          <span
+            className={`px-3 py-1 text-xs font-semibold rounded-full ${
+              contract.status === "approved"
+                ? "bg-green-100 text-green-700"
+                : contract.status === "pending"
+                ? "bg-yellow-100 text-yellow-700"
+                : contract.status === "canceled"
+                ? "bg-red-100 text-red-700"
+                : "bg-gray-100 text-gray-700"
+            }`}
+          >
+            {contract.status === "approved"
+              ? "Aprobado"
+              : contract.status === "pending"
+              ? "Pendiente"
+              : contract.status === "canceled"
+              ? "Cancelado"
+              : contract.status}
           </span>
         </div>
+
+        <p className="text-xs text-gray-500 mb-3">
+          {dayjs(contract.createdAt).utc().local().fromNow()}
+        </p>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -56,7 +76,7 @@ export function RequestedCard({
           <p className="text-gray-700 font-semibold">
             {contract.vendorId.firstName} {contract.vendorId.lastName}
           </p>
-          <p className="text- text-gray-500">T{contract.vendorId.code}</p>
+          <p className="text-gray-500">T{contract.vendorId.code}</p>
         </div>
 
         <div>
@@ -87,7 +107,7 @@ export function RequestedCard({
         </p>
       </div>
 
-      <div className="pt-2 border-t flex justify-between items-center">
+      <div className="pt-2 border-t flex justify-between items-center mt-auto">
         <span className="text-lg font-bold text-green-600">
           ${contract.totalPrice}
         </span>
@@ -114,11 +134,11 @@ export function RequestedCard({
 
               <button
                 className={`px-3 py-1 rounded-md text-white text-sm transition 
-    ${
-      cancellingId === contract.id
-        ? "bg-gray-400 cursor-not-allowed"
-        : "bg-red-500 hover:bg-red-600 cursor-pointer"
-    }`}
+              ${
+                cancellingId === contract.id
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-red-500 hover:bg-red-600 cursor-pointer"
+              }`}
                 disabled={cancellingId === contract.id}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -133,14 +153,14 @@ export function RequestedCard({
             </>
           )}
 
-          {role == "vendor" && (
+          {role == "vendor" && contract.status === "pending" && (
             <button
               className={`px-3 py-1 rounded-md text-white text-sm transition 
-    ${
-      deletionId === contract.id
-        ? "bg-gray-400 cursor-not-allowed"
-        : "bg-red-500 hover:bg-red-600 cursor-pointer"
-    }`}
+            ${
+              deletionId === contract.id
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-red-500 hover:bg-red-600 cursor-pointer"
+            }`}
               disabled={deletionId === contract.id}
               onClick={(e) => {
                 e.stopPropagation();
