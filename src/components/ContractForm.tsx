@@ -290,10 +290,17 @@ export const ContractForm = ({
                     updated[index].productId = selected?.value || "";
                     setForm({ ...form, products: updated });
                   }}
-                  options={products.map((prod) => ({
-                    value: prod.id,
-                    label: prod.name,
-                  }))}
+                  options={products
+                    .filter(
+                      (prod) =>
+                        !form.products.some(
+                          (p, i) => i !== index && p.productId === prod.id
+                        )
+                    )
+                    .map((prod) => ({
+                      value: prod.id,
+                      label: prod.name,
+                    }))}
                   placeholder="Seleccione un producto"
                   isClearable
                   isDisabled={!!initialData?.id}

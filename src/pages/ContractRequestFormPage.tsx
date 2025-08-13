@@ -198,14 +198,20 @@ export default function ContractRequestFormPage() {
                     updated[index].productId = selected?.value || "";
                     setForm({ ...form, products: updated });
                   }}
-                  options={products.map((prod) => ({
-                    value: prod.id,
-                    label: prod.name,
-                  }))}
+                  options={products
+                    .filter(
+                      (prod) =>
+                        !form.products.some(
+                          (fp, i) => fp.productId === prod.id && i !== index
+                        )
+                    )
+                    .map((prod) => ({
+                      value: prod.id,
+                      label: prod.name,
+                    }))}
                   placeholder="Seleccione un producto"
                   isClearable
                   isDisabled={!!initialData?.id}
-                  required
                 />
               </div>
 
