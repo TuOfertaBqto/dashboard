@@ -13,6 +13,7 @@ dayjs.locale("es");
 interface Props {
   role: UserRole;
   contract: Contract;
+  onClick: (contract: Contract) => void;
   onApprove: (id: string) => Promise<Contract>;
   onCancel: (id: string) => Promise<Contract>;
   onDelete: (id: string) => Promise<void>;
@@ -21,6 +22,7 @@ interface Props {
 export function RequestedCard({
   role,
   contract,
+  onClick,
   onApprove,
   onCancel,
   onDelete,
@@ -35,7 +37,10 @@ export function RequestedCard({
   }, 0);
 
   return (
-    <div className="bg-white shadow-md rounded-2xl p-5 transition hover:shadow-lg space-y-4 h-full flex flex-col">
+    <div
+      className="bg-white shadow-md rounded-2xl p-5 cursor-pointer transition hover:shadow-lg space-y-4 h-full flex flex-col"
+      onClick={() => onClick(contract)}
+    >
       <div>
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-800">

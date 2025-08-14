@@ -133,6 +133,7 @@ export default function ContractsPage() {
 
       <InstallmentModal
         open={isModalOpen}
+        isRequest={false}
         onClose={() => setIsModalOpen(false)}
         payments={installments}
         contract={contractSelected}
