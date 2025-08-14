@@ -1,6 +1,7 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "./useAuth";
+import { useAuthGuard } from "./useAuthGuard";
 
 interface PrivateRouteProps {
   children: React.ReactElement;
@@ -8,13 +9,16 @@ interface PrivateRouteProps {
 }
 
 export const PrivateRoute = ({ children, allowedRoles }: PrivateRouteProps) => {
-  const { token, user } = useAuth();
+  const { user } = useAuth();
+  const { loading } = useAuthGuard();
+  const location = useLocation();
 
-  if (!token || !user) return <Navigate to="/login" replace />;
+  if (loading) return <div>Cargando...</div>;
 
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/login" replace />;
-  }
+  if (!user) return <Navigate to="/login" replace state={{ from: location }} />;
+
+  if (!allowedRoles.includes(user.role))
+    return <Navigate to="/login" replace state={{ from: location }} />;
 
   return children;
 };

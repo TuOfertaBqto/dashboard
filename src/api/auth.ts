@@ -25,6 +25,20 @@ const login = async (data: LoginPayload) => {
   throw new Error("Error de red o desconocido.");
 };
 
+const validateToken = async () => {
+  console.log("validando gg");
+
+  try {
+    const { data } = await api.get("/auth/validate");
+
+    return data;
+  } catch (err) {
+    console.error(err);
+    return { valid: false, user: null };
+  }
+};
+
 export const AuthApi = {
   login,
+  validateToken,
 };
