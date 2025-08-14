@@ -26,8 +26,6 @@ const login = async (data: LoginPayload) => {
 };
 
 const validateToken = async () => {
-  console.log("validando gg");
-
   try {
     const { data } = await api.get("/auth/validate");
 
