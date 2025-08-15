@@ -118,15 +118,7 @@ export const InstallmentPaymentPage = () => {
         Contrato: C#{payment.contract.code}
       </p>
       <p className="text-sm text-gray-600">
-        Monto a pagar: $
-        {Math.min(
-          payment.contract.installmentAmount,
-          parseFloat(
-            payment.debt?.toString() ??
-              payment.contract.installmentAmount.toString()
-          ),
-          payment.contract.installmentAmount - (payment.amountPaid ?? 0)
-        )}
+        Monto a pagar: ${payment.installmentAmount - (payment.amountPaid ?? 0)}
       </p>
 
       <form
@@ -201,6 +193,8 @@ export const InstallmentPaymentPage = () => {
             name="paidAt"
             value={form.paidAt}
             onChange={handleChange}
+            min="2025-05-01"
+            max={new Date().toISOString().split("T")[0]}
             className="w-full border p-2 rounded"
             required
           />

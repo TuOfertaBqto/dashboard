@@ -9,6 +9,7 @@ import dayjs from "dayjs";
 
 interface Props {
   open: boolean;
+  isRequest: boolean;
   onClose: () => void;
   payments: ContractPayment[];
   contract?: Contract | null;
@@ -16,6 +17,7 @@ interface Props {
 
 export const InstallmentModal = ({
   open,
+  isRequest,
   onClose,
   payments,
   contract,
@@ -25,11 +27,6 @@ export const InstallmentModal = ({
     payments.length === 0 && contract
       ? generateInstallmentsFromContract(contract)
       : payments;
-
-  const baseInstallmentAmount = contract?.installmentAmount ?? 0;
-  const total = contract?.totalPrice ?? 0;
-  const numPayments = payments.length || effectivePayments.length;
-  let accumulated = 0;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -127,21 +124,13 @@ export const InstallmentModal = ({
               </thead>
               <tbody>
                 {effectivePayments.map((p, index) => {
-                  let amount = baseInstallmentAmount;
-
-                  if (index === numPayments - 1) {
-                    amount = total - accumulated;
-                  }
-
-                  accumulated += amount;
-
                   return (
                     <tr key={p.id} className="border-t">
                       <td className="p-2">{index + 1}</td>
                       <td className="p-2">
                         {dayjs(p.dueDate.split("T")[0]).format("DD-MM-YYYY")}
                       </td>
-                      <td className="p-2">${amount}</td>
+                      <td className="p-2">${p.installmentAmount}</td>
                       <td className="p-2">
                         {p.amountPaid ? `$${p.amountPaid}` : "—"}
                       </td>
@@ -159,58 +148,62 @@ export const InstallmentModal = ({
             </table>
           </div>
 
-          {/* Botón de cerrar */}
           <div className="flex justify-end mt-6">
-            <div>
-              <PDFDownloadLink
-                document={
-                  <MyPdfDocument
-                    name={
-                      contract?.customerId.firstName.trim().toUpperCase() ?? ""
-                    }
-                    lastName={
-                      contract?.customerId.lastName.trim().toUpperCase() ?? ""
-                    }
-                    cedula={contract?.customerId.documentId ?? ""}
-                    direccion={contract?.customerId.adress ?? ""}
-                    fechaInicio={
-                      contract?.startDate?.split("T")[0] ??
-                      new Date().toISOString().split("T")[0]
-                    }
-                    descripcion={
-                      contract?.products.map(
-                        (p) => `(${p.quantity}) ${p.product.name}`
-                      ) || ["Sin productos"]
-                    }
-                    montoTotal={contract?.totalPrice ?? 0}
-                    cuotas={effectivePayments}
-                    cantidadProductos={
-                      contract?.products.reduce(
-                        (total, p) => total + p.quantity,
-                        0
-                      ) ?? 0
-                    }
-                    documentIdPhoto={contract?.customerId.documentIdPhoto ?? ""}
-                  />
-                }
-                fileName={`Contrato ${
-                  contract?.customerId.firstName.split(" ")[0] +
-                  " " +
-                  contract?.customerId.lastName.split(" ")[0]
-                }.pdf`}
-              >
-                {({ loading }) => (
-                  <button
-                    type="button"
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-all mr-2 cursor-pointer"
-                    disabled={loading}
-                  >
-                    <ArrowDownTrayIcon className="w-5 h-5" />
-                    {loading ? "Generando PDF..." : "Descargar PDF"}
-                  </button>
-                )}
-              </PDFDownloadLink>
-            </div>
+            {!isRequest && (
+              <div>
+                <PDFDownloadLink
+                  document={
+                    <MyPdfDocument
+                      name={
+                        contract?.customerId.firstName.trim().toUpperCase() ??
+                        ""
+                      }
+                      lastName={
+                        contract?.customerId.lastName.trim().toUpperCase() ?? ""
+                      }
+                      cedula={contract?.customerId.documentId ?? ""}
+                      direccion={contract?.customerId.adress ?? ""}
+                      fechaInicio={
+                        contract?.startDate?.split("T")[0] ??
+                        new Date().toISOString().split("T")[0]
+                      }
+                      descripcion={
+                        contract?.products.map(
+                          (p) => `(${p.quantity}) ${p.product.name}`
+                        ) || ["Sin productos"]
+                      }
+                      montoTotal={contract?.totalPrice ?? 0}
+                      cuotas={effectivePayments}
+                      cantidadProductos={
+                        contract?.products.reduce(
+                          (total, p) => total + p.quantity,
+                          0
+                        ) ?? 0
+                      }
+                      documentIdPhoto={
+                        contract?.customerId.documentIdPhoto ?? ""
+                      }
+                    />
+                  }
+                  fileName={`Contrato ${
+                    contract?.customerId.firstName.split(" ")[0] +
+                    " " +
+                    contract?.customerId.lastName.split(" ")[0]
+                  }.pdf`}
+                >
+                  {({ loading }) => (
+                    <button
+                      type="button"
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-all mr-2 cursor-pointer"
+                      disabled={loading}
+                    >
+                      <ArrowDownTrayIcon className="w-5 h-5" />
+                      {loading ? "Generando PDF..." : "Descargar PDF"}
+                    </button>
+                  )}
+                </PDFDownloadLink>
+              </div>
+            )}
             <button
               onClick={onClose}
               className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 cursor-pointer"

@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import { AuthProvider } from "./auth/AuthProvider";
@@ -13,8 +13,13 @@ import { ProductFormPage } from "./pages/ProductFormPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { InstallmentListPage } from "./pages/InstallmentListPage";
 import { InstallmentPaymentPage } from "./pages/InstallmentPaymentPage";
+import RequestedContractsPage from "./pages/RequestedContractsPage";
+import ContractRequestFormPage from "./pages/ContractRequestFormPage";
 
 function App() {
+  const allowedRoles = ["super_admin", "admin", "main"];
+  const allowedRolesWithVendor = ["super_admin", "admin", "main", "vendor"];
+  const onlyVendorMain = ["main", "vendor"];
   return (
     <AuthProvider>
       <BrowserRouter>
@@ -24,25 +29,137 @@ function App() {
           <Route
             path="/"
             element={
-              <PrivateRoute>
+              <PrivateRoute allowedRoles={allowedRolesWithVendor}>
                 <Layout />
               </PrivateRoute>
             }
           >
-            <Route index element={<Dashboard />} />
-            <Route path="users" element={<UsersPage />} />
-            <Route path="users/new" element={<UserFormPage />} />
-            <Route path="users/:id/edit" element={<UserFormPage />} />
-            <Route path="contracts" element={<ContractsPage />} />
-            <Route path="contracts/new" element={<ContractFormPage />} />
-            <Route path="contracts/:id/edit" element={<ContractFormPage />} />
-            <Route path="products" element={<ProductListPage />} />
-            <Route path="products/new" element={<ProductFormPage />} />
-            <Route path="products/:id/edit" element={<ProductFormPage />} />
-            <Route path="installments" element={<InstallmentListPage />} />
+            <Route index element={<Navigate to="/products" replace />} />
+
+            <Route
+              path="dashboard"
+              element={
+                <PrivateRoute allowedRoles={allowedRoles}>
+                  <Dashboard />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="contracts"
+              element={
+                <PrivateRoute allowedRoles={allowedRoles}>
+                  <ContractsPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="contracts/new"
+              element={
+                <PrivateRoute allowedRoles={allowedRoles}>
+                  <ContractFormPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="contracts/:id/edit"
+              element={
+                <PrivateRoute allowedRoles={allowedRoles}>
+                  <ContractFormPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="installments"
+              element={
+                <PrivateRoute allowedRoles={allowedRoles}>
+                  <InstallmentListPage />
+                </PrivateRoute>
+              }
+            />
             <Route
               path="installments/:id/pay"
-              element={<InstallmentPaymentPage />}
+              element={
+                <PrivateRoute allowedRoles={allowedRoles}>
+                  <InstallmentPaymentPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="users"
+              element={
+                <PrivateRoute allowedRoles={allowedRolesWithVendor}>
+                  <UsersPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="users/new"
+              element={
+                <PrivateRoute allowedRoles={allowedRolesWithVendor}>
+                  <UserFormPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="users/:id/edit"
+              element={
+                <PrivateRoute allowedRoles={allowedRolesWithVendor}>
+                  <UserFormPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="products"
+              element={
+                <PrivateRoute allowedRoles={allowedRolesWithVendor}>
+                  <ProductListPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="products/new"
+              element={
+                <PrivateRoute allowedRoles={allowedRoles}>
+                  <ProductFormPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="products/:id/edit"
+              element={
+                <PrivateRoute allowedRoles={allowedRoles}>
+                  <ProductFormPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="requests"
+              element={
+                <PrivateRoute allowedRoles={onlyVendorMain}>
+                  <RequestedContractsPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="requests/new"
+              element={
+                <PrivateRoute allowedRoles={onlyVendorMain}>
+                  <ContractRequestFormPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="requests/:id/edit"
+              element={
+                <PrivateRoute allowedRoles={onlyVendorMain}>
+                  <ContractRequestFormPage />
+                </PrivateRoute>
+              }
             />
 
             <Route path="*" element={<NotFoundPage />} />

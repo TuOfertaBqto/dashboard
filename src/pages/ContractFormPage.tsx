@@ -55,7 +55,6 @@ export default function ContractFormPage() {
       if (id) {
         const {
           agreement,
-          installmentAmount,
           requestDate,
           totalPrice,
           customerId,
@@ -66,7 +65,6 @@ export default function ContractFormPage() {
 
         await ContractApi.update(id, {
           agreement,
-          installmentAmount,
           requestDate,
           totalPrice,
           customerId,
@@ -110,9 +108,12 @@ export default function ContractFormPage() {
         await ContractPaymentApi.create({
           contractId: contractToDispatch.id,
           agreementContract: contractToDispatch.agreement,
-          installmentAmountContract: contractToDispatch.installmentAmount,
           startContract: contractToDispatch.startDate.split("T")[0],
-          totalPriceContract: contractToDispatch.totalPrice,
+          products: contractToDispatch.products.map((p) => ({
+            price: p.product.price,
+            installmentAmount: p.product.installmentAmount,
+            quantity: p.quantity,
+          })),
         });
       }
 
@@ -125,7 +126,7 @@ export default function ContractFormPage() {
   if (loading) return <p className="p-4">Cargando...</p>;
 
   return (
-    <div className="max-w-3xl mx-auto mt-8">
+    <div className="max-w-4xl mx-auto mt-8">
       <h1 className="text-2xl font-semibold mb-6">
         {id ? `Editar contrato C#${contract?.code}` : "Crear contrato"}
       </h1>

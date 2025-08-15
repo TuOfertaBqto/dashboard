@@ -1,5 +1,6 @@
 import type { Inventory } from "../api/inventory";
 import type { Product } from "../api/product";
+import { useAuth } from "../auth/useAuth";
 import { DeleteButton, EditButton } from "./ActionButtons";
 
 interface Props {
@@ -15,6 +16,7 @@ export const ProductTable = ({
   onEdit,
   onDelete,
 }: Props) => {
+  const { user } = useAuth();
   return (
     <div className="bg-white rounded shadow overflow-x-auto">
       <table className="w-full table-auto">
@@ -22,8 +24,13 @@ export const ProductTable = ({
           <tr>
             <th className="p-3 text-left">Nombre</th>
             <th className="p-3 text-left">Precio</th>
-            <th className="p-3 text-left">Stock</th>
-            <th className="p-3 text-left">Acciones</th>
+            <th className="p-3 text-left">Cuota semanal</th>
+            {user?.role !== "vendor" && (
+              <>
+                <th className="p-3 text-left">Stock</th>
+                <th className="p-3 text-left">Acciones</th>
+              </>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -38,11 +45,16 @@ export const ProductTable = ({
               <tr key={i.id} className="border-t">
                 <td className="p-3">{i.product.name}</td>
                 <td className="p-3">${i.product.price}</td>
-                <td className="p-3">{i.stockQuantity}</td>
-                <td className="p-3 space-x-2">
-                  <EditButton onClick={() => onEdit(i.product)} />
-                  <DeleteButton onClick={() => onDelete(i.product)} />
-                </td>
+                <td className="p-3">${i.product.installmentAmount}</td>
+                {user?.role !== "vendor" && (
+                  <>
+                    <td className="p-3">{i.stockQuantity}</td>
+                    <td className="p-3 space-x-2">
+                      <EditButton onClick={() => onEdit(i.product)} />
+                      <DeleteButton onClick={() => onDelete(i.product)} />
+                    </td>
+                  </>
+                )}
               </tr>
             ))
           )}

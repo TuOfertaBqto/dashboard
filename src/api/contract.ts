@@ -9,11 +9,20 @@ type ContractProduct = {
 };
 
 export type CreateContract = {
-  vendorId: string;
+  vendorId?: string;
   customerId: string;
   requestDate: string;
   startDate?: string | null;
   endDate?: string | null;
+  agreement: "weekly" | "fortnightly";
+  totalPrice: number;
+  status?: "canceled" | "pending" | "approved";
+  products: ContractProduct[];
+};
+
+export type CreateContractRequest = {
+  customerId: string;
+  requestDate: string;
   installmentAmount: number;
   agreement: "weekly" | "fortnightly";
   totalPrice: number;
@@ -31,6 +40,7 @@ export type Contract = {
   installmentAmount: number;
   agreement: "weekly" | "fortnightly";
   totalPrice: number;
+  status: "canceled" | "pending" | "approved";
   products: {
     id: string;
     createdAt: Date;
@@ -50,6 +60,16 @@ export const ContractApi = {
   getAll: async (): Promise<Contract[]> => {
     try {
       const res = await api.get("/contract");
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching contract:", error);
+      return [];
+    }
+  },
+
+  getRequested: async (): Promise<Contract[]> => {
+    try {
+      const res = await api.get("/contract/request");
       return res.data;
     } catch (error) {
       console.error("Error fetching contract:", error);

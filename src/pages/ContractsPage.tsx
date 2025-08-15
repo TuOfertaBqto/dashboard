@@ -91,9 +91,12 @@ export default function ContractsPage() {
       await ContractPaymentApi.create({
         contractId: contractToDispatch.id,
         agreementContract: contractToDispatch.agreement,
-        installmentAmountContract: contractToDispatch.installmentAmount,
         startContract: contractToDispatch.startDate.split("T")[0],
-        totalPriceContract: contractToDispatch.totalPrice,
+        products: contractToDispatch.products.map((p) => ({
+          price: p.product.price,
+          installmentAmount: p.product.installmentAmount,
+          quantity: p.quantity,
+        })),
       });
 
       fetchContracts();
@@ -130,6 +133,7 @@ export default function ContractsPage() {
 
       <InstallmentModal
         open={isModalOpen}
+        isRequest={false}
         onClose={() => setIsModalOpen(false)}
         payments={installments}
         contract={contractSelected}

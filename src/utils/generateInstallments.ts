@@ -9,41 +9,105 @@ function getNextSaturday(): dayjs.Dayjs {
   return today.add(daysToAdd, "day").startOf("day");
 }
 
+// export function generateInstallmentsFromContract(
+//   contract: Contract
+// ): ContractPayment[] {
+//   const startDate = getNextSaturday();
+//   const intervalDays = contract.agreement === "fortnightly" ? 14 : 7;
+
+//   const total = contract.totalPrice;
+//   const amount = contract.installmentAmount;
+//   const numPayments = Math.ceil(total / amount);
+//   const installments: ContractPayment[] = [];
+
+//   let remaining = total;
+
+//   for (let i = 0; i < numPayments; i++) {
+//     const dueDate = startDate.add(i * intervalDays, "day").toISOString();
+//     const currentAmount = i === numPayments - 1 ? remaining : amount;
+
+//     installments.push({
+//       id: `fake-${i + 1}`,
+//       dueDate,
+//       amountPaid: null,
+//       paymentMethod: null,
+//       paidAt: undefined,
+//       debt: i === 0 ? contract.totalPrice.toString() : undefined,
+//       contract: contract,
+//       createdAt: dueDate,
+//       updatedAt: dueDate,
+//       deletedAt: null,
+//       referenceNumber: null,
+//       photo: null,
+//       owner: null,
+//     });
+
+//     remaining -= currentAmount;
+//   }
+
+//   return installments;
+// }
+
 export function generateInstallmentsFromContract(
   contract: Contract
 ): ContractPayment[] {
-  const startDate = getNextSaturday();
-  const intervalDays = contract.agreement === "fortnightly" ? 14 : 7;
+  const payments: ContractPayment[] = [];
 
-  const total = contract.totalPrice;
-  const amount = contract.installmentAmount;
-  const numPayments = Math.ceil(total / amount);
-  const installments: ContractPayment[] = [];
+  const intervalDays = contract.agreement === "weekly" ? 7 : 14;
 
-  let remaining = total;
+  const remainingProducts = contract.products.map((p) => {
+    let adjustedInstallment = p.product.installmentAmount * p.quantity;
 
-  for (let i = 0; i < numPayments; i++) {
-    const dueDate = startDate.add(i * intervalDays, "day").toISOString();
-    const currentAmount = i === numPayments - 1 ? remaining : amount;
+    if (contract.agreement === "fortnightly") {
+      adjustedInstallment *= 2;
+    }
 
-    installments.push({
-      id: `fake-${i + 1}`,
-      dueDate,
-      amountPaid: null,
-      paymentMethod: null,
-      paidAt: undefined,
-      debt: i === 0 ? contract.totalPrice.toString() : undefined,
-      contract: contract,
-      createdAt: dueDate,
-      updatedAt: dueDate,
+    const totalCost = p.product.price * p.quantity;
+
+    return {
+      remainingBalance: totalCost,
+      adjustedInstallment,
+    };
+  });
+
+  let installmentIndex = 0;
+
+  while (remainingProducts.some((p) => p.remainingBalance > 0)) {
+    let periodPayment = 0;
+
+    remainingProducts.forEach((p) => {
+      if (p.remainingBalance > 0) {
+        if (p.remainingBalance >= p.adjustedInstallment) {
+          periodPayment += p.adjustedInstallment;
+          p.remainingBalance -= p.adjustedInstallment;
+        } else {
+          periodPayment += p.remainingBalance;
+          p.remainingBalance = 0;
+        }
+      }
+    });
+    const startDate = new Date(getNextSaturday().toString());
+    const dueDate = new Date(startDate);
+    dueDate.setDate(startDate.getDate() + installmentIndex * intervalDays);
+
+    payments.push({
+      id: crypto.randomUUID(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       deletedAt: null,
+      contract,
+      paymentMethod: null,
       referenceNumber: null,
       photo: null,
       owner: null,
+      dueDate: dueDate.toISOString(),
+      amountPaid: null,
+      debt: payments.length === 0 ? contract.totalPrice.toString() : undefined,
+      installmentAmount: periodPayment,
     });
 
-    remaining -= currentAmount;
+    installmentIndex++;
   }
 
-  return installments;
+  return payments;
 }

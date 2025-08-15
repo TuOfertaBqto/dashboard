@@ -10,7 +10,6 @@ import {
 import type { ContractPayment } from "../api/contract-payment";
 import { numeroALetras } from "../utils/numero-a-letras";
 import { translatePaymentMethod } from "../utils/translations";
-import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 
 Font.registerHyphenationCallback((word) => [word]);
@@ -98,6 +97,8 @@ interface Props {
   documentIdPhoto: string;
 }
 
+const SIGNATURE_VENDOR = import.meta.env.VITE_SIGNATURE_VENDOR;
+
 export const MyPdfDocument = ({
   name,
   lastName,
@@ -111,30 +112,11 @@ export const MyPdfDocument = ({
   documentIdPhoto,
 }: Props) => {
   const cantidadLetras = numeroALetras(montoTotal).toUpperCase();
-  let accumulated = 0;
   const debt = Math.min(
     ...cuotas
       .map((c) => (c.debt == null ? NaN : Number(c.debt)))
       .filter((d) => !isNaN(d))
   );
-  const [vendorImageBase64, setVendorImageBase64] = useState<string | null>(
-    null
-  );
-
-  useEffect(() => {
-    const loadImage = async () => {
-      const response = await fetch("/vendor.png"); // desde public
-      const blob = await response.blob();
-
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setVendorImageBase64(reader.result as string);
-      };
-      reader.readAsDataURL(blob);
-    };
-
-    loadImage();
-  }, []);
 
   function fechaEnPalabras(fechaString: string): string {
     const [año, mes, dia] = fechaString.split("-").map(Number);
@@ -335,13 +317,6 @@ export const MyPdfDocument = ({
           </View>
 
           {cuotas.map((cuota, index) => {
-            let amount = cuota.contract.installmentAmount;
-
-            if (index === cuotas.length - 1) {
-              amount = cuota.contract.totalPrice - accumulated;
-            }
-
-            accumulated += amount;
             return (
               <View style={styles.tableRow} key={index}>
                 <Text style={[styles.tableCol, { width: "20%" }]}>
@@ -361,7 +336,7 @@ export const MyPdfDocument = ({
                     { width: "15%", textAlign: "center" },
                   ]}
                 >
-                  ${amount}
+                  ${cuota.installmentAmount}
                 </Text>
                 <Text style={[styles.tableCol, { width: "25%" }]}>
                   {translatePaymentMethod(cuota.paymentMethod ?? "")}
@@ -438,9 +413,9 @@ export const MyPdfDocument = ({
           }}
         >
           <View style={{ width: "35%", alignItems: "center" }}>
-            {vendorImageBase64 && (
+            {SIGNATURE_VENDOR && (
               <Image
-                src={vendorImageBase64}
+                src={SIGNATURE_VENDOR}
                 style={{ width: 60, marginBottom: -11 }}
               />
             )}

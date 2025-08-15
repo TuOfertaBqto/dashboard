@@ -12,17 +12,23 @@ export type ContractPayment = {
   photo: null;
   owner: null;
   dueDate: string;
+  installmentAmount: number;
   amountPaid: null;
   paidAt?: string;
   debt?: string;
 };
 
+type ProductPaymentDTO = {
+  price: number;
+  installmentAmount: number;
+  quantity: number;
+};
+
 export type CreateContractPayment = {
   contractId: string;
   startContract: string;
-  installmentAmountContract: number;
   agreementContract: "weekly" | "fortnightly";
-  totalPriceContract: number;
+  products: ProductPaymentDTO[];
 };
 
 export type UpdateContractPayment = {
@@ -48,13 +54,13 @@ export type UpdateContractPayment = {
 };
 
 export const ContractPaymentApi = {
-  create: async (data: CreateContractPayment): Promise<ContractPayment> => {
+  create: async (data: CreateContractPayment): Promise<ContractPayment[]> => {
     try {
       const res = await api.post("/contract-payment", data);
       return res.data;
     } catch (error) {
       console.error("Error creating contract-payment:", error);
-      return {} as ContractPayment;
+      return [] as ContractPayment[];
     }
   },
 

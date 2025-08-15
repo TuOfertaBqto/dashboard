@@ -17,6 +17,7 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
   const [form, setForm] = useState<CreateProduct>({
     name: "",
     description: null,
+    installmentAmount: 0,
     price: 0,
     categoryId: "",
   });
@@ -30,6 +31,7 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
       setForm({
         name: initialData.name,
         description: initialData.description || null,
+        installmentAmount: initialData.installmentAmount,
         price: initialData.price,
         categoryId: initialData.categoryId.id,
       });
@@ -56,7 +58,7 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
     >
   ) => {
     const { name, value } = e.target;
-    if (["price"].includes(name)) {
+    if (["price", "installmentAmount"].includes(name)) {
       const intValue = parseInt(value, 10);
 
       if (value === "" || (!isNaN(intValue) && intValue > 0)) {
@@ -154,7 +156,7 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
 
       <div>
         <label htmlFor="price" className="block mb-1 text-sm">
-          Precio
+          Precio ($)
         </label>
         <input
           id="price"
@@ -163,6 +165,24 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
           min={1}
           step={1}
           value={form.price}
+          onChange={handleChange}
+          className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          required
+          onWheel={(e) => e.currentTarget.blur()}
+        />
+      </div>
+
+      <div>
+        <label htmlFor="installmentAmount" className="block mb-1 text-sm">
+          Cuota semanal ($)
+        </label>
+        <input
+          id="installmentAmount"
+          name="installmentAmount"
+          type="number"
+          min={1}
+          step={1}
+          value={form.installmentAmount}
           onChange={handleChange}
           className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           required
