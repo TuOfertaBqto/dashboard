@@ -56,6 +56,13 @@ export type Contract = {
   deletedAt: Date | null;
 };
 
+export type ResponseCountContract = {
+  activeContracts: number;
+  pendingToDispatch: number;
+  canceledContracts: number;
+  completedContracts: number;
+};
+
 export const ContractApi = {
   getAll: async (): Promise<Contract[]> => {
     try {
@@ -139,6 +146,16 @@ export const ContractApi = {
     } catch (error) {
       console.error("Error removing contract:", error);
       return { msg: "error removing contract" };
+    }
+  },
+
+  getCount: async (): Promise<ResponseCountContract | { msg: string }> => {
+    try {
+      const res = await api.get("/contract/count");
+      return res.data;
+    } catch (error) {
+      console.error("error counting contracts:", error);
+      return { msg: "error counting contracts" };
     }
   },
 };
