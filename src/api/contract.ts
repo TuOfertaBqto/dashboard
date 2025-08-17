@@ -149,13 +149,13 @@ export const ContractApi = {
     }
   },
 
-  getCount: async (): Promise<ResponseCountContract | { msg: string }> => {
+  getCount: async (): Promise<ResponseCountContract> => {
     try {
       const res = await api.get("/contract/count");
       return res.data;
     } catch (error) {
       console.error("error counting contracts:", error);
-      return { msg: "error counting contracts" };
+      return {} as ResponseCountContract;
     }
   },
 };
