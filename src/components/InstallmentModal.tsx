@@ -4,7 +4,12 @@ import type { ContractPayment } from "../api/contract-payment";
 import { generateInstallmentsFromContract } from "../utils/generateInstallments";
 import { translatePaymentMethod } from "../utils/translations";
 import MyPdfDocument from "./MyPdfDocument";
-import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowDownTrayIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  ExclamationCircleIcon,
+} from "@heroicons/react/24/outline";
 import dayjs from "dayjs";
 
 interface Props {
@@ -109,8 +114,14 @@ export const InstallmentModal = ({
           </div>
 
           {/* Tabla de pagos */}
-          <div className="overflow-x-auto max-h-[50vh] border rounded">
-            <table className="w-full text-sm">
+          <div
+            className="overflow-x-auto border rounded 
+                max-h-screen 
+                md:max-h-[70vh] 
+                lg:max-h-[80vh] 
+                min-h-fit"
+          >
+            <table className="w-full text-sm table-auto">
               <thead className="bg-gray-100 text-left sticky top-0 z-10">
                 <tr>
                   <th className="p-2">#</th>
@@ -124,11 +135,32 @@ export const InstallmentModal = ({
               </thead>
               <tbody>
                 {effectivePayments.map((p, index) => {
+                  let dueDateClass = "";
+                  let IconComponent = null;
+
+                  if (p.paidAt) {
+                    dueDateClass = "bg-green-100 text-green-700";
+                    IconComponent = CheckCircleIcon;
+                  } else if (dayjs(p.dueDate).isBefore(dayjs(), "day")) {
+                    dueDateClass = "bg-red-100 text-red-700";
+                    IconComponent = ExclamationCircleIcon;
+                  } else {
+                    dueDateClass = "bg-yellow-100 text-yellow-800";
+                    IconComponent = ClockIcon;
+                  }
+
                   return (
                     <tr key={p.id} className="border-t">
                       <td className="p-2">{index + 1}</td>
                       <td className="p-2">
-                        {dayjs(p.dueDate.split("T")[0]).format("DD-MM-YYYY")}
+                        <span
+                          className={`inline-flex items-center gap-1 px-2 py-1 rounded-full font-semibold ${dueDateClass}`}
+                        >
+                          {IconComponent && (
+                            <IconComponent className="w-4 h-4" />
+                          )}
+                          {dayjs(p.dueDate).format("DD-MM-YYYY")}
+                        </span>
                       </td>
                       <td className="p-2">${p.installmentAmount}</td>
                       <td className="p-2">
@@ -138,7 +170,7 @@ export const InstallmentModal = ({
                         {translatePaymentMethod(p.paymentMethod ?? "")}
                       </td>
                       <td className="p-2">
-                        {p.paidAt ? p.paidAt.split("T")[0] : "—"}
+                        {p.paidAt ? dayjs(p.paidAt).format("DD-MM-YYYY") : "—"}
                       </td>
                       <td className="p-2">{p.debt ? "$" + p.debt : ""}</td>
                     </tr>
