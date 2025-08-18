@@ -18,6 +18,15 @@ export type User = {
   documentIdPhoto?: string;
 };
 
+export type VendorStats = {
+  code: string;
+  vendorName: string;
+  activeContracts: string;
+  pendingContracts: string;
+  cancelledContracts: string;
+  finishedContracts: string;
+};
+
 export const userApi = {
   getAll: async (role?: UserRole): Promise<User[]> => {
     try {
@@ -68,6 +77,16 @@ export const userApi = {
     } catch (error) {
       console.error("Error removing user:", error);
       return { msg: "error removing user" };
+    }
+  },
+
+  getVendorStats: async (): Promise<VendorStats[]> => {
+    try {
+      const res = await api.get("/user/vendor-stats");
+      return res.data;
+    } catch (error) {
+      console.error("error getVendorStats:", error);
+      return [];
     }
   },
 };
