@@ -141,7 +141,9 @@ export const InstallmentModal = ({
                   if (p.paidAt) {
                     dueDateClass = "bg-green-100 text-green-700";
                     IconComponent = CheckCircleIcon;
-                  } else if (dayjs(p.dueDate).isBefore(dayjs(), "day")) {
+                  } else if (
+                    dayjs(p.dueDate.split("T")[0]).isBefore(dayjs(), "day")
+                  ) {
                     dueDateClass = "bg-red-100 text-red-700";
                     IconComponent = ExclamationCircleIcon;
                   } else {
@@ -159,7 +161,7 @@ export const InstallmentModal = ({
                           {IconComponent && (
                             <IconComponent className="w-4 h-4" />
                           )}
-                          {dayjs(p.dueDate).format("DD-MM-YYYY")}
+                          {dayjs(p.dueDate.split("T")[0]).format("DD-MM-YYYY")}
                         </span>
                       </td>
                       <td className="p-2">${p.installmentAmount}</td>
@@ -170,7 +172,9 @@ export const InstallmentModal = ({
                         {translatePaymentMethod(p.paymentMethod ?? "")}
                       </td>
                       <td className="p-2">
-                        {p.paidAt ? dayjs(p.paidAt).format("DD-MM-YYYY") : "—"}
+                        {p.paidAt
+                          ? dayjs(p.paidAt.split("T")[0]).format("DD-MM-YYYY")
+                          : "—"}
                       </td>
                       <td className="p-2">{p.debt ? "$" + p.debt : ""}</td>
                     </tr>
