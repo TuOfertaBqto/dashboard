@@ -201,7 +201,7 @@ export const InstallmentModal = ({
                       direccion={contract?.customerId.adress ?? ""}
                       fechaInicio={
                         contract?.startDate?.split("T")[0] ??
-                        new Date().toISOString().split("T")[0]
+                        dayjs().format("YYYY-MM-DD")
                       }
                       descripcion={
                         contract?.products.map(

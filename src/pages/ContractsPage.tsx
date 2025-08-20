@@ -9,6 +9,7 @@ import {
   type ContractPayment,
 } from "../api/contract-payment";
 import { InstallmentModal } from "../components/InstallmentModal";
+import dayjs from "dayjs";
 
 export default function ContractsPage() {
   const navigate = useNavigate();
@@ -23,6 +24,9 @@ export default function ContractsPage() {
     null
   );
   const [installments, setInstallments] = useState<ContractPayment[]>([]);
+  const [dispatchDate, setDispatchDate] = useState<string>(
+    dayjs().format("YYYY-MM-DD")
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -66,9 +70,8 @@ export default function ContractsPage() {
 
     try {
       await ContractApi.update(contractToDispatch.id, {
-        startDate: contractToDispatch.startDate,
+        startDate: dispatchDate,
       });
-
       for (const p of contractToDispatch.products) {
         if (p.status === "to_buy") {
           await InventoryMovApi.create({
@@ -91,7 +94,7 @@ export default function ContractsPage() {
       await ContractPaymentApi.create({
         contractId: contractToDispatch.id,
         agreementContract: contractToDispatch.agreement,
-        startContract: contractToDispatch.startDate.split("T")[0],
+        startContract: dispatchDate,
         products: contractToDispatch.products.map((p) => ({
           price: p.product.price,
           installmentAmount: p.product.installmentAmount,
@@ -149,9 +152,33 @@ export default function ContractsPage() {
 
       <ConfirmModal
         open={!!contractToDispatch}
-        title="Despachar contrato"
-        message={`¿Deseas despachar el contrato "${contractToDispatch?.code}"? Esto asignará la fecha de inicio como la fecha actual.`}
-        onCancel={() => setContractToDispatch(null)}
+        title={`Despachar contrato #${contractToDispatch?.code}`}
+        message={
+          <div className="flex flex-col w-full my-3">
+            <label
+              htmlFor="dispatchDate"
+              className="mb-1 text-sm font-medium text-gray-700"
+            >
+              Selecciona la fecha de despacho
+            </label>
+            <input
+              type="date"
+              id="dispatchDate"
+              name="dispatchDate"
+              className="border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800
+               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              value={dispatchDate}
+              required
+              min="2025-05-01"
+              max={dayjs().format("YYYY-MM-DD")}
+              onChange={(e) => setDispatchDate(e.target.value)}
+            />
+          </div>
+        }
+        onCancel={() => {
+          setContractToDispatch(null);
+          setDispatchDate(dayjs().format("YYYY-MM-DD"));
+        }}
         onConfirm={handleDispatch}
       />
     </div>

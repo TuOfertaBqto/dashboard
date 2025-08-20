@@ -116,9 +116,11 @@ export const ContractTable = ({
                 </td>
                 <td className="p-2">${contract.totalPrice}</td>
                 <td className="p-2">
-                  {dayjs(contract.startDate?.split("T")[0]).format(
-                    "DD-MM-YYYY"
-                  )}
+                  {contract.startDate
+                    ? dayjs(contract.startDate?.split("T")[0]).format(
+                        "DD-MM-YYYY"
+                      )
+                    : ""}
                 </td>
                 <td className="p-2">
                   {contract.endDate?.split("T")[0]
@@ -133,10 +135,7 @@ export const ContractTable = ({
                       <DispatchButton
                         onClick={(e) => {
                           e.stopPropagation();
-                          onDispatch({
-                            ...contract,
-                            startDate: new Date().toISOString(),
-                          });
+                          onDispatch(contract);
                         }}
                       />
                     )}

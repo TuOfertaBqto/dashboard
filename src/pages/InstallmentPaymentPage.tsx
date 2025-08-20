@@ -5,6 +5,7 @@ import {
   type ContractPayment,
   type UpdateContractPayment,
 } from "../api/contract-payment";
+import dayjs from "dayjs";
 
 export const InstallmentPaymentPage = () => {
   const { id } = useParams();
@@ -18,7 +19,7 @@ export const InstallmentPaymentPage = () => {
     amountPaid: 0,
     paymentMethod: "cash",
     referenceNumber: "",
-    paidAt: new Date().toISOString().slice(0, 10),
+    paidAt: dayjs().format("YYYY-MM-DD"),
     owner: "",
     photo: "",
   });
@@ -194,7 +195,7 @@ export const InstallmentPaymentPage = () => {
             value={form.paidAt}
             onChange={handleChange}
             min="2025-05-01"
-            max={new Date().toISOString().split("T")[0]}
+            max={dayjs().format("YYYY-MM-DD")}
             className="w-full border p-2 rounded"
             required
           />
