@@ -10,6 +10,8 @@ import {
 } from "../api/contract-payment";
 import { InstallmentModal } from "../components/InstallmentModal";
 import dayjs from "dayjs";
+import { DebtsReportPDF } from "../components/DebtsReportPDF";
+import { pdf } from "@react-pdf/renderer";
 
 export default function ContractsPage() {
   const navigate = useNavigate();
@@ -46,9 +48,7 @@ export default function ContractsPage() {
     setLoading(true);
     try {
       const data = await ContractApi.getAll();
-      const due = await ContractPaymentApi.getOverdueCustomersByVendor();
       setContracts(data);
-      console.log(due);
     } catch (err) {
       console.log("Error loading contract", err);
     } finally {
@@ -112,16 +112,38 @@ export default function ContractsPage() {
     }
   };
 
+  const handleDownloadPDF = async () => {
+    // aquí vendría la data desde tu API o estado
+    const vendors = await ContractPaymentApi.getOverdueCustomersByVendor();
+
+    const blob = await pdf(<DebtsReportPDF vendors={vendors} />).toBlob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    const now = dayjs().format("YYYYMMDD_HHmmss");
+    link.download = `cuotas_atrasadas_${now}.pdf`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Contratos</h1>
-        <button
-          onClick={() => navigate("/contracts/new")}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer"
-        >
-          Crear contrato
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => navigate("/contracts/new")}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer"
+          >
+            Crear contrato
+          </button>
+          <button
+            onClick={handleDownloadPDF}
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 cursor-pointer"
+          >
+            Descargar PDF
+          </button>
+        </div>
       </div>
 
       <ContractTable

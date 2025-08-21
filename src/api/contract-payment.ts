@@ -58,6 +58,7 @@ type ContractDebt = {
   contractCode: string;
   overdueInstallments: number;
   overdueAmount: number;
+  overdueNumbers: number[];
 };
 
 type CustomerWithDebt = {
@@ -67,6 +68,7 @@ type CustomerWithDebt = {
 };
 export type VendorsWithDebts = {
   vendorId: string;
+  code: string;
   vendorName: string;
   customers: CustomerWithDebt[];
 };
