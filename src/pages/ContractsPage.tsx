@@ -46,7 +46,9 @@ export default function ContractsPage() {
     setLoading(true);
     try {
       const data = await ContractApi.getAll();
+      const due = await ContractPaymentApi.getOverdueCustomersByVendor();
       setContracts(data);
+      console.log(due);
     } catch (err) {
       console.log("Error loading contract", err);
     } finally {

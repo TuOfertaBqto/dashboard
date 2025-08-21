@@ -53,6 +53,24 @@ export type UpdateContractPayment = {
   paidAt: string;
 };
 
+type ContractDebt = {
+  contractId: string;
+  contractCode: string;
+  overdueInstallments: number;
+  overdueAmount: number;
+};
+
+type CustomerWithDebt = {
+  customerId: string;
+  customerName: string;
+  contracts: ContractDebt[];
+};
+export type VendorsWithDebts = {
+  vendorId: string;
+  vendorName: string;
+  customers: CustomerWithDebt[];
+};
+
 export const ContractPaymentApi = {
   create: async (data: CreateContractPayment): Promise<ContractPayment[]> => {
     try {
@@ -101,6 +119,18 @@ export const ContractPaymentApi = {
     } catch (error) {
       console.error("Error updating contract-payment:", error);
       return {};
+    }
+  },
+
+  getOverdueCustomersByVendor: async (): Promise<VendorsWithDebts[]> => {
+    try {
+      const res = await api.get(
+        "/contract-payment/overdue/customers-by-vendor"
+      );
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching contract-payment:", error);
+      return [];
     }
   },
 };
