@@ -75,7 +75,7 @@ export const Header = () => {
 
           <div className="absolute top-18 left-0 w-full bg-[#1f2937] text-white shadow-md z-50 animate-slide-down md:hidden">
             <ul className="flex flex-col divide-y divide-gray-200">
-              {user?.role == "main" && (
+              {(user?.role == "main" || user?.role == "admin") && (
                 <li
                   className="p-4 flex items-center gap-2 active:bg-[#111827]"
                   onClick={() => {
@@ -127,21 +127,21 @@ export const Header = () => {
                 className="p-4 flex items-center gap-2 active:bg-[#111827]"
                 onClick={() => {
                   setIsMenuOpen(false);
-                  navigate("/products");
-                }}
-              >
-                <CubeIcon className="w-5 h-5" />
-                Productos
-              </li>
-              <li
-                className="p-4 flex items-center gap-2 active:bg-[#111827]"
-                onClick={() => {
-                  setIsMenuOpen(false);
                   navigate("/users");
                 }}
               >
                 <UsersIcon className="h-5 w-5" />
                 Usuarios
+              </li>
+              <li
+                className="p-4 flex items-center gap-2 active:bg-[#111827]"
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  navigate("/products");
+                }}
+              >
+                <CubeIcon className="w-5 h-5" />
+                Productos
               </li>
               <li
                 className="p-4 text-red-600 flex items-center gap-2 active:bg-[#111827]"

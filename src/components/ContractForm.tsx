@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import type { Product } from "../api/product";
 import Select, { type SingleValue } from "react-select";
 import { PlusCircleIcon, TrashIcon } from "@heroicons/react/24/outline";
+import dayjs from "dayjs";
 
 interface Props {
   initialData?: Contract | null;
@@ -248,7 +249,7 @@ export const ContractForm = ({
                 onChange={handleChange}
                 required={dispatched === true}
                 min="2025-05-01"
-                max={new Date().toISOString().split("T")[0]}
+                max={dayjs().format("YYYY-MM-DD")}
                 className="w-full border p-2 rounded disabled:opacity-70 disabled:cursor-not-allowed disabled:bg-gray-100"
               />
             </div>

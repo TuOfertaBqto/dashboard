@@ -9,6 +9,10 @@ import {
   type ContractPayment,
 } from "../api/contract-payment";
 import { InstallmentModal } from "../components/InstallmentModal";
+import dayjs from "dayjs";
+import { DebtsReportPDF } from "../components/DebtsReportPDF";
+import { pdf } from "@react-pdf/renderer";
+import { ArrowDownTrayIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
 
 export default function ContractsPage() {
   const navigate = useNavigate();
@@ -23,8 +27,12 @@ export default function ContractsPage() {
     null
   );
   const [installments, setInstallments] = useState<ContractPayment[]>([]);
+  const [dispatchDate, setDispatchDate] = useState<string>(
+    dayjs().format("YYYY-MM-DD")
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [isDownloading, setIsDownloading] = useState<boolean>(false);
 
   const handleRowClick = async (contract: Contract) => {
     setContractSelected(contract);
@@ -66,9 +74,8 @@ export default function ContractsPage() {
 
     try {
       await ContractApi.update(contractToDispatch.id, {
-        startDate: contractToDispatch.startDate,
+        startDate: dispatchDate,
       });
-
       for (const p of contractToDispatch.products) {
         if (p.status === "to_buy") {
           await InventoryMovApi.create({
@@ -91,7 +98,7 @@ export default function ContractsPage() {
       await ContractPaymentApi.create({
         contractId: contractToDispatch.id,
         agreementContract: contractToDispatch.agreement,
-        startContract: contractToDispatch.startDate.split("T")[0],
+        startContract: dispatchDate,
         products: contractToDispatch.products.map((p) => ({
           price: p.product.price,
           installmentAmount: p.product.installmentAmount,
@@ -107,16 +114,56 @@ export default function ContractsPage() {
     }
   };
 
+  const handleDownloadPDF = async () => {
+    try {
+      setIsDownloading(true);
+      const vendors = await ContractPaymentApi.getOverdueCustomersByVendor();
+
+      const blob = await pdf(<DebtsReportPDF vendors={vendors} />).toBlob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      const now = dayjs().format("YYYYMMDD");
+      link.download = `Cuotas atrasadas ${now}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error al generar el reporte:", error);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Contratos</h1>
-        <button
-          onClick={() => navigate("/contracts/new")}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer"
-        >
-          Crear contrato
-        </button>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 w-full">
+        <h1 className="text-2xl font-bold text-center sm:text-left">
+          Contratos
+        </h1>
+
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <button
+            onClick={() => navigate("/contracts/new")}
+            className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white font-medium shadow hover:bg-blue-700 transition w-full sm:w-auto cursor-pointer"
+          >
+            <PlusCircleIcon className="w-5 h-5" />
+            Crear contrato
+          </button>
+
+          <button
+            onClick={handleDownloadPDF}
+            disabled={isDownloading}
+            className={`flex items-center justify-center gap-2 px-4 py-2 rounded-xl font-medium shadow transition w-full sm:w-auto 
+      ${
+        isDownloading
+          ? "bg-gray-400 text-white cursor-not-allowed"
+          : "bg-green-600 text-white hover:bg-green-700 cursor-pointer"
+      }`}
+          >
+            <ArrowDownTrayIcon className="w-5 h-5" />
+            {isDownloading ? "Generando..." : "Reporte deudas"}
+          </button>
+        </div>
       </div>
 
       <ContractTable
@@ -149,9 +196,33 @@ export default function ContractsPage() {
 
       <ConfirmModal
         open={!!contractToDispatch}
-        title="Despachar contrato"
-        message={`¿Deseas despachar el contrato "${contractToDispatch?.code}"? Esto asignará la fecha de inicio como la fecha actual.`}
-        onCancel={() => setContractToDispatch(null)}
+        title={`Despachar contrato #${contractToDispatch?.code}`}
+        message={
+          <div className="flex flex-col w-full my-3">
+            <label
+              htmlFor="dispatchDate"
+              className="mb-1 text-sm font-medium text-gray-700"
+            >
+              Selecciona la fecha de despacho
+            </label>
+            <input
+              type="date"
+              id="dispatchDate"
+              name="dispatchDate"
+              className="border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800
+               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              value={dispatchDate}
+              required
+              min="2025-05-01"
+              max={dayjs().format("YYYY-MM-DD")}
+              onChange={(e) => setDispatchDate(e.target.value)}
+            />
+          </div>
+        }
+        onCancel={() => {
+          setContractToDispatch(null);
+          setDispatchDate(dayjs().format("YYYY-MM-DD"));
+        }}
         onConfirm={handleDispatch}
       />
     </div>

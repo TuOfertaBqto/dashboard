@@ -80,19 +80,30 @@ export const Sidebar = () => {
     );
   }
 
-  if (userRole === "main" || userRole === "vendor") {
-    generalMenuItems.unshift({
-      name: "Solicitudes",
-      icon: <DocumentArrowUpIcon className="h-5 w-5" />,
-      route: "/requests",
-    });
-  }
-
   if (userRole === "main") {
+    generalMenuItems.unshift(
+      {
+        name: "Dashboard",
+        icon: <SquaresPlusIcon className="h-5 w-5" />,
+        route: "/dashboard",
+      },
+      {
+        name: "Solicitudes",
+        icon: <DocumentArrowUpIcon className="h-5 w-5" />,
+        route: "/requests",
+      }
+    );
+  } else if (userRole === "admin" || userRole === "super_admin") {
     generalMenuItems.unshift({
       name: "Dashboard",
       icon: <SquaresPlusIcon className="h-5 w-5" />,
       route: "/dashboard",
+    });
+  } else if (userRole === "vendor") {
+    generalMenuItems.unshift({
+      name: "Solicitudes",
+      icon: <DocumentArrowUpIcon className="h-5 w-5" />,
+      route: "/requests",
     });
   }
 

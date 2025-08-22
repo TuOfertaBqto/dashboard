@@ -73,6 +73,7 @@ export default function Dashboard() {
           <table className="min-w-full border-collapse">
             <thead>
               <tr className="bg-gray-100 text-left">
+                <th className="px-4 py-2 border-b">Código</th>
                 <th className="px-4 py-2 border-b">Nombre</th>
                 <th className="px-4 py-2 border-b">Activos</th>
                 <th className="px-4 py-2 border-b">Pendientes</th>
@@ -83,6 +84,7 @@ export default function Dashboard() {
             <tbody>
               {vendors.map((v) => (
                 <tr key={v.code} className="hover:bg-gray-50">
+                  <td className="px-4 py-2 border-b">T{v.code}</td>
                   <td className="px-4 py-2 border-b">{v.vendorName}</td>
                   <td className="px-4 py-2 border-b">{v.activeContracts}</td>
                   <td className="px-4 py-2 border-b">{v.pendingContracts}</td>
