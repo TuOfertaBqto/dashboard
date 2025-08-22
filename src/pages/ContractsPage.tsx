@@ -153,12 +153,12 @@ export default function ContractsPage() {
           <button
             onClick={handleDownloadPDF}
             disabled={isDownloading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium shadow transition
-            ${
-              isDownloading
-                ? "bg-gray-400 text-white cursor-not-allowed"
-                : "bg-green-600 text-white hover:bg-green-700 cursor-pointer"
-            }`}
+            className={`flex items-center justify-center gap-2 px-4 py-2 rounded-xl font-medium shadow transition w-full sm:w-auto 
+      ${
+        isDownloading
+          ? "bg-gray-400 text-white cursor-not-allowed"
+          : "bg-green-600 text-white hover:bg-green-700 cursor-pointer"
+      }`}
           >
             <ArrowDownTrayIcon className="w-5 h-5" />
             {isDownloading ? "Generando..." : "Reporte deudas"}
