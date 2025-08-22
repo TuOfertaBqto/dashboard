@@ -12,6 +12,7 @@ import { InstallmentModal } from "../components/InstallmentModal";
 import dayjs from "dayjs";
 import { DebtsReportPDF } from "../components/DebtsReportPDF";
 import { pdf } from "@react-pdf/renderer";
+import { ArrowDownTrayIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
 
 export default function ContractsPage() {
   const navigate = useNavigate();
@@ -113,7 +114,6 @@ export default function ContractsPage() {
   };
 
   const handleDownloadPDF = async () => {
-    // aquí vendría la data desde tu API o estado
     const vendors = await ContractPaymentApi.getOverdueCustomersByVendor();
 
     const blob = await pdf(<DebtsReportPDF vendors={vendors} />).toBlob();
@@ -128,20 +128,28 @@ export default function ContractsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Contratos</h1>
-        <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 w-full">
+        {/* Título */}
+        <h1 className="text-2xl font-bold text-center sm:text-left">
+          Contratos
+        </h1>
+
+        {/* Botones */}
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <button
             onClick={() => navigate("/contracts/new")}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer"
+            className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white font-medium shadow hover:bg-blue-700 transition w-full sm:w-auto cursor-pointer"
           >
+            <PlusCircleIcon className="w-5 h-5" />
             Crear contrato
           </button>
+
           <button
             onClick={handleDownloadPDF}
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 cursor-pointer"
+            className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-green-600 text-white font-medium shadow hover:bg-green-700 transition w-full sm:w-auto cursor-pointer"
           >
-            Descargar PDF
+            <ArrowDownTrayIcon className="w-5 h-5" />
+            Reporte deudas
           </button>
         </div>
       </div>
