@@ -68,6 +68,11 @@ export const Sidebar = () => {
   ) {
     generalMenuItems.unshift(
       {
+        name: "Dashboard",
+        icon: <SquaresPlusIcon className="h-5 w-5" />,
+        route: "/dashboard",
+      },
+      {
         name: "Pagos",
         icon: <CurrencyDollarIcon className="h-5 w-5" />,
         route: "/installments",
@@ -85,14 +90,6 @@ export const Sidebar = () => {
       name: "Solicitudes",
       icon: <DocumentArrowUpIcon className="h-5 w-5" />,
       route: "/requests",
-    });
-  }
-
-  if (userRole === "main") {
-    generalMenuItems.unshift({
-      name: "Dashboard",
-      icon: <SquaresPlusIcon className="h-5 w-5" />,
-      route: "/dashboard",
     });
   }
 
