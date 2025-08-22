@@ -68,11 +68,6 @@ export const Sidebar = () => {
   ) {
     generalMenuItems.unshift(
       {
-        name: "Dashboard",
-        icon: <SquaresPlusIcon className="h-5 w-5" />,
-        route: "/dashboard",
-      },
-      {
         name: "Pagos",
         icon: <CurrencyDollarIcon className="h-5 w-5" />,
         route: "/installments",
@@ -85,7 +80,26 @@ export const Sidebar = () => {
     );
   }
 
-  if (userRole === "main" || userRole === "vendor") {
+  if (userRole === "main") {
+    generalMenuItems.unshift(
+      {
+        name: "Dashboard",
+        icon: <SquaresPlusIcon className="h-5 w-5" />,
+        route: "/dashboard",
+      },
+      {
+        name: "Solicitudes",
+        icon: <DocumentArrowUpIcon className="h-5 w-5" />,
+        route: "/requests",
+      }
+    );
+  } else if (userRole === "admin" || userRole === "super_admin") {
+    generalMenuItems.unshift({
+      name: "Dashboard",
+      icon: <SquaresPlusIcon className="h-5 w-5" />,
+      route: "/dashboard",
+    });
+  } else if (userRole === "vendor") {
     generalMenuItems.unshift({
       name: "Solicitudes",
       icon: <DocumentArrowUpIcon className="h-5 w-5" />,
