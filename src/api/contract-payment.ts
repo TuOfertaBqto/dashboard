@@ -135,4 +135,14 @@ export const ContractPaymentApi = {
       return [];
     }
   },
+
+  canVendorRequest: async (): Promise<boolean> => {
+    try {
+      const res = await api.get("/contract-payment/vendor/can-request");
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching contract-payment:", error);
+      return false;
+    }
+  },
 };
