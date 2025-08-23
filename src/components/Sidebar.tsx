@@ -83,7 +83,7 @@ export const Sidebar = () => {
   if (userRole === "main") {
     generalMenuItems.unshift(
       {
-        name: "Dashboard",
+        name: "Reportes",
         icon: <SquaresPlusIcon className="h-5 w-5" />,
         route: "/dashboard",
       },
@@ -95,7 +95,7 @@ export const Sidebar = () => {
     );
   } else if (userRole === "admin" || userRole === "super_admin") {
     generalMenuItems.unshift({
-      name: "Dashboard",
+      name: "Reportes",
       icon: <SquaresPlusIcon className="h-5 w-5" />,
       route: "/dashboard",
     });

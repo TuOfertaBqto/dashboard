@@ -84,7 +84,7 @@ export const Header = () => {
                   }}
                 >
                   <SquaresPlusIcon className="w-5 h-5" />
-                  Dashboard
+                  Reportes
                 </li>
               )}
               {(user?.role == "main" || user?.role == "vendor") && (
