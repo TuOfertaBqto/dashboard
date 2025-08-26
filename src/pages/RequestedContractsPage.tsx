@@ -9,6 +9,7 @@ import {
   ContractPaymentApi,
   type ContractPayment,
 } from "../api/contract-payment";
+import { InventoryApi } from "../api/inventory";
 
 export default function RequestedContractsPage() {
   const navigate = useNavigate();
@@ -45,6 +46,20 @@ export default function RequestedContractsPage() {
     const contractApproved = await ContractApi.update(id, {
       status: "approved",
     });
+
+    await Promise.all(
+      contractApproved.products.map(async (p) => {
+        const [toDesp, stock] = await Promise.all([
+          ContractApi.getToDispatchQuantity(p.product.id),
+          InventoryApi.getStockByProductId(p.product.id),
+        ]);
+
+        const status = stock >= p.quantity + toDesp ? "to_dispatch" : "to_buy";
+
+        await ContractApi.updateProducts(p.id, status);
+      })
+    );
+
     fetchRequestedContracts();
     return contractApproved;
   };
