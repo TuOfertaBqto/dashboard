@@ -36,9 +36,9 @@ const validateToken = async () => {
   }
 };
 
-const forgotPassword = async () => {
+const forgotPassword = async (email: string) => {
   try {
-    const { data } = await api.post("/auth/forgot-password");
+    const { data } = await api.post("/auth/forgot-password", { email });
 
     return data;
   } catch (err) {
@@ -47,9 +47,12 @@ const forgotPassword = async () => {
   }
 };
 
-const resetPassword = async () => {
+const resetPassword = async (token: string, newPassword: string) => {
   try {
-    const { data } = await api.post("/auth/reset-password");
+    const { data } = await api.post("/auth/reset-password", {
+      token,
+      newPassword,
+    });
 
     return data;
   } catch (err) {
