@@ -90,6 +90,12 @@ export default function Login() {
             {errorMessage}
           </div>
         )}
+
+        <p className="text-center text-sm text-gray-600">
+          <a href="/forgot-password" className="text-blue-600 hover:underline">
+            ¿Olvidaste tu contraseña?
+          </a>
+        </p>
       </form>
     </div>
   );
