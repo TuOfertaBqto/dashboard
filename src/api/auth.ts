@@ -36,7 +36,31 @@ const validateToken = async () => {
   }
 };
 
+const forgotPassword = async () => {
+  try {
+    const { data } = await api.post("/auth/forgot-password");
+
+    return data;
+  } catch (err) {
+    console.error(err);
+    return { message: "Error al enviar el correo de recuperación" };
+  }
+};
+
+const resetPassword = async () => {
+  try {
+    const { data } = await api.post("/auth/reset-password");
+
+    return data;
+  } catch (err) {
+    console.error(err);
+    return { message: "Error al restaurar contraseña" };
+  }
+};
+
 export const AuthApi = {
   login,
   validateToken,
+  forgotPassword,
+  resetPassword,
 };
