@@ -9,6 +9,7 @@ import {
   CheckCircleIcon,
   ClockIcon,
   ExclamationCircleIcon,
+  InformationCircleIcon,
 } from "@heroicons/react/24/outline";
 import dayjs from "dayjs";
 
@@ -138,7 +139,10 @@ export const InstallmentModal = ({
                   let dueDateClass = "";
                   let IconComponent = null;
 
-                  if (p.paidAt) {
+                  if (p.paymentMethod === "discount") {
+                    dueDateClass = "bg-blue-100 text-blue-700";
+                    IconComponent = InformationCircleIcon; // 👈 el que prefieras
+                  } else if (p.paidAt) {
                     dueDateClass = "bg-green-100 text-green-700";
                     IconComponent = CheckCircleIcon;
                   } else if (

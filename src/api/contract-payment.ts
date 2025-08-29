@@ -7,7 +7,15 @@ export type ContractPayment = {
   updatedAt: string;
   deletedAt: null;
   contract: Contract;
-  paymentMethod: null;
+  paymentMethod:
+    | "binance"
+    | "paypal"
+    | "zelle"
+    | "mobile_payment"
+    | "bank_transfer"
+    | "cash"
+    | "discount"
+    | null;
   referenceNumber: null;
   photo: null;
   owner: null;
