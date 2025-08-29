@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Input } from "../../components/Input";
 import { AuthApi } from "../../api/auth";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/useAuth";
 
 export default function Login() {
@@ -92,9 +92,9 @@ export default function Login() {
         )}
 
         <p className="text-center text-sm text-gray-600">
-          <a href="/forgot-password" className="text-blue-600 hover:underline">
+          <Link to="/forgot-password" className="text-blue-600 hover:underline">
             ¿Olvidaste tu contraseña?
-          </a>
+          </Link>
         </p>
       </form>
     </div>

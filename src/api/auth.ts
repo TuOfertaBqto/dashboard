@@ -39,11 +39,29 @@ const validateToken = async () => {
 const forgotPassword = async (email: string) => {
   try {
     const { data } = await api.post("/auth/forgot-password", { email });
-
-    return data;
+    return { error: false, data };
   } catch (err) {
     console.error(err);
-    return { message: "Error al enviar el correo de recuperación" };
+
+    if (axios.isAxiosError(err)) {
+      if (err.response) {
+        return {
+          error: true,
+          status: err.response.status,
+          message:
+            err.response.data?.message ||
+            "Error al enviar el correo de recuperación",
+        };
+      }
+
+      return {
+        error: true,
+        status: 500,
+        message: "No se pudo conectar al servidor",
+      };
+    }
+
+    return { error: true, status: 500, message: "Error desconocido" };
   }
 };
 
@@ -56,8 +74,24 @@ const resetPassword = async (token: string, newPassword: string) => {
 
     return data;
   } catch (err) {
-    console.error(err);
-    return { message: "Error al restaurar contraseña" };
+    if (axios.isAxiosError(err)) {
+      if (err.response) {
+        return {
+          error: true,
+          status: err.response.status,
+          message:
+            err.response.data?.message || "Error al restaurar contraseña",
+        };
+      }
+
+      return {
+        error: true,
+        status: 500,
+        message: "No se pudo conectar al servidor",
+      };
+    }
+
+    return { error: true, status: 500, message: "Error desconocido" };
   }
 };
 
