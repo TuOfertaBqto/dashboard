@@ -1,5 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import Login from "./pages/Login";
+import Login from "./pages/auth/Login";
 import Dashboard from "./pages/Dashboard";
 import { PrivateRoute } from "./auth/PrivateRoute";
 import UsersPage from "./pages/Users";
@@ -15,6 +15,8 @@ import { InstallmentPaymentPage } from "./pages/InstallmentPaymentPage";
 import RequestedContractsPage from "./pages/RequestedContractsPage";
 import ContractRequestFormPage from "./pages/ContractRequestFormPage";
 import { useAuth } from "./auth/useAuth";
+import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 
 function App() {
   const { user } = useAuth();
@@ -25,6 +27,8 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
 
         <Route
           path="/"

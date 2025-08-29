@@ -6,6 +6,7 @@ export function translatePaymentMethod(method: string): string {
     mobile_payment: "Pago móvil",
     bank_transfer: "Transferencia bancaria",
     cash: "Efectivo",
+    discount: "Descuento",
   };
 
   return translations[method] ?? method;

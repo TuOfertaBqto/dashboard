@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Input } from "../components/Input";
-import { AuthApi } from "../api/auth";
-import { Navigate, useNavigate } from "react-router-dom";
-import { useAuth } from "../auth/useAuth";
+import { Input } from "../../components/Input";
+import { AuthApi } from "../../api/auth";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import { useAuth } from "../../auth/useAuth";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -90,6 +90,12 @@ export default function Login() {
             {errorMessage}
           </div>
         )}
+
+        <p className="text-center text-sm text-gray-600">
+          <Link to="/forgot-password" className="text-blue-600 hover:underline">
+            ¿Olvidaste tu contraseña?
+          </Link>
+        </p>
       </form>
     </div>
   );
