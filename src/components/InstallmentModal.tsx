@@ -138,10 +138,11 @@ export const InstallmentModal = ({
                 {effectivePayments.map((p, index) => {
                   let dueDateClass = "";
                   let IconComponent = null;
+                  let number = "";
 
                   if (p.paymentMethod === "discount") {
                     dueDateClass = "bg-blue-100 text-blue-700";
-                    IconComponent = InformationCircleIcon; // 👈 el que prefieras
+                    IconComponent = InformationCircleIcon;
                   } else if (p.paidAt) {
                     dueDateClass = "bg-green-100 text-green-700";
                     IconComponent = CheckCircleIcon;
@@ -155,9 +156,24 @@ export const InstallmentModal = ({
                     IconComponent = ClockIcon;
                   }
 
+                  if (
+                    effectivePayments[0] &&
+                    effectivePayments[1] &&
+                    effectivePayments[0].installmentAmount >
+                      effectivePayments[1].installmentAmount
+                  ) {
+                    if (index === 0) {
+                      number = "Inicial";
+                    } else {
+                      number = index.toString();
+                    }
+                  } else {
+                    number = (index + 1).toString();
+                  }
+
                   return (
                     <tr key={p.id} className="border-t">
-                      <td className="p-2">{index + 1}</td>
+                      <td className="p-2">{number}</td>
                       <td className="p-2">
                         <span
                           className={`inline-flex items-center gap-1 px-2 py-1 rounded-full font-semibold ${dueDateClass}`}
