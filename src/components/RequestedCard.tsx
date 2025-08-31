@@ -72,14 +72,22 @@ export function RequestedCard({
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <p className="text-sm text-gray-400 font-medium">Vendedor</p>
-          <p className="text-gray-700 font-semibold">
-            {contract.vendorId.firstName} {contract.vendorId.lastName}
-          </p>
-          <p className="text-gray-500">T{contract.vendorId.code}</p>
-        </div>
+      <div
+        className={`grid ${
+          role === "vendor" ? "grid-cols-1" : "grid-cols-2"
+        } gap-4`}
+      >
+        {role !== "vendor" && (
+          <div>
+            <p className="text-sm text-gray-400 font-medium">
+              Vendedor T{contract.vendorId.code}
+            </p>
+            <p className="text-gray-700 font-semibold">
+              {contract.vendorId.firstName} {contract.vendorId.lastName}
+            </p>
+            <p className="text-gray-500"></p>
+          </div>
+        )}
 
         <div>
           <p className="text-sm text-gray-400 font-medium">Cliente</p>
