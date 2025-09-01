@@ -2,11 +2,17 @@ import { useEffect, useState } from "react";
 import { ContractApi } from "../api/contract";
 import { userApi, type VendorStats } from "../api/user";
 import {
+  ArrowDownTrayIcon,
   CheckCircleIcon,
   ClipboardDocumentCheckIcon,
   TruckIcon,
   XCircleIcon,
 } from "@heroicons/react/24/outline";
+import { ContractPaymentApi } from "../api/contract-payment";
+import { DebtsReportPDF } from "../components/pdf/DebtsReportPDF";
+import dayjs from "dayjs";
+import { pdf } from "@react-pdf/renderer";
+import { VendorsTotalsPDF } from "../components/pdf/VendorsTotalsPDF";
 
 type DashboardStats = {
   activeContracts: number;
@@ -18,17 +24,67 @@ type DashboardStats = {
 export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [vendors, setVendors] = useState<VendorStats[]>([]);
+  const [isDownloading, setIsDownloading] = useState<boolean>(false);
+  const [isDownloadingVendorTotals, setIsDownloadingVendorTotals] =
+    useState<boolean>(false);
 
   useEffect(() => {
     ContractApi.getCount().then((res) => setStats(res));
     userApi.getVendorStats().then((res) => setVendors(res));
   }, []);
 
+  const handleDownloadPDF = async () => {
+    try {
+      setIsDownloading(true);
+      const vendors = await ContractPaymentApi.getOverdueCustomersByVendor();
+
+      const blob = await pdf(<DebtsReportPDF vendors={vendors} />).toBlob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      const now = dayjs().format("YYYYMMDD");
+      link.download = `Cuotas atrasadas ${now}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error al generar el reporte:", error);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  const downloadVendorsTotalsPDF = async () => {
+    try {
+      setIsDownloadingVendorTotals(true);
+
+      const vendors = await ContractPaymentApi.getVendorPaymentsSummary();
+      const globalTotals = await ContractPaymentApi.getGlobalPaymentsSummary();
+
+      const blob = await pdf(
+        <VendorsTotalsPDF totals={globalTotals} vendors={vendors} />
+      ).toBlob();
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      const now = dayjs().format("YYYYMMDD");
+      link.download = `Relacion vencimiento vendedores ${now}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(
+        "Error al generar el reporte Relacion vencimiento vendedores:",
+        error
+      );
+    } finally {
+      setIsDownloadingVendorTotals(false);
+    }
+  };
+
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">Bienvenido al Dashboard</h1>
 
-      {/* Cards con métricas */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="flex items-center bg-green-50 shadow-md rounded-2xl p-6">
           <CheckCircleIcon className="h-10 w-10 text-green-600 mr-4" />
@@ -66,7 +122,57 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Tabla de vendedores */}
+      <div className="bg-white shadow-md rounded-2xl p-4 space-y-4">
+        <h2 className="text-xl font-semibold">Reportes</h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="flex flex-col justify-between border rounded-xl p-4 bg-gray-50">
+            <div>
+              <p className="font-semibold text-gray-700">Deudas por vendedor</p>
+              <p className="text-sm text-gray-500">
+                Reporte de cuotas atrasadas de clientes agrupadas por vendedor.
+              </p>
+            </div>
+            <button
+              onClick={handleDownloadPDF}
+              disabled={isDownloading}
+              className={`mt-3 px-4 py-2 rounded-lg shadow transition flex items-center justify-center gap-2 font-medium w-full sm:w-auto
+    ${
+      isDownloading
+        ? "bg-blue-600 text-white cursor-not-allowed opacity-70"
+        : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+    }`}
+            >
+              <ArrowDownTrayIcon className="w-5 h-5" />
+              <span>{isDownloading ? "Descargando..." : "Descargar"}</span>
+            </button>
+          </div>
+
+          <div className="flex flex-col justify-between border rounded-xl p-4 bg-gray-50">
+            <div>
+              <p className="font-semibold text-gray-700">Pagos por vendedor</p>
+              <p className="text-sm text-gray-500">
+                Resumen de los pagos por vendedor.
+              </p>
+            </div>
+            <button
+              onClick={downloadVendorsTotalsPDF}
+              disabled={isDownloadingVendorTotals}
+              className={`flex items-center justify-center gap-2 px-4 py-2 rounded-xl font-medium shadow transition w-full sm:w-auto
+    ${
+      isDownloadingVendorTotals
+        ? "bg-blue-600 text-white cursor-not-allowed opacity-70"
+        : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+    }`}
+            >
+              <ArrowDownTrayIcon className="w-5 h-5" />
+              <span>
+                {isDownloadingVendorTotals ? "Descargando..." : "Descargar"}
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div className="bg-white shadow-md rounded-2xl p-4 overflow-x-auto">
         <h2 className="text-xl font-semibold mb-4">Vendedores</h2>
         <div className="hidden md:block">
@@ -96,9 +202,7 @@ export default function Dashboard() {
           </table>
         </div>
 
-        {/* Vista móvil: tabla optimizada con nombre truncado si es muy largo */}
         <div className="md:hidden border rounded-lg overflow-hidden shadow-sm">
-          {/* Encabezados */}
           <div className="grid grid-cols-[40px_1fr_repeat(4,40px)] bg-gray-100 text-xs font-semibold text-gray-600">
             <div className="p-2">Cód</div>
             <div className="p-2">Vendedor</div>
@@ -108,7 +212,6 @@ export default function Dashboard() {
             <div className="p-2 text-center">Fin.</div>
           </div>
 
-          {/* Filas */}
           {vendors.map((v) => (
             <div
               key={v.code}

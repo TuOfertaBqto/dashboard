@@ -104,7 +104,7 @@ export function VendorsTotalsPDF({
 
         <View style={styles.tableHeader}>
           <Text style={styles.colName}>Vendedor</Text>
-          <Text style={styles.colAmount}>Pagado</Text>
+          <Text style={styles.colAmount}>Cobrado</Text>
           <Text style={styles.colAmount}>Vencido</Text>
           <Text style={styles.colAmount}>Pendiente</Text>
           <Text style={styles.colAmount}>Total Deuda</Text>
