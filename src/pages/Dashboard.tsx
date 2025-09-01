@@ -129,7 +129,8 @@ export default function Dashboard() {
             <div>
               <p className="font-semibold text-gray-700">Deudas por vendedor</p>
               <p className="text-sm text-gray-500">
-                Reporte de cuotas atrasadas de clientes agrupadas por vendedor.
+                Reporte de las cuotas vencidas de clientes, agrupadas por
+                vendedor.
               </p>
             </div>
             <button
@@ -151,7 +152,7 @@ export default function Dashboard() {
             <div>
               <p className="font-semibold text-gray-700">Pagos por vendedor</p>
               <p className="text-sm text-gray-500">
-                Resumen de los pagos por vendedor.
+                Resumen de los pagos, organizados por vendedor.
               </p>
             </div>
             <button
