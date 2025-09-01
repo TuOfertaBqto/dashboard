@@ -81,6 +81,20 @@ export type VendorsWithDebts = {
   customers: CustomerWithDebt[];
 };
 
+type GlobalPaymentsTotals = {
+  totalAmountPaid: number;
+  totalOverdueDebt: number;
+  totalPendingBalance: number;
+  totalDebt: number;
+};
+
+type VendorPaymentsTotals = GlobalPaymentsTotals & {
+  vendorId: string;
+  vendorCode: string;
+  firstName: string;
+  lastName: string;
+};
+
 export const ContractPaymentApi = {
   create: async (data: CreateContractPayment): Promise<ContractPayment[]> => {
     try {
@@ -151,6 +165,25 @@ export const ContractPaymentApi = {
     } catch (error) {
       console.error("Error fetching contract-payment:", error);
       return false;
+    }
+  },
+
+  getGlobalPaymentsSummary: async (): Promise<GlobalPaymentsTotals> => {
+    try {
+      const res = await api.get("/contract-payment/payments-summary");
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching payments-summary global:", error);
+      return {} as GlobalPaymentsTotals;
+    }
+  },
+  getVendorPaymentsSummary: async (): Promise<VendorPaymentsTotals[]> => {
+    try {
+      const res = await api.get("/contract-payment/vendor/payments-summary");
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching payments-summary global:", error);
+      return [] as VendorPaymentsTotals[];
     }
   },
 };
