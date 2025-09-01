@@ -10,9 +10,7 @@ import {
 } from "../api/contract-payment";
 import { InstallmentModal } from "../components/InstallmentModal";
 import dayjs from "dayjs";
-import { DebtsReportPDF } from "../components/DebtsReportPDF";
-import { pdf } from "@react-pdf/renderer";
-import { ArrowDownTrayIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
+import { PlusCircleIcon } from "@heroicons/react/24/outline";
 
 export default function ContractsPage() {
   const navigate = useNavigate();
@@ -32,7 +30,6 @@ export default function ContractsPage() {
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [isDownloading, setIsDownloading] = useState<boolean>(false);
 
   const handleRowClick = async (contract: Contract) => {
     setContractSelected(contract);
@@ -114,26 +111,6 @@ export default function ContractsPage() {
     }
   };
 
-  const handleDownloadPDF = async () => {
-    try {
-      setIsDownloading(true);
-      const vendors = await ContractPaymentApi.getOverdueCustomersByVendor();
-
-      const blob = await pdf(<DebtsReportPDF vendors={vendors} />).toBlob();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      const now = dayjs().format("YYYYMMDD");
-      link.download = `Cuotas atrasadas ${now}.pdf`;
-      link.click();
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("Error al generar el reporte:", error);
-    } finally {
-      setIsDownloading(false);
-    }
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 w-full">
@@ -148,20 +125,6 @@ export default function ContractsPage() {
           >
             <PlusCircleIcon className="w-5 h-5" />
             Crear contrato
-          </button>
-
-          <button
-            onClick={handleDownloadPDF}
-            disabled={isDownloading}
-            className={`flex items-center justify-center gap-2 px-4 py-2 rounded-xl font-medium shadow transition w-full sm:w-auto 
-      ${
-        isDownloading
-          ? "bg-gray-400 text-white cursor-not-allowed"
-          : "bg-green-600 text-white hover:bg-green-700 cursor-pointer"
-      }`}
-          >
-            <ArrowDownTrayIcon className="w-5 h-5" />
-            {isDownloading ? "Generando..." : "Reporte deudas"}
           </button>
         </div>
       </div>
