@@ -81,14 +81,14 @@ export type VendorsWithDebts = {
   customers: CustomerWithDebt[];
 };
 
-type GlobalPaymentsTotals = {
+export type GlobalPaymentsTotals = {
   totalAmountPaid: number;
   totalOverdueDebt: number;
   totalPendingBalance: number;
   totalDebt: number;
 };
 
-type VendorPaymentsTotals = GlobalPaymentsTotals & {
+export type VendorPaymentsTotals = GlobalPaymentsTotals & {
   vendorId: string;
   vendorCode: string;
   firstName: string;
