@@ -3,7 +3,7 @@ import type { Contract } from "../api/contract";
 import type { ContractPayment } from "../api/contract-payment";
 import { generateInstallmentsFromContract } from "../utils/generateInstallments";
 import { translatePaymentMethod } from "../utils/translations";
-import MyPdfDocument from "./MyPdfDocument";
+import MyPdfDocument from "./pdf/MyPdfDocument";
 import {
   ArrowDownTrayIcon,
   CheckCircleIcon,

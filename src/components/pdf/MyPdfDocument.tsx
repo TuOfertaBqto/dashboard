@@ -7,9 +7,9 @@ import {
   Text,
   View,
 } from "@react-pdf/renderer";
-import type { ContractPayment } from "../api/contract-payment";
-import { numeroALetras } from "../utils/numero-a-letras";
-import { translatePaymentMethod } from "../utils/translations";
+import type { ContractPayment } from "../../api/contract-payment";
+import { numeroALetras } from "../../utils/numero-a-letras";
+import { translatePaymentMethod } from "../../utils/translations";
 import dayjs from "dayjs";
 
 Font.registerHyphenationCallback((word) => [word]);
@@ -18,22 +18,23 @@ Font.register({
   family: "Calibri",
   fonts: [
     {
-      src: new URL("../../public/fonts/calibri-regular.ttf", import.meta.url)
+      src: new URL("../../../public/fonts/calibri-regular.ttf", import.meta.url)
         .href,
       fontWeight: "normal",
     },
     {
-      src: new URL("../../public/fonts/calibri-bold.ttf", import.meta.url).href,
+      src: new URL("../../../public/fonts/calibri-bold.ttf", import.meta.url)
+        .href,
       fontWeight: "bold",
     },
     {
-      src: new URL("../../public/fonts/calibri-italic.ttf", import.meta.url)
+      src: new URL("../../../public/fonts/calibri-italic.ttf", import.meta.url)
         .href,
       fontStyle: "italic",
     },
     {
       src: new URL(
-        "../../public/fonts/calibri-bold-italic.ttf",
+        "../../../public/fonts/calibri-bold-italic.ttf",
         import.meta.url
       ).href,
       fontWeight: "bold",

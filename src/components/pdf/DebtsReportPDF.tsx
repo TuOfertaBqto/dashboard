@@ -8,27 +8,27 @@ import {
 } from "@react-pdf/renderer";
 import type { VendorsWithDebts } from "../../api/contract-payment";
 
-// Opcional: puedes registrar fuentes personalizadas si quieres
 Font.register({
   family: "Calibri",
   fonts: [
     {
-      src: new URL("../../public/fonts/calibri-regular.ttf", import.meta.url)
+      src: new URL("../../../public/fonts/calibri-regular.ttf", import.meta.url)
         .href,
       fontWeight: "normal",
     },
     {
-      src: new URL("../../public/fonts/calibri-bold.ttf", import.meta.url).href,
+      src: new URL("../../../public/fonts/calibri-bold.ttf", import.meta.url)
+        .href,
       fontWeight: "bold",
     },
     {
-      src: new URL("../../public/fonts/calibri-italic.ttf", import.meta.url)
+      src: new URL("../../../public/fonts/calibri-italic.ttf", import.meta.url)
         .href,
       fontStyle: "italic",
     },
     {
       src: new URL(
-        "../../public/fonts/calibri-bold-italic.ttf",
+        "../../../public/fonts/calibri-bold-italic.ttf",
         import.meta.url
       ).href,
       fontWeight: "bold",
