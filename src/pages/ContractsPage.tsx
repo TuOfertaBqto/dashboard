@@ -10,7 +10,7 @@ import {
 } from "../api/contract-payment";
 import { InstallmentModal } from "../components/InstallmentModal";
 import dayjs from "dayjs";
-import { DebtsReportPDF } from "../components/DebtsReportPDF";
+import { DebtsReportPDF } from "../components/pdf/DebtsReportPDF";
 import { pdf } from "@react-pdf/renderer";
 import { ArrowDownTrayIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
 
