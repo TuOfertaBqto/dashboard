@@ -94,6 +94,18 @@ export const ContractApi = {
     }
   },
 
+  countContractsByVendor: async (
+    id: string
+  ): Promise<ResponseCountContract> => {
+    try {
+      const res = await api.get(`/contract/vendor/count/${id}`);
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching count contract by ID", error);
+      return {} as ResponseCountContract;
+    }
+  },
+
   getToDispatchQuantity: async (productId: string): Promise<number> => {
     try {
       const res = await api.get<{ toDispatchQuantity: number }>(
