@@ -201,4 +201,18 @@ export const ContractPaymentApi = {
       return {} as VendorPaymentsTotals;
     }
   },
+
+  getOverdueCustomersByOneVendor: async (
+    id: string
+  ): Promise<VendorsWithDebts> => {
+    try {
+      const res = await api.get(
+        `contract-payment/overdue/${id}/customers-by-vendor`
+      );
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching overdue by vendor", error);
+      return {} as VendorsWithDebts;
+    }
+  },
 };
