@@ -1,12 +1,12 @@
 import {
   ArrowRightEndOnRectangleIcon,
-  //ArrowRightOnRectangleIcon,
   Bars3Icon,
   CubeIcon,
   CurrencyDollarIcon,
   DocumentArrowUpIcon,
   DocumentTextIcon,
   SquaresPlusIcon,
+  UserIcon,
   UsersIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
@@ -78,17 +78,20 @@ export const Header = () => {
                   setOpen(false);
                   navigate(`/profile/${user.id}`);
                 }}
-                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-gray-700 cursor-pointer"
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-100 text-gray-700 cursor-pointer"
               >
+                <UserIcon className="w-5 h-5 text-gray-500" />
                 Ir al perfil
               </button>
+
               <button
                 onClick={() => {
                   setOpen(false);
                   setShowLogoutModal(true);
                 }}
-                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-red-600 cursor-pointer"
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-100 text-red-600 cursor-pointer"
               >
+                <ArrowRightEndOnRectangleIcon className="w-5 h-5 text-red-500" />
                 Cerrar sesión
               </button>
             </div>
