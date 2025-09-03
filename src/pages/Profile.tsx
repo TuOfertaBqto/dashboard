@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../auth/useAuth";
 import { userApi, type User } from "../api/user";
 import { ContractApi, type ResponseCountContract } from "../api/contract";
@@ -9,10 +9,12 @@ import {
   type VendorsWithDebts,
 } from "../api/contract-payment";
 import { formatMoney } from "../utils/formatMoney";
+import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 
 export default function Profile() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<User | null>(null);
   const [stats, setStats] = useState<ResponseCountContract | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -65,6 +67,14 @@ export default function Profile() {
 
   return (
     <div className="p-4 md:p-8 space-y-8">
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium shadow-sm transition cursor-pointer"
+      >
+        <ArrowLeftIcon className="w-4 h-4" />
+        Regresar
+      </button>
+
       {/* Perfil */}
       {profile && (
         <section className="bg-white rounded-2xl shadow p-4 md:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
