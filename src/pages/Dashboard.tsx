@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ContractApi } from "../api/contract";
+import { ContractApi, type ResponseCountContract } from "../api/contract";
 import { userApi, type VendorStats } from "../api/user";
 import {
   ArrowDownTrayIcon,
@@ -13,16 +13,11 @@ import { DebtsReportPDF } from "../components/pdf/DebtsReportPDF";
 import dayjs from "dayjs";
 import { pdf } from "@react-pdf/renderer";
 import { VendorsTotalsPDF } from "../components/pdf/VendorsTotalsPDF";
-
-type DashboardStats = {
-  activeContracts: number;
-  pendingToDispatch: number;
-  canceledContracts: number;
-  completedContracts: number;
-};
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
-  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const navigate = useNavigate();
+  const [stats, setStats] = useState<ResponseCountContract | null>(null);
   const [vendors, setVendors] = useState<VendorStats[]>([]);
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const [isDownloadingVendorTotals, setIsDownloadingVendorTotals] =
@@ -190,7 +185,11 @@ export default function Dashboard() {
             </thead>
             <tbody>
               {vendors.map((v) => (
-                <tr key={v.code} className="hover:bg-gray-50">
+                <tr
+                  key={v.id}
+                  onClick={() => navigate(`/profile/${v.id}`)}
+                  className="hover:bg-gray-50"
+                >
                   <td className="px-4 py-2 border-b">T{v.code}</td>
                   <td className="px-4 py-2 border-b">{v.vendorName}</td>
                   <td className="px-4 py-2 border-b">{v.activeContracts}</td>
@@ -215,7 +214,8 @@ export default function Dashboard() {
 
           {vendors.map((v) => (
             <div
-              key={v.code}
+              key={v.id}
+              onClick={() => navigate(`/profile/${v.id}`)}
               className="grid grid-cols-[40px_1fr_repeat(4,40px)] border-t text-xs items-center"
             >
               <div className="p-2 font-semibold text-gray-700">T{v.code}</div>

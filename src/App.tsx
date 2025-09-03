@@ -17,6 +17,7 @@ import ContractRequestFormPage from "./pages/ContractRequestFormPage";
 import { useAuth } from "./auth/useAuth";
 import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
+import Profile from "./pages/Profile";
 
 function App() {
   const { user } = useAuth();
@@ -173,6 +174,14 @@ function App() {
             element={
               <PrivateRoute allowedRoles={onlyVendorMain}>
                 <ContractRequestFormPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="profile/:id"
+            element={
+              <PrivateRoute allowedRoles={allowedRolesWithVendor}>
+                <Profile />
               </PrivateRoute>
             }
           />
