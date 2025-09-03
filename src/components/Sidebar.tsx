@@ -9,6 +9,7 @@ import {
   DocumentTextIcon,
   CurrencyDollarIcon,
   DocumentArrowUpIcon,
+  UserIcon,
 } from "@heroicons/react/24/outline";
 
 import { useState } from "react";
@@ -109,6 +110,11 @@ export const Sidebar = () => {
 
   const otherMenuItems: MenuItem[] = [
     {
+      name: "Ir al perfil",
+      icon: <UserIcon className="h-5 w-5" />,
+      route: `/profile/${user?.id}`,
+    },
+    {
       name: "Cerrar sesión",
       icon: <ArrowRightEndOnRectangleIcon className="h-5 w-5" />,
       route: "/login",
@@ -191,12 +197,19 @@ export const Sidebar = () => {
           <div
             key={item.name}
             className={`flex items-center gap-3 p-2 cursor-pointer rounded-md hover:bg-gray-700 ${item.color}`}
-            onClick={() => setShowLogoutModal(true)}
+            onClick={() => {
+              if (item.name === "Cerrar sesión") {
+                setShowLogoutModal(true);
+              } else {
+                handleNavigation(item.route);
+              }
+            }}
           >
             {item.icon}
             {isOpen && <span>{item.name}</span>}
           </div>
         ))}
+
         <ConfirmModal
           open={showLogoutModal}
           title="Cerrar sesión"
