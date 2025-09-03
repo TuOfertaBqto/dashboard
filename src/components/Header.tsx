@@ -49,7 +49,6 @@ export const Header = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          {/* Correo y rol siempre visibles */}
           {user && (
             <div className="text-right">
               <div className="font-medium text-gray-800">{user.email}</div>
@@ -59,7 +58,6 @@ export const Header = () => {
             </div>
           )}
 
-          {/* Avatar con menú */}
           <button
             onClick={() => setOpen(!open)}
             className="w-10 h-10 rounded-full border border-gray-300 overflow-hidden focus:outline-none cursor-pointer"
@@ -73,7 +71,6 @@ export const Header = () => {
             />
           </button>
 
-          {/* Dropdown solo con opciones */}
           {open && user && (
             <div className="absolute right-4 top-14 w-48 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-50">
               <button
