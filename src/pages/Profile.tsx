@@ -176,7 +176,7 @@ export default function Profile() {
                         </span>
 
                         {/* Columna 2 */}
-                        <span className="text-gray-600 justify-self-center w-[120px] text-center">
+                        <span className="text-gray-600 justify-self-center text-center">
                           Cuotas: {c.overdueInstallments}{" "}
                           <span className="italic text-gray-500">
                             ({cuotasDisplay})
@@ -184,7 +184,7 @@ export default function Profile() {
                         </span>
 
                         {/* Columna 3 */}
-                        <span className="text-right font-bold text-red-600">
+                        <span className="text-right font-bold text-red-600 justify-self-end">
                           ${formatMoney(c.overdueAmount)}
                         </span>
                       </li>
