@@ -188,7 +188,7 @@ export default function Dashboard() {
                 <tr
                   key={v.id}
                   onClick={() => navigate(`/profile/${v.id}`)}
-                  className="hover:bg-gray-50"
+                  className="hover:bg-gray-50 active:bg-gray-100 cursor-pointer"
                 >
                   <td className="px-4 py-2 border-b">T{v.code}</td>
                   <td className="px-4 py-2 border-b">{v.vendorName}</td>
@@ -216,7 +216,7 @@ export default function Dashboard() {
             <div
               key={v.id}
               onClick={() => navigate(`/profile/${v.id}`)}
-              className="grid grid-cols-[40px_1fr_repeat(4,40px)] border-t text-xs items-center"
+              className="grid grid-cols-[40px_1fr_repeat(4,40px)] border-t text-xs items-center hover:bg-gray-50 active:bg-gray-100 cursor-pointer"
             >
               <div className="p-2 font-semibold text-gray-700">T{v.code}</div>
               <div className="p-2 font-medium whitespace-nowrap overflow-hidden truncate">
