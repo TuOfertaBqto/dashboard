@@ -8,6 +8,7 @@ import {
   type VendorPaymentsTotals,
   type VendorsWithDebts,
 } from "../api/contract-payment";
+import { formatMoney } from "../utils/formatMoney";
 
 export default function Profile() {
   const { id } = useParams<{ id: string }>();
@@ -80,25 +81,25 @@ export default function Profile() {
       <section>
         <h3 className="text-lg font-semibold text-gray-700 mb-3">Contratos</h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div className="bg-blue-50 p-4 rounded-xl text-center">
+          <div className="bg-white p-4 rounded-xl shadow-md text-center">
             <p className="text-sm text-gray-500">Activos</p>
             <p className="text-lg font-bold text-blue-700">
               {stats?.activeContracts}
             </p>
           </div>
-          <div className="bg-yellow-50 p-4 rounded-xl text-center">
+          <div className="bg-white p-4 rounded-xl shadow-md text-center">
             <p className="text-sm text-gray-500">Pend. Despacho</p>
             <p className="text-lg font-bold text-yellow-700">
               {stats?.pendingToDispatch}
             </p>
           </div>
-          <div className="bg-red-50 p-4 rounded-xl text-center">
+          <div className="bg-white p-4 rounded-xl shadow-md text-center">
             <p className="text-sm text-gray-500">Cancelados</p>
             <p className="text-lg font-bold text-red-700">
               {stats?.canceledContracts}
             </p>
           </div>
-          <div className="bg-green-50 p-4 rounded-xl text-center">
+          <div className="bg-white p-4 rounded-xl shadow-md text-center">
             <p className="text-sm text-gray-500">Completados</p>
             <p className="text-lg font-bold text-green-700">
               {stats?.completedContracts}
@@ -113,28 +114,28 @@ export default function Profile() {
           Resumen de Pagos
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div className="bg-green-50 p-4 rounded-xl text-center">
+          <div className="bg-white p-4 rounded-xl shadow-md text-center">
             <p className="text-sm text-gray-500">Cobrado</p>
             <p className="text-lg font-bold text-green-700">
-              ${payments?.totalAmountPaid.toLocaleString()}
+              ${formatMoney(payments?.totalAmountPaid || 0)}
             </p>
           </div>
-          <div className="bg-red-50 p-4 rounded-xl text-center">
+          <div className="bg-white p-4 rounded-xl shadow-md text-center">
             <p className="text-sm text-gray-500">Atrasado</p>
             <p className="text-lg font-bold text-red-700">
-              ${payments?.totalOverdueDebt.toLocaleString()}
+              ${formatMoney(payments?.totalOverdueDebt || 0)}
             </p>
           </div>
-          <div className="bg-yellow-50 p-4 rounded-xl text-center">
+          <div className="bg-white p-4 rounded-xl shadow-md text-center">
             <p className="text-sm text-gray-500">Pendiente</p>
             <p className="text-lg font-bold text-yellow-700">
-              ${payments?.totalPendingBalance.toLocaleString()}
+              ${formatMoney(payments?.totalPendingBalance || 0)}
             </p>
           </div>
-          <div className="bg-gray-50 p-4 rounded-xl text-center">
+          <div className="bg-white p-4 rounded-xl shadow-md text-center">
             <p className="text-sm text-gray-500">Deuda Total</p>
             <p className="text-lg font-bold text-gray-700">
-              ${payments?.totalDebt.toLocaleString()}
+              ${formatMoney(payments?.totalDebt || 0)}
             </p>
           </div>
         </div>
@@ -166,7 +167,7 @@ export default function Profile() {
                         {c.overdueInstallments} ({c.overdueNumbers.join(", ")})
                       </span>
                       <span className="text-sm font-bold text-red-600">
-                        ${c.overdueAmount.toLocaleString()}
+                        ${formatMoney(c.overdueAmount)}
                       </span>
                     </li>
                   ))}
