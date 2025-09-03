@@ -83,13 +83,13 @@ export default function Profile() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div className="bg-white p-4 rounded-xl shadow-md text-center">
             <p className="text-sm text-gray-500">Activos</p>
-            <p className="text-lg font-bold text-blue-700">
+            <p className="text-lg font-bold text-green-700">
               {stats?.activeContracts}
             </p>
           </div>
           <div className="bg-white p-4 rounded-xl shadow-md text-center">
             <p className="text-sm text-gray-500">Pend. Despacho</p>
-            <p className="text-lg font-bold text-yellow-700">
+            <p className="text-lg font-bold text-blue-700">
               {stats?.pendingToDispatch}
             </p>
           </div>
@@ -101,7 +101,7 @@ export default function Profile() {
           </div>
           <div className="bg-white p-4 rounded-xl shadow-md text-center">
             <p className="text-sm text-gray-500">Completados</p>
-            <p className="text-lg font-bold text-green-700">
+            <p className="text-lg font-bold text-gray-700">
               {stats?.completedContracts}
             </p>
           </div>
@@ -156,21 +156,40 @@ export default function Profile() {
                 <h4 className="font-semibold text-gray-800 mb-2">
                   {customer.customerName}
                 </h4>
-                <ul className="space-y-2">
-                  {customer.contracts.map((c) => (
-                    <li
-                      key={c.contractId}
-                      className="flex justify-between items-center border-b last:border-0 py-2"
-                    >
-                      <span className="text-sm text-gray-600">
-                        {c.contractCode} - Cuotas vencidas:{" "}
-                        {c.overdueInstallments} ({c.overdueNumbers.join(", ")})
-                      </span>
-                      <span className="text-sm font-bold text-red-600">
-                        ${formatMoney(c.overdueAmount)}
-                      </span>
-                    </li>
-                  ))}
+                <ul className="space-y-1">
+                  {customer.contracts.map((c) => {
+                    const cuotasDisplay =
+                      c.overdueNumbers.length > 3
+                        ? `#${c.overdueNumbers[0]} … #${
+                            c.overdueNumbers[c.overdueNumbers.length - 1]
+                          }`
+                        : c.overdueNumbers.map((n) => `#${n}`).join(", ");
+
+                    return (
+                      <li
+                        key={c.contractId}
+                        className="grid grid-cols-[150px_auto_100px] items-center border-b last:border-0 py-1 text-sm"
+                      >
+                        {/* Columna 1 */}
+                        <span className="text-gray-700">
+                          Contrato: #{c.contractCode}
+                        </span>
+
+                        {/* Columna 2 */}
+                        <span className="text-gray-600 justify-self-center w-[120px] text-center">
+                          Cuotas: {c.overdueInstallments}{" "}
+                          <span className="italic text-gray-500">
+                            ({cuotasDisplay})
+                          </span>
+                        </span>
+
+                        {/* Columna 3 */}
+                        <span className="text-right font-bold text-red-600">
+                          ${formatMoney(c.overdueAmount)}
+                        </span>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             ))}
