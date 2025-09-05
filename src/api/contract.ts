@@ -1,8 +1,8 @@
 import { api } from "./api";
-import type { Product } from "./product";
+import type { ContractProduct } from "./contract-product";
 import type { User } from "./user";
 
-type ContractProduct = {
+type CreateContractProduct = {
   productId: string;
   quantity: number;
   status?: "to_buy" | "to_dispatch" | "dispatched";
@@ -17,7 +17,7 @@ export type CreateContract = {
   agreement: "weekly" | "fortnightly";
   totalPrice: number;
   status?: "canceled" | "pending" | "approved";
-  products: ContractProduct[];
+  products: CreateContractProduct[];
 };
 
 export type CreateContractRequest = {
@@ -26,7 +26,7 @@ export type CreateContractRequest = {
   installmentAmount: number;
   agreement: "weekly" | "fortnightly";
   totalPrice: number;
-  products: ContractProduct[];
+  products: CreateContractProduct[];
 };
 
 export type Contract = {
@@ -41,16 +41,7 @@ export type Contract = {
   agreement: "weekly" | "fortnightly";
   totalPrice: number;
   status: "canceled" | "pending" | "approved";
-  products: {
-    id: string;
-    createdAt: Date;
-    updatedAt: Date;
-    deletedAt: Date | null;
-    product: Product;
-    deliveryDate: Date | null;
-    status: "to_buy" | "to_dispatch" | "dispatched";
-    quantity: number;
-  }[];
+  products: ContractProduct[];
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;

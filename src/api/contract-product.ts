@@ -1,4 +1,16 @@
 import { api } from "./api";
+import type { Product } from "./product";
+
+export type ContractProduct = {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+  product: Product;
+  deliveryDate: Date | null;
+  status: "to_buy" | "to_dispatch" | "dispatched";
+  quantity: number;
+};
 
 export const ContractProductApi = {
   getToDispatchQuantity: async (productId: string): Promise<number> => {
@@ -12,6 +24,8 @@ export const ContractProductApi = {
       return 0;
     }
   },
+
+  updateBulk: async () => {},
 
   updateProducts: async (
     id: string,
