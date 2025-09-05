@@ -10,6 +10,19 @@ export type ContractProduct = {
   deliveryDate: Date | null;
   status: "to_buy" | "to_dispatch" | "dispatched";
   quantity: number;
+  price: number;
+  installmentAmount: number;
+};
+
+type UpdateContractProducts = {
+  id?: string;
+  contractId?: string;
+  productId?: string;
+  quantity?: number;
+  deliveryDate?: Date;
+  status?: "to_buy" | "to_dispatch" | "dispatched";
+  price?: number;
+  installmentAmount?: number;
 };
 
 export const ContractProductApi = {
@@ -25,7 +38,14 @@ export const ContractProductApi = {
     }
   },
 
-  updateBulk: async () => {},
+  updateBulk: async (updateBulk: UpdateContractProducts[]) => {
+    try {
+      const res = await api.patch(`/contract-product`, updateBulk);
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching update contract products:", error);
+    }
+  },
 
   updateProducts: async (
     id: string,
