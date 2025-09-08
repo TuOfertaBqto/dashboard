@@ -277,11 +277,12 @@ export default function ContractRequestFormPage() {
                       type="number"
                       min="1"
                       step="1"
-                      className={`w-full border p-2 rounded ${
+                      className={`w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${
                         isEdit && user?.role !== "main"
                           ? "bg-gray-100 cursor-not-allowed"
                           : ""
                       }`}
+                      onWheel={(e) => e.currentTarget.blur()}
                       value={p.quantity === 0 ? "" : p.quantity}
                       onChange={(e) => {
                         const value = e.target.value;
@@ -309,11 +310,12 @@ export default function ContractRequestFormPage() {
                       type="number"
                       min="1"
                       step="1"
-                      className={`w-full border p-2 rounded ${
+                      className={`w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none${
                         user?.role !== "main"
                           ? "bg-gray-100 cursor-not-allowed"
                           : "bg-white"
                       }`}
+                      onWheel={(e) => e.currentTarget.blur()}
                       value={p.price}
                       onChange={(e) => {
                         if (user?.role !== "main") return;
@@ -341,11 +343,12 @@ export default function ContractRequestFormPage() {
                       type="number"
                       min="1"
                       step="1"
-                      className={`w-full border p-2 rounded ${
+                      className={`w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${
                         user?.role !== "main"
                           ? "bg-gray-100 cursor-not-allowed"
                           : "bg-white"
                       }`}
+                      onWheel={(e) => e.currentTarget.blur()}
                       value={p.installmentAmount}
                       onChange={(e) => {
                         if (user?.role !== "main") return;
