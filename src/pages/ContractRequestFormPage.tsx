@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   ContractApi,
   type Contract,
+  type CreateContractProduct,
   type CreateContractRequest,
 } from "../api/contract";
 import { userApi, type User } from "../api/user";
@@ -105,6 +106,19 @@ export default function ContractRequestFormPage() {
     fetchValidation();
   }, []);
 
+  const setProductField = <K extends keyof CreateContractProduct>(
+    index: number,
+    field: K,
+    value: CreateContractProduct[K]
+  ) => {
+    setForm((prev) => ({
+      ...prev,
+      products: prev.products.map((prod, i) =>
+        i === index ? { ...prod, [field]: value } : prod
+      ),
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -133,14 +147,14 @@ export default function ContractRequestFormPage() {
     try {
       if (isEdit && id) {
         const { agreement, customerId, totalPrice, products } = form;
-        await Promise.all([
-          ContractApi.update(id, {
-            agreement,
-            customerId,
-            totalPrice,
-          }),
-          ContractProductApi.updateBulk(products),
-        ]);
+
+        await ContractApi.update(id, {
+          agreement,
+          customerId,
+          totalPrice,
+        });
+
+        await ContractProductApi.updateBulk(products);
       } else {
         await ContractApi.create(form);
       }
@@ -242,12 +256,17 @@ export default function ContractRequestFormPage() {
                           .find((opt) => opt.value === p.productId) || null
                       }
                       onChange={(selected) => {
-                        const updated = [...form.products];
-                        updated[index].productId = selected?.value || "";
-                        updated[index].price = selected?.price || 0;
-                        updated[index].installmentAmount =
-                          selected?.installmentAmount || 0;
-                        setForm({ ...form, products: updated });
+                        setProductField(
+                          index,
+                          "productId",
+                          selected?.value || ""
+                        );
+                        setProductField(index, "price", selected?.price || 0);
+                        setProductField(
+                          index,
+                          "installmentAmount",
+                          selected?.installmentAmount || 0
+                        );
                       }}
                       options={products
                         .filter(
@@ -288,13 +307,12 @@ export default function ContractRequestFormPage() {
                       onWheel={(e) => e.currentTarget.blur()}
                       value={p.quantity === 0 ? "" : p.quantity}
                       onChange={(e) => {
-                        const value = e.target.value;
-                        const intValue = parseInt(value, 10);
-                        const updated = [...form.products];
-                        updated[index].quantity = isNaN(intValue)
-                          ? 0
-                          : intValue;
-                        setForm({ ...form, products: updated });
+                        const intValue = parseInt(e.target.value, 10);
+                        setProductField(
+                          index,
+                          "quantity",
+                          isNaN(intValue) ? 0 : intValue
+                        );
                       }}
                       required
                       readOnly={
@@ -324,14 +342,7 @@ export default function ContractRequestFormPage() {
                         if (user?.role !== "main") return;
 
                         const intValue = parseInt(e.target.value, 10) || 0;
-                        setForm((prev) => {
-                          const updated = [...prev.products];
-                          updated[index] = {
-                            ...updated[index],
-                            price: intValue,
-                          };
-                          return { ...prev, products: updated };
-                        });
+                        setProductField(index, "price", intValue);
                       }}
                       readOnly={user?.role !== "main"}
                     />
@@ -357,14 +368,7 @@ export default function ContractRequestFormPage() {
                         if (user?.role !== "main") return;
 
                         const intValue = parseInt(e.target.value, 10) || 0;
-                        setForm((prev) => {
-                          const updated = [...prev.products];
-                          updated[index] = {
-                            ...updated[index],
-                            installmentAmount: intValue,
-                          };
-                          return { ...prev, products: updated };
-                        });
+                        setProductField(index, "installmentAmount", intValue);
                       }}
                       readOnly={user?.role !== "main"}
                     />

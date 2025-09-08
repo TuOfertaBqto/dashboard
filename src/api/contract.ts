@@ -2,7 +2,7 @@ import { api } from "./api";
 import type { ContractProduct } from "./contract-product";
 import type { User } from "./user";
 
-type CreateContractProduct = {
+export type CreateContractProduct = {
   id?: string;
   productId: string;
   quantity: number;

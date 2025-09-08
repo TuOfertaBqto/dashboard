@@ -33,7 +33,7 @@ export function RequestedCard({
   const [deletionId, setDeletionId] = useState<string | null>(null);
 
   const amount = contract.products.reduce((sum, cp) => {
-    return sum + cp.product.installmentAmount * cp.quantity;
+    return sum + cp.installmentAmount * cp.quantity;
   }, 0);
 
   return (
