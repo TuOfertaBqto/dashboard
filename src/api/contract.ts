@@ -1,11 +1,14 @@
 import { api } from "./api";
-import type { Product } from "./product";
+import type { ContractProduct } from "./contract-product";
 import type { User } from "./user";
 
-type ContractProduct = {
+export type CreateContractProduct = {
+  id?: string;
   productId: string;
   quantity: number;
-  status?: "to_buy" | "to_dispatch" | "dispatched";
+  status: "to_buy" | "to_dispatch" | "dispatched";
+  price: number;
+  installmentAmount: number;
 };
 
 export type CreateContract = {
@@ -17,7 +20,7 @@ export type CreateContract = {
   agreement: "weekly" | "fortnightly";
   totalPrice: number;
   status?: "canceled" | "pending" | "approved";
-  products: ContractProduct[];
+  products: CreateContractProduct[];
 };
 
 export type CreateContractRequest = {
@@ -26,7 +29,7 @@ export type CreateContractRequest = {
   installmentAmount: number;
   agreement: "weekly" | "fortnightly";
   totalPrice: number;
-  products: ContractProduct[];
+  products: CreateContractProduct[];
 };
 
 export type Contract = {
@@ -41,16 +44,7 @@ export type Contract = {
   agreement: "weekly" | "fortnightly";
   totalPrice: number;
   status: "canceled" | "pending" | "approved";
-  products: {
-    id: string;
-    createdAt: Date;
-    updatedAt: Date;
-    deletedAt: Date | null;
-    product: Product;
-    deliveryDate: Date | null;
-    status: "to_buy" | "to_dispatch" | "dispatched";
-    quantity: number;
-  }[];
+  products: ContractProduct[];
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
@@ -106,18 +100,6 @@ export const ContractApi = {
     }
   },
 
-  getToDispatchQuantity: async (productId: string): Promise<number> => {
-    try {
-      const res = await api.get<{ toDispatchQuantity: number }>(
-        `/contract-product/to-dispatch/${productId}`
-      );
-      return res.data.toDispatchQuantity ?? 0;
-    } catch (error) {
-      console.error("Error fetching to-dispatch quantity:", error);
-      return 0;
-    }
-  },
-
   create: async (data: CreateContract): Promise<Contract> => {
     try {
       const res = await api.post("/contract", data);
@@ -138,19 +120,6 @@ export const ContractApi = {
     } catch (error) {
       console.error("Error updating contract:", error);
       return {} as Contract;
-    }
-  },
-
-  updateProducts: async (
-    id: string,
-    status: "to_buy" | "to_dispatch" | "dispatched"
-  ) => {
-    try {
-      const res = await api.patch(`/contract-product/${id}`, { status });
-      return res.data;
-    } catch (error) {
-      console.error("Error updating contract products:", error);
-      return { msg: "error updating contract products" };
     }
   },
 

@@ -56,8 +56,12 @@ export const ContractForm = ({
         agreement: initialData.agreement || "weekly",
         totalPrice: initialData.totalPrice || 0,
         products: initialData.products.map((p) => ({
+          id: p.id,
           productId: p.product.id,
           quantity: p.quantity,
+          status: p.status,
+          price: p.price,
+          installmentAmount: p.installmentAmount,
         })),
       });
       setDispatched(false);
@@ -412,7 +416,13 @@ export const ContractForm = ({
                 ...form,
                 products: [
                   ...form.products,
-                  { productId: "", quantity: 1, status: "to_buy" },
+                  {
+                    productId: "",
+                    quantity: 1,
+                    status: "to_buy",
+                    price: 0,
+                    installmentAmount: 0,
+                  },
                 ],
               })
             }
