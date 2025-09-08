@@ -11,9 +11,12 @@ import Select from "react-select";
 import { PlusCircleIcon, TrashIcon } from "@heroicons/react/24/outline";
 import dayjs from "dayjs";
 import { ContractPaymentApi } from "../api/contract-payment";
+import { useAuth } from "../auth/useAuth";
+import { ContractProductApi } from "../api/contract-product";
 
 export default function ContractRequestFormPage() {
   const { id } = useParams();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const isEdit = !!id;
@@ -46,6 +49,7 @@ export default function ContractRequestFormPage() {
 
         if (isEdit && id) {
           const contract = await ContractApi.getById(id);
+
           setInitialData(contract);
           setForm({
             customerId: contract.customerId.id,
@@ -54,8 +58,12 @@ export default function ContractRequestFormPage() {
             requestDate: contract.requestDate,
             totalPrice: contract.totalPrice,
             products: contract.products.map((p) => ({
+              id: p.id,
               productId: p.product.id,
               quantity: p.quantity,
+              status: p.status,
+              price: p.price,
+              installmentAmount: p.installmentAmount,
             })),
           });
         }
@@ -69,15 +77,14 @@ export default function ContractRequestFormPage() {
 
   useEffect(() => {
     const newTotal = form.products.reduce((acc, p) => {
-      const prod = products.find((prod) => prod.id === p.productId);
-      if (prod && p.quantity > 0) {
-        return acc + prod.price * p.quantity;
+      if (p.productId && p.quantity > 0) {
+        return acc + (p.price || 0) * p.quantity;
       }
       return acc;
     }, 0);
 
     setForm((prev) => ({ ...prev, totalPrice: newTotal }));
-  }, [form.products, products]);
+  }, [form.products]);
 
   useEffect(() => {
     const fetchValidation = async () => {
@@ -125,12 +132,15 @@ export default function ContractRequestFormPage() {
     setLoading(true);
     try {
       if (isEdit && id) {
-        const { agreement, customerId, totalPrice } = form;
-        await ContractApi.update(id, {
-          agreement,
-          customerId,
-          totalPrice,
-        });
+        const { agreement, customerId, totalPrice, products } = form;
+        await Promise.all([
+          ContractApi.update(id, {
+            agreement,
+            customerId,
+            totalPrice,
+          }),
+          ContractProductApi.updateBulk(products),
+        ]);
       } else {
         await ContractApi.create(form);
       }
@@ -210,8 +220,6 @@ export default function ContractRequestFormPage() {
             </h3>
 
             {form.products.map((p, index) => {
-              const selected = products.find((prod) => prod.id === p.productId);
-
               return (
                 <div
                   key={index}
@@ -225,12 +233,20 @@ export default function ContractRequestFormPage() {
                     <Select
                       value={
                         products
-                          .map((prod) => ({ value: prod.id, label: prod.name }))
+                          .map((prod) => ({
+                            value: prod.id,
+                            label: prod.name,
+                            price: prod.price,
+                            installmentAmount: prod.installmentAmount,
+                          }))
                           .find((opt) => opt.value === p.productId) || null
                       }
                       onChange={(selected) => {
                         const updated = [...form.products];
                         updated[index].productId = selected?.value || "";
+                        updated[index].price = selected?.price || 0;
+                        updated[index].installmentAmount =
+                          selected?.installmentAmount || 0;
                         setForm({ ...form, products: updated });
                       }}
                       options={products
@@ -243,6 +259,8 @@ export default function ContractRequestFormPage() {
                         .map((prod) => ({
                           value: prod.id,
                           label: prod.name,
+                          price: prod.price,
+                          installmentAmount: prod.installmentAmount,
                         }))}
                       placeholder="Seleccione un producto"
                       isClearable
@@ -260,8 +278,10 @@ export default function ContractRequestFormPage() {
                       min="1"
                       step="1"
                       className={`w-full border p-2 rounded ${
-                        isEdit ? "bg-gray-100 cursor-not-allowed" : ""
-                      } `}
+                        isEdit && user?.role !== "main"
+                          ? "bg-gray-100 cursor-not-allowed"
+                          : ""
+                      }`}
                       value={p.quantity === 0 ? "" : p.quantity}
                       onChange={(e) => {
                         const value = e.target.value;
@@ -273,7 +293,10 @@ export default function ContractRequestFormPage() {
                         setForm({ ...form, products: updated });
                       }}
                       required
-                      readOnly={!!initialData?.id || !canRequest}
+                      readOnly={
+                        user?.role !== "main" &&
+                        (!!initialData?.id || !canRequest)
+                      }
                     />
                   </div>
 
@@ -284,9 +307,28 @@ export default function ContractRequestFormPage() {
                     </label>
                     <input
                       type="number"
-                      className="w-full border p-2 rounded bg-gray-100"
-                      value={selected?.price ?? 0}
-                      readOnly
+                      min="1"
+                      step="1"
+                      className={`w-full border p-2 rounded ${
+                        user?.role !== "main"
+                          ? "bg-gray-100 cursor-not-allowed"
+                          : "bg-white"
+                      }`}
+                      value={p.price}
+                      onChange={(e) => {
+                        if (user?.role !== "main") return;
+
+                        const intValue = parseInt(e.target.value, 10) || 0;
+                        setForm((prev) => {
+                          const updated = [...prev.products];
+                          updated[index] = {
+                            ...updated[index],
+                            price: intValue,
+                          };
+                          return { ...prev, products: updated };
+                        });
+                      }}
+                      readOnly={user?.role !== "main"}
                     />
                   </div>
 
@@ -297,9 +339,28 @@ export default function ContractRequestFormPage() {
                     </label>
                     <input
                       type="number"
-                      className="w-full border p-2 rounded bg-gray-100"
-                      value={selected?.installmentAmount ?? 0}
-                      readOnly
+                      min="1"
+                      step="1"
+                      className={`w-full border p-2 rounded ${
+                        user?.role !== "main"
+                          ? "bg-gray-100 cursor-not-allowed"
+                          : "bg-white"
+                      }`}
+                      value={p.installmentAmount}
+                      onChange={(e) => {
+                        if (user?.role !== "main") return;
+
+                        const intValue = parseInt(e.target.value, 10) || 0;
+                        setForm((prev) => {
+                          const updated = [...prev.products];
+                          updated[index] = {
+                            ...updated[index],
+                            installmentAmount: intValue,
+                          };
+                          return { ...prev, products: updated };
+                        });
+                      }}
+                      readOnly={user?.role !== "main"}
                     />
                   </div>
 
@@ -337,7 +398,13 @@ export default function ContractRequestFormPage() {
                     ...form,
                     products: [
                       ...form.products,
-                      { productId: "", quantity: 1, status: "to_buy" },
+                      {
+                        productId: "",
+                        quantity: 1,
+                        status: "to_buy",
+                        price: 0,
+                        installmentAmount: 0,
+                      },
                     ],
                   })
                 }

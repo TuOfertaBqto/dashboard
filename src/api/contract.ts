@@ -3,9 +3,12 @@ import type { ContractProduct } from "./contract-product";
 import type { User } from "./user";
 
 type CreateContractProduct = {
+  id?: string;
   productId: string;
   quantity: number;
-  status?: "to_buy" | "to_dispatch" | "dispatched";
+  status: "to_buy" | "to_dispatch" | "dispatched";
+  price: number;
+  installmentAmount: number;
 };
 
 export type CreateContract = {
