@@ -264,7 +264,10 @@ export default function ContractRequestFormPage() {
                         }))}
                       placeholder="Seleccione un producto"
                       isClearable
-                      isDisabled={!!initialData?.id || !canRequest}
+                      isDisabled={
+                        user?.role !== "main" &&
+                        (!!initialData?.id || !canRequest)
+                      }
                     />
                   </div>
 
