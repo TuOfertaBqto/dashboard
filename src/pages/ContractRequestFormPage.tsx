@@ -18,6 +18,7 @@ import { ContractProductApi } from "../api/contract-product";
 export default function ContractRequestFormPage() {
   const { id } = useParams();
   const { user } = useAuth();
+  const isMain = user?.role !== "main";
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const isEdit = !!id;
@@ -283,10 +284,7 @@ export default function ContractRequestFormPage() {
                         }))}
                       placeholder="Seleccione un producto"
                       isClearable
-                      isDisabled={
-                        user?.role !== "main" &&
-                        (!!initialData?.id || !canRequest)
-                      }
+                      isDisabled={isMain && (!!initialData?.id || !canRequest)}
                     />
                   </div>
 
@@ -300,9 +298,7 @@ export default function ContractRequestFormPage() {
                       min="1"
                       step="1"
                       className={`w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${
-                        isEdit && user?.role !== "main"
-                          ? "bg-gray-100 cursor-not-allowed"
-                          : ""
+                        isEdit && isMain ? "bg-gray-100 cursor-not-allowed" : ""
                       }`}
                       onWheel={(e) => e.currentTarget.blur()}
                       value={p.quantity === 0 ? "" : p.quantity}
@@ -315,10 +311,7 @@ export default function ContractRequestFormPage() {
                         );
                       }}
                       required
-                      readOnly={
-                        user?.role !== "main" &&
-                        (!!initialData?.id || !canRequest)
-                      }
+                      readOnly={isMain && (!!initialData?.id || !canRequest)}
                     />
                   </div>
 
@@ -331,20 +324,18 @@ export default function ContractRequestFormPage() {
                       type="number"
                       min="1"
                       step="1"
-                      className={`w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none${
-                        user?.role !== "main"
-                          ? "bg-gray-100 cursor-not-allowed"
-                          : "bg-white"
+                      className={`w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${
+                        isMain ? "bg-gray-100 cursor-not-allowed" : "bg-white"
                       }`}
                       onWheel={(e) => e.currentTarget.blur()}
                       value={p.price}
                       onChange={(e) => {
-                        if (user?.role !== "main") return;
+                        if (isMain) return;
 
                         const intValue = parseInt(e.target.value, 10) || 0;
                         setProductField(index, "price", intValue);
                       }}
-                      readOnly={user?.role !== "main"}
+                      readOnly={isMain}
                     />
                   </div>
 
@@ -358,19 +349,17 @@ export default function ContractRequestFormPage() {
                       min="1"
                       step="1"
                       className={`w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${
-                        user?.role !== "main"
-                          ? "bg-gray-100 cursor-not-allowed"
-                          : "bg-white"
+                        isMain ? "bg-gray-100 cursor-not-allowed" : "bg-white"
                       }`}
                       onWheel={(e) => e.currentTarget.blur()}
                       value={p.installmentAmount}
                       onChange={(e) => {
-                        if (user?.role !== "main") return;
+                        if (isMain) return;
 
                         const intValue = parseInt(e.target.value, 10) || 0;
                         setProductField(index, "installmentAmount", intValue);
                       }}
-                      readOnly={user?.role !== "main"}
+                      readOnly={isMain}
                     />
                   </div>
 
