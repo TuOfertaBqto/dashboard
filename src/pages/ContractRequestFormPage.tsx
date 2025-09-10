@@ -301,7 +301,7 @@ export default function ContractRequestFormPage() {
                         isEdit && isMain ? "bg-gray-100 cursor-not-allowed" : ""
                       }`}
                       onWheel={(e) => e.currentTarget.blur()}
-                      value={p.quantity === 0 ? "" : p.quantity}
+                      value={p.quantity || ""}
                       onChange={(e) => {
                         const intValue = parseInt(e.target.value, 10);
                         setProductField(
@@ -328,13 +328,14 @@ export default function ContractRequestFormPage() {
                         isMain ? "bg-gray-100 cursor-not-allowed" : "bg-white"
                       }`}
                       onWheel={(e) => e.currentTarget.blur()}
-                      value={p.price}
+                      value={p.price || ""}
                       onChange={(e) => {
                         if (isMain) return;
 
                         const intValue = parseInt(e.target.value, 10) || 0;
                         setProductField(index, "price", intValue);
                       }}
+                      required
                       readOnly={isMain}
                     />
                   </div>
@@ -352,13 +353,14 @@ export default function ContractRequestFormPage() {
                         isMain ? "bg-gray-100 cursor-not-allowed" : "bg-white"
                       }`}
                       onWheel={(e) => e.currentTarget.blur()}
-                      value={p.installmentAmount}
+                      value={p.installmentAmount || ""}
                       onChange={(e) => {
                         if (isMain) return;
 
                         const intValue = parseInt(e.target.value, 10) || 0;
                         setProductField(index, "installmentAmount", intValue);
                       }}
+                      required
                       readOnly={isMain}
                     />
                   </div>
