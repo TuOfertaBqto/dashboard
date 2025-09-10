@@ -149,13 +149,18 @@ export default function ContractRequestFormPage() {
       if (isEdit && id) {
         const { agreement, customerId, totalPrice, products } = form;
 
+        const updatedProducts: CreateContractProduct[] = products.map((p) => ({
+          ...p,
+          contractId: id,
+        }));
+
         await ContractApi.update(id, {
           agreement,
           customerId,
           totalPrice,
         });
 
-        await ContractProductApi.updateBulk(products);
+        await ContractProductApi.updateBulk(updatedProducts);
       } else {
         await ContractApi.create(form);
       }
@@ -409,7 +414,7 @@ export default function ContractRequestFormPage() {
                     ],
                   })
                 }
-                disabled={!!initialData?.id || !canRequest}
+                disabled={isMain && (!!initialData?.id || !canRequest)}
               >
                 <PlusCircleIcon className="h-5 w-5" />
                 <span>Agregar un producto</span>
