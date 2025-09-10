@@ -59,4 +59,14 @@ export const ContractProductApi = {
       return { msg: "error updating contract products" };
     }
   },
+
+  remove: async (id: string) => {
+    try {
+      const res = await api.delete(`/contract-product/${id}`);
+      return res.data;
+    } catch (error) {
+      console.error("Error removing contract product:", error);
+      return { msg: "error removing contract product" };
+    }
+  },
 };
