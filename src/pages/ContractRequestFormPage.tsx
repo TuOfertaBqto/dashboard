@@ -14,6 +14,7 @@ import dayjs from "dayjs";
 import { ContractPaymentApi } from "../api/contract-payment";
 import { useAuth } from "../auth/useAuth";
 import { ContractProductApi } from "../api/contract-product";
+import { ConfirmModal } from "../components/ConfirmModal";
 
 export default function ContractRequestFormPage() {
   const { id } = useParams();
@@ -37,6 +38,9 @@ export default function ContractRequestFormPage() {
   const [initialData, setInitialData] = useState<Contract | null>(null);
   const [canRequest, setCanRequest] = useState<boolean>(false);
   const [messageRequest, setMessageRequest] = useState<string>("");
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [indexToRemove, setIndexToRemove] = useState<number>(-1);
+  const [isRemoving, setIsRemoving] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -169,6 +173,41 @@ export default function ContractRequestFormPage() {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRemoveProduct = async (index: number) => {
+    if (indexToRemove === -1) return;
+
+    const product = form.products[index];
+    setIsRemoving(true);
+
+    try {
+      const updated = [...form.products];
+      updated.splice(index, 1);
+
+      const newTotal = updated.reduce((acc, p) => {
+        if (p.productId && p.quantity > 0) {
+          return acc + (p.price || 0) * p.quantity;
+        }
+        return acc;
+      }, 0);
+
+      if (product.id && id) {
+        await ContractProductApi.remove(product.id);
+
+        await ContractApi.update(id, {
+          totalPrice: newTotal,
+        });
+      }
+
+      setForm({ ...form, products: updated });
+    } catch (error) {
+      console.error("Error eliminando el producto:", error);
+    } finally {
+      setIsRemoving(false);
+      setShowModal(false);
+      setIndexToRemove(-1);
     }
   };
 
@@ -375,13 +414,12 @@ export default function ContractRequestFormPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        const updated = [...form.products];
-                        updated.splice(index, 1);
-                        setForm({ ...form, products: updated });
+                        setIndexToRemove(index);
+                        setShowModal(true);
                       }}
                       className="text-white bg-red-600 hover:bg-red-700 p-2 rounded-full"
                       title="Eliminar producto"
-                      disabled={!!initialData?.id}
+                      disabled={isRemoving}
                     >
                       <TrashIcon className="h-5 w-5" />
                     </button>
@@ -447,6 +485,14 @@ export default function ContractRequestFormPage() {
           {loading ? "Guardando..." : "Guardar"}
         </button>
       </div>
+
+      <ConfirmModal
+        open={showModal}
+        title="Eliminar producto"
+        message="¿Estás seguro de que deseas eliminar el producto del contrato? Esta acción no se puede deshacer."
+        onCancel={() => setShowModal(false)}
+        onConfirm={() => handleRemoveProduct(indexToRemove)}
+      />
     </form>
   );
 }
