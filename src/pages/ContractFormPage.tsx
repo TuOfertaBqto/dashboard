@@ -113,8 +113,8 @@ export default function ContractFormPage() {
           agreementContract: contractToDispatch.agreement,
           startContract: contractToDispatch.startDate.split("T")[0],
           products: contractToDispatch.products.map((p) => ({
-            price: p.product.price,
-            installmentAmount: p.product.installmentAmount,
+            price: p.price,
+            installmentAmount: p.installmentAmount,
             quantity: p.quantity,
           })),
         });
