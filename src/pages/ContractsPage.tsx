@@ -98,8 +98,8 @@ export default function ContractsPage() {
         agreementContract: contractToDispatch.agreement,
         startContract: dispatchDate,
         products: contractToDispatch.products.map((p) => ({
-          price: p.product.price,
-          installmentAmount: p.product.installmentAmount,
+          price: p.price,
+          installmentAmount: p.installmentAmount,
           quantity: p.quantity,
         })),
       });
