@@ -177,6 +177,7 @@ export const ContractPaymentApi = {
       return {} as GlobalPaymentsTotals;
     }
   },
+
   getVendorPaymentsSummary: async (): Promise<VendorPaymentsTotals[]> => {
     try {
       const res = await api.get("/contract-payment/vendor/payments-summary");
@@ -184,6 +185,34 @@ export const ContractPaymentApi = {
     } catch (error) {
       console.error("Error fetching payments-summary global:", error);
       return [] as VendorPaymentsTotals[];
+    }
+  },
+
+  getOneVendorPaymentsSummary: async (
+    id: string
+  ): Promise<VendorPaymentsTotals> => {
+    try {
+      const res = await api.get(
+        `contract-payment/vendor/${id}/payments-summary`
+      );
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching payments-summary by vendor:", error);
+      return {} as VendorPaymentsTotals;
+    }
+  },
+
+  getOverdueCustomersByOneVendor: async (
+    id: string
+  ): Promise<VendorsWithDebts> => {
+    try {
+      const res = await api.get(
+        `contract-payment/overdue/${id}/customers-by-vendor`
+      );
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching overdue by vendor", error);
+      return {} as VendorsWithDebts;
     }
   },
 };

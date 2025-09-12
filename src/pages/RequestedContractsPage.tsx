@@ -10,6 +10,7 @@ import {
   type ContractPayment,
 } from "../api/contract-payment";
 import { InventoryApi } from "../api/inventory";
+import { ContractProductApi } from "../api/contract-product";
 
 export default function RequestedContractsPage() {
   const navigate = useNavigate();
@@ -50,13 +51,13 @@ export default function RequestedContractsPage() {
     await Promise.all(
       contractApproved.products.map(async (p) => {
         const [toDesp, stock] = await Promise.all([
-          ContractApi.getToDispatchQuantity(p.product.id),
+          ContractProductApi.getToDispatchQuantity(p.product.id),
           InventoryApi.getStockByProductId(p.product.id),
         ]);
 
         const status = stock >= p.quantity + toDesp ? "to_dispatch" : "to_buy";
 
-        await ContractApi.updateProducts(p.id, status);
+        await ContractProductApi.updateProducts(p.id, status);
       })
     );
 

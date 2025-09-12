@@ -1,12 +1,12 @@
 import {
   ArrowRightEndOnRectangleIcon,
-  ArrowRightOnRectangleIcon,
   Bars3Icon,
   CubeIcon,
   CurrencyDollarIcon,
   DocumentArrowUpIcon,
   DocumentTextIcon,
   SquaresPlusIcon,
+  UserIcon,
   UsersIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
@@ -20,6 +20,7 @@ export const Header = () => {
   const navigate = useNavigate();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
     <>
@@ -56,13 +57,45 @@ export const Header = () => {
               </div>
             </div>
           )}
+
           <button
-            onClick={() => setShowLogoutModal(true)}
-            className="p-2 rounded  transition"
-            title="Cerrar sesión"
+            onClick={() => setOpen(!open)}
+            className="w-10 h-10 rounded-full border border-gray-300 overflow-hidden focus:outline-none cursor-pointer"
           >
-            <ArrowRightOnRectangleIcon className="w-6 h-6 text-gray-600 cursor-pointer" />
+            <img
+              src={
+                "https://res.cloudinary.com/ddy2z86ai/image/upload/v1756922816/withoutPhoto_jv8xlt.png"
+              }
+              alt="Perfil"
+              className="w-full h-full object-cover"
+            />
           </button>
+
+          {open && user && (
+            <div className="absolute right-4 top-14 w-48 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-50">
+              <button
+                onClick={() => {
+                  setOpen(false);
+                  navigate(`/profile/${user.id}`);
+                }}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-100 text-gray-700 cursor-pointer"
+              >
+                <UserIcon className="w-5 h-5 text-gray-500" />
+                Ir al perfil
+              </button>
+
+              <button
+                onClick={() => {
+                  setOpen(false);
+                  setShowLogoutModal(true);
+                }}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-100 text-red-600 cursor-pointer"
+              >
+                <ArrowRightEndOnRectangleIcon className="w-5 h-5 text-red-500" />
+                Cerrar sesión
+              </button>
+            </div>
+          )}
         </div>
       </header>
 

@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   ContractApi,
   type Contract,
+  type CreateContractProduct,
   type CreateContractRequest,
 } from "../api/contract";
 import { userApi, type User } from "../api/user";
@@ -11,9 +12,14 @@ import Select from "react-select";
 import { PlusCircleIcon, TrashIcon } from "@heroicons/react/24/outline";
 import dayjs from "dayjs";
 import { ContractPaymentApi } from "../api/contract-payment";
+import { useAuth } from "../auth/useAuth";
+import { ContractProductApi } from "../api/contract-product";
+import { ConfirmModal } from "../components/ConfirmModal";
 
 export default function ContractRequestFormPage() {
   const { id } = useParams();
+  const { user } = useAuth();
+  const isMain = user?.role !== "main";
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const isEdit = !!id;
@@ -32,6 +38,9 @@ export default function ContractRequestFormPage() {
   const [initialData, setInitialData] = useState<Contract | null>(null);
   const [canRequest, setCanRequest] = useState<boolean>(false);
   const [messageRequest, setMessageRequest] = useState<string>("");
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [indexToRemove, setIndexToRemove] = useState<number>(-1);
+  const [isRemoving, setIsRemoving] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,6 +55,7 @@ export default function ContractRequestFormPage() {
 
         if (isEdit && id) {
           const contract = await ContractApi.getById(id);
+
           setInitialData(contract);
           setForm({
             customerId: contract.customerId.id,
@@ -54,8 +64,12 @@ export default function ContractRequestFormPage() {
             requestDate: contract.requestDate,
             totalPrice: contract.totalPrice,
             products: contract.products.map((p) => ({
+              id: p.id,
               productId: p.product.id,
               quantity: p.quantity,
+              status: p.status,
+              price: p.price,
+              installmentAmount: p.installmentAmount,
             })),
           });
         }
@@ -69,15 +83,14 @@ export default function ContractRequestFormPage() {
 
   useEffect(() => {
     const newTotal = form.products.reduce((acc, p) => {
-      const prod = products.find((prod) => prod.id === p.productId);
-      if (prod && p.quantity > 0) {
-        return acc + prod.price * p.quantity;
+      if (p.productId && p.quantity > 0) {
+        return acc + (p.price || 0) * p.quantity;
       }
       return acc;
     }, 0);
 
     setForm((prev) => ({ ...prev, totalPrice: newTotal }));
-  }, [form.products, products]);
+  }, [form.products]);
 
   useEffect(() => {
     const fetchValidation = async () => {
@@ -97,6 +110,19 @@ export default function ContractRequestFormPage() {
 
     fetchValidation();
   }, []);
+
+  const setProductField = <K extends keyof CreateContractProduct>(
+    index: number,
+    field: K,
+    value: CreateContractProduct[K]
+  ) => {
+    setForm((prev) => ({
+      ...prev,
+      products: prev.products.map((prod, i) =>
+        i === index ? { ...prod, [field]: value } : prod
+      ),
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,12 +151,20 @@ export default function ContractRequestFormPage() {
     setLoading(true);
     try {
       if (isEdit && id) {
-        const { agreement, customerId, totalPrice } = form;
+        const { agreement, customerId, totalPrice, products } = form;
+
+        const updatedProducts: CreateContractProduct[] = products.map((p) => ({
+          ...p,
+          contractId: id,
+        }));
+
         await ContractApi.update(id, {
           agreement,
           customerId,
           totalPrice,
         });
+
+        await ContractProductApi.updateBulk(updatedProducts);
       } else {
         await ContractApi.create(form);
       }
@@ -139,6 +173,41 @@ export default function ContractRequestFormPage() {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRemoveProduct = async (index: number) => {
+    if (indexToRemove === -1) return;
+
+    const product = form.products[index];
+    setIsRemoving(true);
+
+    try {
+      const updated = [...form.products];
+      updated.splice(index, 1);
+
+      const newTotal = updated.reduce((acc, p) => {
+        if (p.productId && p.quantity > 0) {
+          return acc + (p.price || 0) * p.quantity;
+        }
+        return acc;
+      }, 0);
+
+      if (product.id && id) {
+        await ContractProductApi.remove(product.id);
+
+        await ContractApi.update(id, {
+          totalPrice: newTotal,
+        });
+      }
+
+      setForm({ ...form, products: updated });
+    } catch (error) {
+      console.error("Error eliminando el producto:", error);
+    } finally {
+      setIsRemoving(false);
+      setShowModal(false);
+      setIndexToRemove(-1);
     }
   };
 
@@ -210,8 +279,6 @@ export default function ContractRequestFormPage() {
             </h3>
 
             {form.products.map((p, index) => {
-              const selected = products.find((prod) => prod.id === p.productId);
-
               return (
                 <div
                   key={index}
@@ -225,13 +292,26 @@ export default function ContractRequestFormPage() {
                     <Select
                       value={
                         products
-                          .map((prod) => ({ value: prod.id, label: prod.name }))
+                          .map((prod) => ({
+                            value: prod.id,
+                            label: prod.name,
+                            price: prod.price,
+                            installmentAmount: prod.installmentAmount,
+                          }))
                           .find((opt) => opt.value === p.productId) || null
                       }
                       onChange={(selected) => {
-                        const updated = [...form.products];
-                        updated[index].productId = selected?.value || "";
-                        setForm({ ...form, products: updated });
+                        setProductField(
+                          index,
+                          "productId",
+                          selected?.value || ""
+                        );
+                        setProductField(index, "price", selected?.price || 0);
+                        setProductField(
+                          index,
+                          "installmentAmount",
+                          selected?.installmentAmount || 0
+                        );
                       }}
                       options={products
                         .filter(
@@ -243,10 +323,12 @@ export default function ContractRequestFormPage() {
                         .map((prod) => ({
                           value: prod.id,
                           label: prod.name,
+                          price: prod.price,
+                          installmentAmount: prod.installmentAmount,
                         }))}
                       placeholder="Seleccione un producto"
                       isClearable
-                      isDisabled={!!initialData?.id || !canRequest}
+                      isDisabled={isMain && (!!initialData?.id || !canRequest)}
                     />
                   </div>
 
@@ -259,21 +341,21 @@ export default function ContractRequestFormPage() {
                       type="number"
                       min="1"
                       step="1"
-                      className={`w-full border p-2 rounded ${
-                        isEdit ? "bg-gray-100 cursor-not-allowed" : ""
-                      } `}
-                      value={p.quantity === 0 ? "" : p.quantity}
+                      className={`w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${
+                        isEdit && isMain ? "bg-gray-100 cursor-not-allowed" : ""
+                      }`}
+                      onWheel={(e) => e.currentTarget.blur()}
+                      value={p.quantity || ""}
                       onChange={(e) => {
-                        const value = e.target.value;
-                        const intValue = parseInt(value, 10);
-                        const updated = [...form.products];
-                        updated[index].quantity = isNaN(intValue)
-                          ? 0
-                          : intValue;
-                        setForm({ ...form, products: updated });
+                        const intValue = parseInt(e.target.value, 10);
+                        setProductField(
+                          index,
+                          "quantity",
+                          isNaN(intValue) ? 0 : intValue
+                        );
                       }}
                       required
-                      readOnly={!!initialData?.id || !canRequest}
+                      readOnly={isMain && (!!initialData?.id || !canRequest)}
                     />
                   </div>
 
@@ -284,9 +366,21 @@ export default function ContractRequestFormPage() {
                     </label>
                     <input
                       type="number"
-                      className="w-full border p-2 rounded bg-gray-100"
-                      value={selected?.price ?? 0}
-                      readOnly
+                      min="1"
+                      step="1"
+                      className={`w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${
+                        isMain ? "bg-gray-100 cursor-not-allowed" : "bg-white"
+                      }`}
+                      onWheel={(e) => e.currentTarget.blur()}
+                      value={p.price || ""}
+                      onChange={(e) => {
+                        if (isMain) return;
+
+                        const intValue = parseInt(e.target.value, 10) || 0;
+                        setProductField(index, "price", intValue);
+                      }}
+                      required
+                      readOnly={isMain}
                     />
                   </div>
 
@@ -297,9 +391,21 @@ export default function ContractRequestFormPage() {
                     </label>
                     <input
                       type="number"
-                      className="w-full border p-2 rounded bg-gray-100"
-                      value={selected?.installmentAmount ?? 0}
-                      readOnly
+                      min="1"
+                      step="1"
+                      className={`w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${
+                        isMain ? "bg-gray-100 cursor-not-allowed" : "bg-white"
+                      }`}
+                      onWheel={(e) => e.currentTarget.blur()}
+                      value={p.installmentAmount || ""}
+                      onChange={(e) => {
+                        if (isMain) return;
+
+                        const intValue = parseInt(e.target.value, 10) || 0;
+                        setProductField(index, "installmentAmount", intValue);
+                      }}
+                      required
+                      readOnly={isMain}
                     />
                   </div>
 
@@ -308,13 +414,12 @@ export default function ContractRequestFormPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        const updated = [...form.products];
-                        updated.splice(index, 1);
-                        setForm({ ...form, products: updated });
+                        setIndexToRemove(index);
+                        setShowModal(true);
                       }}
                       className="text-white bg-red-600 hover:bg-red-700 p-2 rounded-full"
                       title="Eliminar producto"
-                      disabled={!!initialData?.id}
+                      disabled={isRemoving}
                     >
                       <TrashIcon className="h-5 w-5" />
                     </button>
@@ -337,11 +442,17 @@ export default function ContractRequestFormPage() {
                     ...form,
                     products: [
                       ...form.products,
-                      { productId: "", quantity: 1, status: "to_buy" },
+                      {
+                        productId: "",
+                        quantity: 1,
+                        status: "to_buy",
+                        price: 0,
+                        installmentAmount: 0,
+                      },
                     ],
                   })
                 }
-                disabled={!!initialData?.id || !canRequest}
+                disabled={isMain && (!!initialData?.id || !canRequest)}
               >
                 <PlusCircleIcon className="h-5 w-5" />
                 <span>Agregar un producto</span>
@@ -374,6 +485,14 @@ export default function ContractRequestFormPage() {
           {loading ? "Guardando..." : "Guardar"}
         </button>
       </div>
+
+      <ConfirmModal
+        open={showModal}
+        title="Eliminar producto"
+        message="¿Estás seguro de que deseas eliminar el producto del contrato? Esta acción no se puede deshacer."
+        onCancel={() => setShowModal(false)}
+        onConfirm={() => handleRemoveProduct(indexToRemove)}
+      />
     </form>
   );
 }

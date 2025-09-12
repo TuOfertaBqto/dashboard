@@ -10,6 +10,7 @@ import type {
   GlobalPaymentsTotals,
   VendorPaymentsTotals,
 } from "../../api/contract-payment";
+import { formatMoney } from "../../utils/formatMoney";
 
 Font.register({
   family: "Calibri",
@@ -88,14 +89,6 @@ export function VendorsTotalsPDF({
     dateStyle: "short",
     timeStyle: "medium",
   });
-
-  const formatMoney = (value: string | number): string => {
-    const num = Number(value) || 0;
-    return num
-      .toFixed(2)
-      .replace(".", ",")
-      .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  };
 
   return (
     <Document>

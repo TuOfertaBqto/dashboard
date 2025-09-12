@@ -11,6 +11,7 @@ import {
 import { InstallmentModal } from "../components/InstallmentModal";
 import dayjs from "dayjs";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
+import { ContractProductApi } from "../api/contract-product";
 
 export default function ContractsPage() {
   const navigate = useNavigate();
@@ -88,7 +89,7 @@ export default function ContractsPage() {
           type: "out",
         });
 
-        await ContractApi.updateProducts(p.id, "dispatched");
+        await ContractProductApi.updateProducts(p.id, "dispatched");
       }
 
       // TODO: Crear los contract Payments
@@ -97,8 +98,8 @@ export default function ContractsPage() {
         agreementContract: contractToDispatch.agreement,
         startContract: dispatchDate,
         products: contractToDispatch.products.map((p) => ({
-          price: p.product.price,
-          installmentAmount: p.product.installmentAmount,
+          price: p.price,
+          installmentAmount: p.installmentAmount,
           quantity: p.quantity,
         })),
       });

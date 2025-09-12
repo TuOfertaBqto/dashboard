@@ -19,6 +19,7 @@ export type User = {
 };
 
 export type VendorStats = {
+  id: string;
   code: string;
   vendorName: string;
   activeContracts: string;
@@ -47,6 +48,16 @@ export const userApi = {
     } catch (error) {
       console.error("Error fetching user by ID:", error);
       return {} as User;
+    }
+  },
+
+  getProfile: async (id: string): Promise<User | null> => {
+    try {
+      const res = await api.get(`/user/profile/${id}`);
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching profile by ID:", error);
+      return null;
     }
   },
 

@@ -56,8 +56,12 @@ export const ContractForm = ({
         agreement: initialData.agreement || "weekly",
         totalPrice: initialData.totalPrice || 0,
         products: initialData.products.map((p) => ({
+          id: p.id,
           productId: p.product.id,
           quantity: p.quantity,
+          status: p.status,
+          price: p.price,
+          installmentAmount: p.installmentAmount,
         })),
       });
       setDispatched(false);
@@ -262,8 +266,6 @@ export const ContractForm = ({
         </h3>
 
         {form.products.map((p, index) => {
-          const selected = products.find((prod) => prod.id === p.productId);
-
           return (
             <div
               key={index}
@@ -288,7 +290,13 @@ export const ContractForm = ({
                     selected: SingleValue<{ value: string; label: string }>
                   ) => {
                     const updated = [...form.products];
+                    const prod = products.find((p) => p.id === selected?.value);
+
                     updated[index].productId = selected?.value || "";
+                    updated[index].price = prod?.price ?? 0;
+                    updated[index].installmentAmount =
+                      prod?.installmentAmount ?? 0;
+
                     setForm({ ...form, products: updated });
                   }}
                   options={products
@@ -358,7 +366,7 @@ export const ContractForm = ({
                   id={`price-${index}`}
                   type="number"
                   className="w-full border p-2 rounded bg-gray-100"
-                  value={selected?.price ?? 0}
+                  value={p.price}
                   readOnly
                 />
               </div>
@@ -371,7 +379,7 @@ export const ContractForm = ({
                 <input
                   type="number"
                   className="w-full border p-2 rounded bg-gray-100"
-                  value={selected?.installmentAmount ?? 0}
+                  value={p.installmentAmount}
                   readOnly
                 />
               </div>
@@ -412,7 +420,13 @@ export const ContractForm = ({
                 ...form,
                 products: [
                   ...form.products,
-                  { productId: "", quantity: 1, status: "to_buy" },
+                  {
+                    productId: "",
+                    quantity: 1,
+                    status: "to_buy",
+                    price: 0,
+                    installmentAmount: 0,
+                  },
                 ],
               })
             }

@@ -11,6 +11,7 @@ import { ProductApi, type Product } from "../api/product";
 import { InventoryApi } from "../api/inventory";
 import { InventoryMovApi } from "../api/inventory-movement";
 import { ContractPaymentApi } from "../api/contract-payment";
+import { ContractProductApi } from "../api/contract-product";
 
 export default function ContractFormPage() {
   const { id } = useParams();
@@ -75,7 +76,9 @@ export default function ContractFormPage() {
       } else {
         await Promise.all(
           data.products.map(async (p) => {
-            const toDesp = await ContractApi.getToDispatchQuantity(p.productId);
+            const toDesp = await ContractProductApi.getToDispatchQuantity(
+              p.productId
+            );
             const stock = await InventoryApi.getStockByProductId(p.productId);
 
             const isAvailable = stock >= p.quantity + toDesp;
@@ -102,7 +105,7 @@ export default function ContractFormPage() {
             type: "out",
           });
 
-          await ContractApi.updateProducts(p.id, "dispatched");
+          await ContractProductApi.updateProducts(p.id, "dispatched");
         }
 
         await ContractPaymentApi.create({
@@ -110,8 +113,8 @@ export default function ContractFormPage() {
           agreementContract: contractToDispatch.agreement,
           startContract: contractToDispatch.startDate.split("T")[0],
           products: contractToDispatch.products.map((p) => ({
-            price: p.product.price,
-            installmentAmount: p.product.installmentAmount,
+            price: p.price,
+            installmentAmount: p.installmentAmount,
             quantity: p.quantity,
           })),
         });
