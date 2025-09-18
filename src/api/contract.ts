@@ -59,9 +59,9 @@ export type ResponseCountContract = {
 };
 
 export const ContractApi = {
-  getAll: async (): Promise<Contract[]> => {
+  getAllByVendor: async (vendorId: string): Promise<Contract[]> => {
     try {
-      const res = await api.get("/contract");
+      const res = await api.get(`/contract/vendor/${vendorId}`);
       return res.data;
     } catch (error) {
       console.error("Error fetching contract:", error);

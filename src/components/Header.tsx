@@ -2,10 +2,9 @@ import {
   ArrowRightEndOnRectangleIcon,
   Bars3Icon,
   CubeIcon,
-  CurrencyDollarIcon,
   DocumentArrowUpIcon,
-  DocumentTextIcon,
   SquaresPlusIcon,
+  UserGroupIcon,
   UserIcon,
   UsersIcon,
   XMarkIcon,
@@ -138,21 +137,11 @@ export const Header = () => {
                     className="p-4 flex items-center gap-2 active:bg-[#111827]"
                     onClick={() => {
                       setIsMenuOpen(false);
-                      navigate("/installments");
+                      navigate("/vendors");
                     }}
                   >
-                    <CurrencyDollarIcon className="h-5 w-5" />
-                    Pagos
-                  </li>
-                  <li
-                    className="p-4 flex items-center gap-2 active:bg-[#111827]"
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      navigate("/contracts");
-                    }}
-                  >
-                    <DocumentTextIcon className="h-5 w-5" />
-                    Contratos
+                    <UsersIcon className="h-5 w-5" />
+                    Vendedores
                   </li>
                 </>
               )}
@@ -163,7 +152,7 @@ export const Header = () => {
                   navigate("/users");
                 }}
               >
-                <UsersIcon className="h-5 w-5" />
+                <UserGroupIcon className="h-5 w-5" />
                 Usuarios
               </li>
               <li

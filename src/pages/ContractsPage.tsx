@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ConfirmModal } from "../components/ConfirmModal";
 import { ContractTable } from "../components/ContractTable";
 import { ContractApi, type Contract } from "../api/contract";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { InventoryMovApi } from "../api/inventory-movement";
 import {
   ContractPaymentApi,
@@ -12,10 +12,13 @@ import { InstallmentModal } from "../components/InstallmentModal";
 import dayjs from "dayjs";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import { ContractProductApi } from "../api/contract-product";
+import { userApi, type User } from "../api/user";
 
 export default function ContractsPage() {
+  const { id } = useParams();
   const navigate = useNavigate();
   const [contracts, setContracts] = useState<Contract[]>([]);
+  const [user, setUser] = useState<User>();
   const [contractToDelete, setContractToDelete] = useState<Contract | null>(
     null
   );
@@ -30,7 +33,7 @@ export default function ContractsPage() {
     dayjs().format("YYYY-MM-DD")
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const handleRowClick = async (contract: Contract) => {
     setContractSelected(contract);
@@ -44,21 +47,24 @@ export default function ContractsPage() {
     }
   };
 
-  const fetchContracts = async () => {
+  const fetchContracts = useCallback(async () => {
+    if (!id) return;
     setLoading(true);
     try {
-      const data = await ContractApi.getAll();
+      const data = await ContractApi.getAllByVendor(id);
+      const userData = await userApi.getById(id);
       setContracts(data);
+      setUser(userData);
     } catch (err) {
       console.log("Error loading contract", err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     fetchContracts();
-  }, []);
+  }, [fetchContracts]);
 
   const handleDelete = async () => {
     if (!contractToDelete) return;
@@ -114,34 +120,42 @@ export default function ContractsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 w-full">
-        <h1 className="text-2xl font-bold text-center sm:text-left">
-          Contratos
-        </h1>
+      {!loading ? (
+        <>
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 w-full">
+            <h1 className="text-2xl font-bold text-center sm:text-left">
+              Contratos{" "}
+              {user
+                ? `de T${user.code} ${user.firstName} ${user.lastName}`
+                : ""}
+            </h1>
 
-        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-          <button
-            onClick={() => navigate("/contracts/new")}
-            className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white font-medium shadow hover:bg-blue-700 transition w-full sm:w-auto cursor-pointer"
-          >
-            <PlusCircleIcon className="w-5 h-5" />
-            Crear contrato
-          </button>
-        </div>
-      </div>
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+              <button
+                onClick={() => navigate("/contracts/new")}
+                className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white font-medium shadow hover:bg-blue-700 transition w-full sm:w-auto cursor-pointer"
+              >
+                <PlusCircleIcon className="w-5 h-5" />
+                Crear contrato
+              </button>
+            </div>
+          </div>
 
-      <ContractTable
-        contracts={contracts}
-        loading={loading}
-        onEdit={(contract) => navigate(`/contracts/${contract.id}/edit`)}
-        onDelete={(id) => {
-          const selected = contracts.find((c) => c.id === id);
-          if (selected) setContractToDelete(selected);
-        }}
-        onDispatch={(contract) => setContractToDispatch(contract)}
-        onRowClick={handleRowClick}
-      />
-
+          <ContractTable
+            contracts={contracts}
+            loading={loading}
+            onEdit={(contract) => navigate(`/contracts/${contract.id}/edit`)}
+            onDelete={(id) => {
+              const selected = contracts.find((c) => c.id === id);
+              if (selected) setContractToDelete(selected);
+            }}
+            onDispatch={(contract) => setContractToDispatch(contract)}
+            onRowClick={handleRowClick}
+          />
+        </>
+      ) : (
+        <p className="py-6 text-gray-400">Cargando...</p>
+      )}
       <InstallmentModal
         open={isModalOpen}
         isRequest={false}

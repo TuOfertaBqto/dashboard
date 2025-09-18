@@ -106,9 +106,9 @@ export const ContractPaymentApi = {
     }
   },
 
-  getAll: async (): Promise<ContractPayment[]> => {
+  getAllByVendor: async (vendorId: string): Promise<ContractPayment[]> => {
     try {
-      const res = await api.get("/contract-payment");
+      const res = await api.get(`/contract-payment/vendor/${vendorId}`);
       return res.data;
     } catch (error) {
       console.error("Error fetching contract-payment:", error);

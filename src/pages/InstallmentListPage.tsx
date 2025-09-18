@@ -5,18 +5,20 @@ import {
   ContractPaymentApi,
   type ContractPayment,
 } from "../api/contract-payment";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export const InstallmentListPage = () => {
+  const { id } = useParams();
   const [installments, setInstallments] = useState<ContractPayment[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!id) return;
       setLoading(true);
       try {
-        const res = await ContractPaymentApi.getAll();
+        const res = await ContractPaymentApi.getAllByVendor(id);
         setInstallments(res);
       } catch (err) {
         console.log("Error loading installments", err);
@@ -25,7 +27,7 @@ export const InstallmentListPage = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [id]);
 
   const getDueDateColor = (dueDate: string) => {
     const today = dayjs().startOf("day");

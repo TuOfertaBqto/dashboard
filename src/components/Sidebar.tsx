@@ -6,10 +6,9 @@ import {
   ChevronDownIcon,
   UsersIcon,
   ArrowRightEndOnRectangleIcon,
-  DocumentTextIcon,
-  CurrencyDollarIcon,
   DocumentArrowUpIcon,
   UserIcon,
+  UserGroupIcon,
 } from "@heroicons/react/24/outline";
 
 import { useState } from "react";
@@ -47,7 +46,7 @@ export const Sidebar = () => {
   const generalMenuItems: MenuItem[] = [
     {
       name: "Usuarios",
-      icon: <UsersIcon className="h-5 w-5" />,
+      icon: <UserGroupIcon className="h-5 w-5" />,
       route: "/users",
     },
     {
@@ -67,18 +66,11 @@ export const Sidebar = () => {
     userRole === "super_admin" ||
     userRole === "admin"
   ) {
-    generalMenuItems.unshift(
-      {
-        name: "Pagos",
-        icon: <CurrencyDollarIcon className="h-5 w-5" />,
-        route: "/installments",
-      },
-      {
-        name: "Contratos",
-        icon: <DocumentTextIcon className="h-5 w-5" />,
-        route: "/contracts",
-      }
-    );
+    generalMenuItems.unshift({
+      name: "Vendedores",
+      icon: <UsersIcon className="h-5 w-5" />,
+      route: "/vendors",
+    });
   }
 
   if (userRole === "main") {
