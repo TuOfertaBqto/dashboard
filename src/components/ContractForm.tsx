@@ -443,7 +443,7 @@ export const ContractForm = ({
           <button
             type="button"
             disabled={loading}
-            onClick={() => navigate("/contracts")}
+            onClick={() => navigate(-1)}
             className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400 cursor-pointer"
           >
             Cancelar

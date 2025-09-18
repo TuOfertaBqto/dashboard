@@ -120,7 +120,7 @@ export default function ContractFormPage() {
         });
       }
 
-      navigate("/contracts");
+      navigate("/vendors");
     } catch (err) {
       console.error("Error guardando contrato", err);
     }

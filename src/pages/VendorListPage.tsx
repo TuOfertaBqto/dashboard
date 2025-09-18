@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { userApi, type User } from "../api/user";
 import { VendorCard } from "../components/VendorCard";
+import { PlusCircleIcon } from "@heroicons/react/24/outline";
+import { useNavigate } from "react-router-dom";
 
 export const VendorListPage = () => {
+  const navigate = useNavigate();
   const [vendors, setVendors] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -23,9 +26,21 @@ export const VendorListPage = () => {
 
   return (
     <div className="space-y-6 px-4 md:px-6 lg:px-8">
-      <h1 className="text-xl md:text-2xl font-semibold text-gray-800">
-        Vendedores
-      </h1>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 w-full">
+        <h1 className="text-2xl font-bold text-center sm:text-left">
+          Vendedores
+        </h1>
+
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <button
+            onClick={() => navigate("/contracts/new")}
+            className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white font-medium shadow hover:bg-blue-700 transition w-full sm:w-auto cursor-pointer"
+          >
+            <PlusCircleIcon className="w-5 h-5" />
+            Crear contrato
+          </button>
+        </div>
+      </div>
 
       {loading ? (
         <p className="text-gray-500">Cargando...</p>
