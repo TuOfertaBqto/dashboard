@@ -11,13 +11,17 @@ import {
 import { InstallmentModal } from "../components/InstallmentModal";
 import dayjs from "dayjs";
 import { ContractProductApi } from "../api/contract-product";
-import { userApi, type User } from "../api/user";
+import { userApi } from "../api/user";
 
-export default function ContractsPage() {
-  const { id } = useParams();
+interface ContractsPageProps {
+  mode: "vendor" | "status";
+}
+
+export default function ContractsPage({ mode }: ContractsPageProps) {
+  const { id, status } = useParams();
   const navigate = useNavigate();
   const [contracts, setContracts] = useState<Contract[]>([]);
-  const [user, setUser] = useState<User>();
+  //const [user, setUser] = useState<User>();
   const [contractToDelete, setContractToDelete] = useState<Contract | null>(
     null
   );
@@ -33,6 +37,7 @@ export default function ContractsPage() {
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
+  const [pageTitle, setPageTitle] = useState<string>("Contratos");
 
   const handleRowClick = async (contract: Contract) => {
     setContractSelected(contract);
@@ -47,19 +52,68 @@ export default function ContractsPage() {
   };
 
   const fetchContracts = useCallback(async () => {
-    if (!id) return;
     setLoading(true);
     try {
-      const data = await ContractApi.getAllByVendor(id);
-      const userData = await userApi.getById(id);
+      let data: Contract[] = [];
+      let title = "Contratos";
+
+      if (mode === "vendor" && id) {
+        data = await ContractApi.getAllByVendor(id);
+        const userData = await userApi.getById(id);
+        title = `Contratos de T${userData.code} ${userData.firstName} ${userData.lastName}`;
+      } else if (mode === "status" && status) {
+        // Definimos los estados válidos
+        const validStatusMap: Record<
+          string,
+          {
+            apiStatus: "canceled" | "pending" | "approved";
+            type?: "to_dispatch" | "dispatched" | "completed";
+            title: string;
+          }
+        > = {
+          active: {
+            apiStatus: "approved",
+            type: "dispatched",
+            title: "Contratos activos",
+          },
+          "to-dispatch": {
+            apiStatus: "approved",
+            type: "to_dispatch",
+            title: "Contratos por despachar",
+          },
+          canceled: {
+            apiStatus: "canceled",
+            title: "Contratos cancelados",
+          },
+          completed: {
+            apiStatus: "approved",
+            type: "completed",
+            title: "Contratos finalizados",
+          },
+        };
+
+        const config = validStatusMap[status.toLowerCase()];
+
+        if (config) {
+          data = await ContractApi.getAllByStatus(
+            config.apiStatus,
+            config.type
+          );
+          title = config.title;
+        } else {
+          data = [];
+          title = "Estado de contrato no válido";
+        }
+      }
+
       setContracts(data);
-      setUser(userData);
+      setPageTitle(title);
     } catch (err) {
       console.log("Error loading contract", err);
     } finally {
       setLoading(false);
     }
-  }, [id]);
+  }, [mode, id, status]);
 
   useEffect(() => {
     fetchContracts();
@@ -124,16 +178,14 @@ export default function ContractsPage() {
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 w-full">
             {/* <h1 className="text-2xl font-bold text-center sm:text-left"></h1> */}
             <h1 className="text-xl md:text-2xl font-semibold text-gray-800">
-              Contratos{" "}
-              {user
-                ? `de T${user.code} ${user.firstName} ${user.lastName}`
-                : ""}
+              {pageTitle}
             </h1>
           </div>
 
           <ContractTable
             contracts={contracts}
             loading={loading}
+            mode={mode}
             onEdit={(contract) => navigate(`/contracts/${contract.id}/edit`)}
             onDelete={(id) => {
               const selected = contracts.find((c) => c.id === id);

@@ -86,10 +86,18 @@ function App() {
             }
           />
           <Route
-            path="vendors/:id/contracts"
+            path="contracts/vendor/:id"
             element={
               <PrivateRoute allowedRoles={allowedRoles}>
-                <ContractsPage />
+                <ContractsPage mode="vendor" />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/contracts/status/:status"
+            element={
+              <PrivateRoute allowedRoles={allowedRoles}>
+                <ContractsPage mode="status" />
               </PrivateRoute>
             }
           />

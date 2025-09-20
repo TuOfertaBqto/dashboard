@@ -5,6 +5,7 @@ import { DeleteButton, DispatchButton, EditButton } from "./ActionButtons";
 interface Props {
   contracts: Contract[];
   loading: boolean;
+  mode: "vendor" | "status";
   onEdit: (contract: Contract) => void;
   onDelete: (id: string) => void;
   onDispatch: (updated: Contract) => void;
@@ -40,6 +41,7 @@ const statusStyles = (status: string): string => {
 export const ContractTable = ({
   contracts,
   loading,
+  mode,
   onEdit,
   onDelete,
   onDispatch,
@@ -51,7 +53,7 @@ export const ContractTable = ({
         <thead className="bg-gray-100 text-gray-700 text-left">
           <tr>
             <th className="p-2">Cod</th>
-            <th className="p-3">Vendedor</th>
+            {mode === "status" && <th className="p-3">Vendedor</th>}
             <th className="p-3">Cliente</th>
             <th className="p-3">Producto</th>
             <th className="p-2">Cant.</th>
@@ -77,9 +79,11 @@ export const ContractTable = ({
                 onClick={() => onRowClick?.(contract)}
               >
                 <td className="p-2">C#{contract.code}</td>
-                <td className="p-3 ">
-                  T{contract.vendorId.code} {contract.vendorId.firstName}
-                </td>
+                {mode === "status" && (
+                  <td className="p-3 ">
+                    T{contract.vendorId.code} {contract.vendorId.firstName}
+                  </td>
+                )}
                 <td className="p-3">
                   {contract.customerId.firstName} {contract.customerId.lastName}
                 </td>

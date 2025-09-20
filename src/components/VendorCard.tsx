@@ -27,7 +27,7 @@ export const VendorCard: FC<VendorCardProps> = ({ vendor }) => {
       {/* Botones */}
       <div className="flex flex-wrap gap-2 w-full">
         <Link
-          to={`/vendors/${vendor.id}/contracts`}
+          to={`/contracts/vendor/${vendor.id}`}
           className="flex-1 min-w-[120px] flex items-center justify-center gap-1 px-3 py-2 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
         >
           <DocumentTextIcon className="w-5 h-5" />

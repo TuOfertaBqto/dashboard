@@ -69,6 +69,21 @@ export const ContractApi = {
     }
   },
 
+  getAllByStatus: async (
+    status: "canceled" | "pending" | "approved",
+    type?: "to_dispatch" | "dispatched" | "completed"
+  ): Promise<Contract[]> => {
+    try {
+      const res = await api.get(`/contract/status/${status}`, {
+        params: type ? { type } : {},
+      });
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching contracts:", error);
+      return [];
+    }
+  },
+
   getRequested: async (): Promise<Contract[]> => {
     try {
       const res = await api.get("/contract/request");
