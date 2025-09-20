@@ -135,30 +135,27 @@ export const ContractTable = ({
                 </td>
                 <td className="p-3">
                   <div className="flex flex-col gap-1">
-                    {!contract.startDate && (
-                      <DispatchButton
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDispatch(contract);
-                        }}
-                      />
-                    )}
-                    {!contract.startDate && (
-                      <EditButton
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onEdit(contract);
-                        }}
-                      />
-                    )}
-
-                    {!contract.startDate && (
-                      <DeleteButton
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDelete(contract.id);
-                        }}
-                      />
+                    {!contract.startDate && contract.status !== "canceled" && (
+                      <>
+                        <DispatchButton
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDispatch(contract);
+                          }}
+                        />
+                        <EditButton
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onEdit(contract);
+                          }}
+                        />
+                        <DeleteButton
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDelete(contract.id);
+                          }}
+                        />
+                      </>
                     )}
                   </div>
                 </td>
