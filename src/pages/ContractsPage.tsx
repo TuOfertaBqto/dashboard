@@ -12,6 +12,7 @@ import { InstallmentModal } from "../components/InstallmentModal";
 import dayjs from "dayjs";
 import { ContractProductApi } from "../api/contract-product";
 import { userApi } from "../api/user";
+import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 
 interface ContractsPageProps {
   mode: "vendor" | "status";
@@ -183,7 +184,14 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
     <div className="space-y-6">
       {!loading ? (
         <>
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 w-full">
+          <div className="flex items-center gap-3 w-full">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium shadow-sm transition cursor-pointer"
+            >
+              <ArrowLeftIcon className="w-4 h-4" />
+              Regresar
+            </button>
             <h1 className="text-xl md:text-2xl font-semibold text-gray-800">
               {pageTitle}
             </h1>

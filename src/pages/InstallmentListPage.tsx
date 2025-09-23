@@ -7,6 +7,7 @@ import {
 } from "../api/contract-payment";
 import { useNavigate, useParams } from "react-router-dom";
 import { userApi } from "../api/user";
+import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 
 export const InstallmentListPage = () => {
   const { id } = useParams();
@@ -54,7 +55,18 @@ export const InstallmentListPage = () => {
     <div className="space-y-6">
       {!loading ? (
         <>
-          <h1 className="text-xl font-semibold">{pageTitle}</h1>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium shadow-sm transition cursor-pointer"
+              >
+                <ArrowLeftIcon className="w-4 h-4" />
+                Regresar
+              </button>
+              <h1 className="text-xl font-semibold">{pageTitle}</h1>
+            </div>
+          </div>
 
           <div className="bg-white rounded shadow overflow-auto">
             <table className="w-full table-auto">
