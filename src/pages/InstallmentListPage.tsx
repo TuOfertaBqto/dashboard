@@ -62,7 +62,6 @@ export const InstallmentListPage = () => {
                 className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium shadow-sm transition cursor-pointer"
               >
                 <ArrowLeftIcon className="w-4 h-4" />
-                Regresar
               </button>
               <h1 className="text-xl font-semibold">{pageTitle}</h1>
             </div>
