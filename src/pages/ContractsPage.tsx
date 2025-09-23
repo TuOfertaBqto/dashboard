@@ -21,7 +21,6 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
   const { id, status } = useParams();
   const navigate = useNavigate();
   const [contracts, setContracts] = useState<Contract[]>([]);
-  //const [user, setUser] = useState<User>();
   const [contractToDelete, setContractToDelete] = useState<Contract | null>(
     null
   );
@@ -58,8 +57,15 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
       let title = "Contratos";
 
       if (mode === "vendor" && id) {
-        data = await ContractApi.getAllByVendor(id);
         const userData = await userApi.getById(id);
+        console.log(userData);
+
+        if (!userData.id) {
+          setContracts([]);
+          setPageTitle("El usuario no existe");
+          return;
+        }
+        data = await ContractApi.getAllByVendor(id);
         title = `Contratos de T${userData.code} ${userData.firstName} ${userData.lastName}`;
       } else if (mode === "status" && status) {
         // Definimos los estados válidos
@@ -110,6 +116,8 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
       setPageTitle(title);
     } catch (err) {
       console.log("Error loading contract", err);
+      setContracts([]);
+      setPageTitle("El usuario no existe o no se pudo cargar");
     } finally {
       setLoading(false);
     }
@@ -176,7 +184,6 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
       {!loading ? (
         <>
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 w-full">
-            {/* <h1 className="text-2xl font-bold text-center sm:text-left"></h1> */}
             <h1 className="text-xl md:text-2xl font-semibold text-gray-800">
               {pageTitle}
             </h1>

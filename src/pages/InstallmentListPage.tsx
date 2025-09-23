@@ -6,11 +6,13 @@ import {
   type ContractPayment,
 } from "../api/contract-payment";
 import { useNavigate, useParams } from "react-router-dom";
+import { userApi } from "../api/user";
 
 export const InstallmentListPage = () => {
   const { id } = useParams();
   const [installments, setInstallments] = useState<ContractPayment[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [pageTitle, setPageTitle] = useState<string>("Cuotas por cobrar");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,10 +20,20 @@ export const InstallmentListPage = () => {
       if (!id) return;
       setLoading(true);
       try {
+        const userData = await userApi.getById(id);
+        if (!userData.id) {
+          setPageTitle("Vendedor no encontrado");
+          setInstallments([]);
+          return;
+        }
+        setPageTitle(
+          `Cuotas por cobrar de T${userData.code} ${userData.firstName} ${userData.lastName}`
+        );
         const res = await ContractPaymentApi.getAllByVendor(id);
         setInstallments(res);
       } catch (err) {
         console.log("Error loading installments", err);
+        setPageTitle("Error al cargar cuotas");
       } finally {
         setLoading(false);
       }
@@ -40,75 +52,87 @@ export const InstallmentListPage = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold">Cuotas por cobrar</h1>
+      {!loading ? (
+        <>
+          <h1 className="text-xl font-semibold">{pageTitle}</h1>
 
-      <div className="bg-white rounded shadow overflow-auto">
-        <table className="w-full table-auto">
-          <thead className="bg-gray-100 text-gray-700">
-            <tr>
-              <th className="p-3 text-left">Contrato</th>
-              <th className="p-3 text-left">Cliente</th>
-              <th className="p-3 text-left">Monto ($)</th>
-              <th className="p-3 text-left">Fecha de vencimiento</th>
-              <th className="p-3 text-left">Estado</th>
-              <th className="p-3 text-left"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {installments.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="text-center py-6 text-gray-400">
-                  {loading ? "Cargando..." : "No hay cuotas pendientes."}
-                </td>
-              </tr>
-            ) : (
-              installments.map((i) => (
-                <tr key={i.id} className="border-t">
-                  <td className="p-3">#{i.contract.code}</td>
-                  <td className="p-3">
-                    {i.contract.customerId.firstName}{" "}
-                    {i.contract.customerId.lastName}
-                  </td>
-                  <td className="p-3">
-                    ${i.installmentAmount - (i.amountPaid ?? 0)}
-                  </td>
-                  <td className="p-3">
-                    {dayjs(i.dueDate.split("T")[0]).format("DD-MM-YYYY")}
-                  </td>
-                  <td className="p-3">
-                    <span
-                      className={classNames(
-                        "text-sm px-2 py-1 rounded font-medium",
-                        getDueDateColor(i.dueDate.split("T")[0])
-                      )}
-                    >
-                      {dayjs(i.dueDate.split("T")[0]).isBefore(dayjs(), "day")
-                        ? "Vencida"
-                        : dayjs(i.dueDate.split("T")[0]).isSame(dayjs(), "day")
-                        ? "Vence hoy"
-                        : "Pendiente"}
-                    </span>
-                  </td>
-                  <td>
-                    <button
-                      disabled={!i.debt}
-                      onClick={() => navigate(`/installments/${i.id}/pay`)}
-                      className={classNames(
-                        "px-3 py-1 rounded text-sm",
-                        i.debt
-                          ? "bg-blue-500 text-white hover:bg-blue-600 cursor-pointer"
-                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      )}
-                    >
-                      Registrar pago
-                    </button>
-                  </td>
+          <div className="bg-white rounded shadow overflow-auto">
+            <table className="w-full table-auto">
+              <thead className="bg-gray-100 text-gray-700">
+                <tr>
+                  <th className="p-3 text-left">Contrato</th>
+                  <th className="p-3 text-left">Cliente</th>
+                  <th className="p-3 text-left">Monto ($)</th>
+                  <th className="p-3 text-left">Fecha de vencimiento</th>
+                  <th className="p-3 text-left">Estado</th>
+                  <th className="p-3 text-left"></th>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              </thead>
+              <tbody>
+                {installments.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="text-center py-6 text-gray-400">
+                      {loading ? "Cargando..." : "No hay cuotas pendientes."}
+                    </td>
+                  </tr>
+                ) : (
+                  installments.map((i) => (
+                    <tr key={i.id} className="border-t">
+                      <td className="p-3">#{i.contract.code}</td>
+                      <td className="p-3">
+                        {i.contract.customerId.firstName}{" "}
+                        {i.contract.customerId.lastName}
+                      </td>
+                      <td className="p-3">
+                        ${i.installmentAmount - (i.amountPaid ?? 0)}
+                      </td>
+                      <td className="p-3">
+                        {dayjs(i.dueDate.split("T")[0]).format("DD-MM-YYYY")}
+                      </td>
+                      <td className="p-3">
+                        <span
+                          className={classNames(
+                            "text-sm px-2 py-1 rounded font-medium",
+                            getDueDateColor(i.dueDate.split("T")[0])
+                          )}
+                        >
+                          {dayjs(i.dueDate.split("T")[0]).isBefore(
+                            dayjs(),
+                            "day"
+                          )
+                            ? "Vencida"
+                            : dayjs(i.dueDate.split("T")[0]).isSame(
+                                dayjs(),
+                                "day"
+                              )
+                            ? "Vence hoy"
+                            : "Pendiente"}
+                        </span>
+                      </td>
+                      <td>
+                        <button
+                          disabled={!i.debt}
+                          onClick={() => navigate(`/installments/${i.id}/pay`)}
+                          className={classNames(
+                            "px-3 py-1 rounded text-sm",
+                            i.debt
+                              ? "bg-blue-500 text-white hover:bg-blue-600 cursor-pointer"
+                              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                          )}
+                        >
+                          Registrar pago
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </>
+      ) : (
+        <p className="py-6 text-gray-400">Cargando...</p>
+      )}
     </div>
   );
 };
