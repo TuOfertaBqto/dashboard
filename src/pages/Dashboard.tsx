@@ -13,7 +13,7 @@ import { DebtsReportPDF } from "../components/pdf/DebtsReportPDF";
 import dayjs from "dayjs";
 import { pdf } from "@react-pdf/renderer";
 import { VendorsTotalsPDF } from "../components/pdf/VendorsTotalsPDF";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -81,14 +81,21 @@ export default function Dashboard() {
       <h1 className="text-2xl font-bold">Bienvenido al Dashboard</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="flex items-center bg-green-50 shadow-md rounded-2xl p-6">
+        <Link
+          to="/contracts/status/active"
+          className="flex items-center bg-green-50 shadow-md rounded-2xl p-6 cursor-pointer hover:shadow-lg transition"
+        >
           <CheckCircleIcon className="h-10 w-10 text-green-600 mr-4" />
           <div>
             <p className="text-gray-600">Contratos Activos</p>
             <p className="text-2xl font-bold">{stats?.activeContracts ?? 0}</p>
           </div>
-        </div>
-        <div className="flex items-center bg-blue-50 shadow-md rounded-2xl p-6">
+        </Link>
+
+        <Link
+          to="/contracts/status/to-dispatch"
+          className="flex items-center bg-blue-50 shadow-md rounded-2xl p-6 cursor-pointer hover:shadow-lg transition"
+        >
           <TruckIcon className="h-10 w-10 text-blue-600 mr-4" />
           <div>
             <p className="text-gray-600">Por despachar</p>
@@ -96,8 +103,12 @@ export default function Dashboard() {
               {stats?.pendingToDispatch ?? 0}
             </p>
           </div>
-        </div>
-        <div className="flex items-center bg-red-50 shadow-md rounded-2xl p-6">
+        </Link>
+
+        <Link
+          to="/contracts/status/canceled"
+          className="flex items-center bg-red-50 shadow-md rounded-2xl p-6 cursor-pointer hover:shadow-lg transition"
+        >
           <XCircleIcon className="h-10 w-10 text-red-600 mr-4" />
           <div>
             <p className="text-gray-600">Cancelados</p>
@@ -105,8 +116,12 @@ export default function Dashboard() {
               {stats?.canceledContracts ?? 0}
             </p>
           </div>
-        </div>
-        <div className="flex items-center bg-gray-50 shadow-md rounded-2xl p-6">
+        </Link>
+
+        <Link
+          to="/contracts/status/completed"
+          className="flex items-center bg-gray-50 shadow-md rounded-2xl p-6 cursor-pointer hover:shadow-lg transition"
+        >
           <ClipboardDocumentCheckIcon className="h-10 w-10 text-gray-600 mr-4" />
           <div>
             <p className="text-gray-600">Finalizados</p>
@@ -114,7 +129,7 @@ export default function Dashboard() {
               {stats?.completedContracts ?? 0}
             </p>
           </div>
-        </div>
+        </Link>
       </div>
 
       <div className="bg-white shadow-md rounded-2xl p-4 space-y-4">

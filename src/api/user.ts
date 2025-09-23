@@ -41,6 +41,16 @@ export const userApi = {
     }
   },
 
+  getAllVendors: async (): Promise<User[]> => {
+    try {
+      const res = await api.get("/user/vendors");
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching vendors:", error);
+      return [];
+    }
+  },
+
   getById: async (id: string): Promise<User> => {
     try {
       const res = await api.get(`/user/${id}`);

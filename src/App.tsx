@@ -18,6 +18,7 @@ import { useAuth } from "./auth/useAuth";
 import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import Profile from "./pages/Profile";
+import { VendorListPage } from "./pages/VendorListPage";
 
 function App() {
   const { user } = useAuth();
@@ -61,14 +62,6 @@ function App() {
             }
           />
           <Route
-            path="contracts"
-            element={
-              <PrivateRoute allowedRoles={allowedRoles}>
-                <ContractsPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
             path="contracts/new"
             element={
               <PrivateRoute allowedRoles={allowedRoles}>
@@ -85,7 +78,31 @@ function App() {
             }
           />
           <Route
-            path="installments"
+            path="vendors"
+            element={
+              <PrivateRoute allowedRoles={allowedRoles}>
+                <VendorListPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="contracts/vendor/:id"
+            element={
+              <PrivateRoute allowedRoles={allowedRoles}>
+                <ContractsPage mode="vendor" />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/contracts/status/:status"
+            element={
+              <PrivateRoute allowedRoles={allowedRoles}>
+                <ContractsPage mode="status" />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="vendors/:id/payments"
             element={
               <PrivateRoute allowedRoles={allowedRoles}>
                 <InstallmentListPage />
