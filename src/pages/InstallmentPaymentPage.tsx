@@ -102,7 +102,7 @@ export const InstallmentPaymentPage = () => {
         paidAt: payload.paidAt,
         owner: payload.owner,
       });
-      navigate("/installments");
+      navigate(-1);
     } catch (error) {
       console.error("Error al registrar pago:", error);
     } finally {
@@ -215,7 +215,7 @@ export const InstallmentPaymentPage = () => {
           <button
             type="button"
             disabled={loading}
-            onClick={() => navigate("/installments")}
+            onClick={() => navigate(-1)}
             className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 cursor-pointer"
           >
             Cancelar
