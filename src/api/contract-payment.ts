@@ -132,7 +132,7 @@ export const ContractPaymentApi = {
       return res.data;
     } catch (error) {
       console.error("Error fetching contract-payment by ID:", error);
-      return {} as ContractPayment;
+      throw error;
     }
   },
 
