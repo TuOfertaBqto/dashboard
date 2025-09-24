@@ -50,9 +50,15 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: 4,
     fontWeight: "bold",
     textTransform: "uppercase",
+  },
+  date: {
+    fontSize: 12,
+    textAlign: "center",
+    marginBottom: 20,
+    fontWeight: "bold",
   },
   vendor: {
     fontSize: 14,
@@ -121,6 +127,7 @@ export function DebtsReportPDF({ vendors }: { vendors: VendorsWithDebts[] }) {
     <Document>
       <Page size="A4" style={styles.page}>
         <Text style={styles.title}>Reporte de Deudas por Vendedor</Text>
+        <Text style={styles.date}>{now}</Text>
 
         {vendors.map((vendor) => (
           <View key={vendor.vendorId}>
