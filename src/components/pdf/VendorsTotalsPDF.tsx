@@ -36,7 +36,13 @@ const styles = StyleSheet.create({
     lineHeight: 1.5,
   },
   title: {
-    fontSize: 16,
+    fontSize: 18,
+    textAlign: "center",
+    marginBottom: 4,
+    fontWeight: "bold",
+  },
+  date: {
+    fontSize: 12,
     textAlign: "center",
     marginBottom: 20,
     fontWeight: "bold",
@@ -94,6 +100,7 @@ export function VendorsTotalsPDF({
     <Document>
       <Page size="A4" style={styles.page}>
         <Text style={styles.title}>Resumen de Pagos por Vendedor</Text>
+        <Text style={styles.date}>{now}</Text>
 
         <View style={styles.tableHeader}>
           <Text style={styles.colName}>Vendedor</Text>
