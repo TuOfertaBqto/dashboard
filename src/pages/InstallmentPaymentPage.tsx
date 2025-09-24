@@ -35,7 +35,7 @@ export const InstallmentPaymentPage = () => {
             contract: data.contract.id,
           }));
         })
-        .catch(() => navigate("/installments"));
+        .catch(() => navigate(-1));
     }
   }, [id, navigate]);
 
