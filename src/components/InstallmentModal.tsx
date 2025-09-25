@@ -116,22 +116,23 @@ export const InstallmentModal = ({
 
           {/* Tabla de pagos */}
           <div
-            className="overflow-x-auto border rounded 
-                max-h-screen 
-                md:max-h-[70vh] 
-                lg:max-h-[80vh] 
-                min-h-fit"
+            className="border rounded 
+    max-h-screen 
+    md:max-h-[70vh] 
+    lg:max-h-[80vh] 
+    min-h-fit 
+    w-full overflow-hidden"
           >
-            <table className="w-full text-sm table-auto">
+            <table className="w-full table-fixed text-[10px] sm:text-xs md:text-sm lg:text-base">
               <thead className="bg-gray-100 text-left sticky top-0 z-10">
                 <tr>
-                  <th className="p-2">#</th>
-                  <th className="p-2">Fecha de vencimiento</th>
-                  <th className="p-2">Monto</th>
-                  <th className="p-2">Pagado</th>
-                  <th className="p-2">Tipo</th>
-                  <th className="p-2">Fecha de pago</th>
-                  <th className="p-2">Saldo</th>
+                  <th className="p-2 w-[5%]">#</th>
+                  <th className="p-2 w-[30%] md:w-[20%]">Vencimiento</th>
+                  <th className="p-2 w-[12%]">Monto</th>
+                  <th className="p-2 w-[13%]">Pagado</th>
+                  <th className="p-2 hidden md:table-cell md:w-[15%]">Tipo</th>
+                  <th className="p-2 w-[20%]">Fecha de pago</th>
+                  <th className="p-2 w-[15%]">Saldo</th>
                 </tr>
               </thead>
               <tbody>
@@ -174,9 +175,13 @@ export const InstallmentModal = ({
                   return (
                     <tr key={p.id} className="border-t">
                       <td className="p-2">{number}</td>
-                      <td className="p-2 whitespace-nowrap">
+                      <td className="p-2">
                         <span
-                          className={`inline-flex items-center gap-1 px-2 py-1 rounded-full font-semibold ${dueDateClass} whitespace-nowrap text-xs sm:text-sm md:text-base`}
+                          className={`
+      inline-flex items-center gap-1 px-2 py-1 rounded-full font-semibold 
+      ${dueDateClass} 
+      max-w-full 
+    `}
                         >
                           {IconComponent && (
                             <IconComponent className="w-4 h-4 shrink-0" />
@@ -192,7 +197,7 @@ export const InstallmentModal = ({
                       <td className="p-2">
                         {p.amountPaid ? `$${p.amountPaid}` : "—"}
                       </td>
-                      <td className="p-2">
+                      <td className="p-2 hidden md:table-cell md:w-[15%]">
                         {translatePaymentMethod(p.paymentMethod ?? "")}
                       </td>
                       <td className="p-2">
