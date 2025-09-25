@@ -35,13 +35,13 @@ export const InstallmentModal = ({
       : payments;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center min-h-[100dvh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Fondo oscuro con blur */}
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
 
       {/* Contenedor del modal */}
-      <div className="relative z-10 bg-white rounded-lg sm:rounded-xl shadow-xl w-full max-w-4xl max-h-screen overflow-y-auto">
-        <div className="p-6">
+      <div className="relative z-10 bg-white rounded-lg sm:rounded-xl shadow-xl w-full max-w-4xl max-h-screen overflow-y-auto py-4">
+        <div className="p-3 sm:p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">
               Cuotas del contrato C#{contract?.code}
