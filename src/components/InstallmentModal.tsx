@@ -174,14 +174,18 @@ export const InstallmentModal = ({
                   return (
                     <tr key={p.id} className="border-t">
                       <td className="p-2">{number}</td>
-                      <td className="p-2">
+                      <td className="p-2 whitespace-nowrap">
                         <span
-                          className={`inline-flex items-center gap-1 px-2 py-1 rounded-full font-semibold ${dueDateClass}`}
+                          className={`inline-flex items-center gap-1 px-2 py-1 rounded-full font-semibold ${dueDateClass} whitespace-nowrap text-xs sm:text-sm md:text-base`}
                         >
                           {IconComponent && (
-                            <IconComponent className="w-4 h-4" />
+                            <IconComponent className="w-4 h-4 shrink-0" />
                           )}
-                          {dayjs(p.dueDate.split("T")[0]).format("DD-MM-YYYY")}
+                          <span className="truncate">
+                            {dayjs(p.dueDate.split("T")[0]).format(
+                              "DD-MM-YYYY"
+                            )}
+                          </span>
                         </span>
                       </td>
                       <td className="p-2">${p.installmentAmount}</td>
