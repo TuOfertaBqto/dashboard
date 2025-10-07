@@ -1,20 +1,20 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  ContractPaymentApi,
-  type ContractPayment,
-  type UpdateContractPayment,
-} from "../api/contract-payment";
+  InstallmentApi,
+  type Installment,
+  type UpdateInstallment,
+} from "../api/installment";
 import dayjs from "dayjs";
 
 export const InstallmentPaymentPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [payment, setPayment] = useState<ContractPayment | null>(null);
+  const [payment, setPayment] = useState<Installment | null>(null);
   const [loading, setLoading] = useState(false);
   //const [, setPhoto] = useState<File | null>(null);
 
-  const [form, setForm] = useState<UpdateContractPayment>({
+  const [form, setForm] = useState<UpdateInstallment>({
     contract: "",
     amountPaid: 0,
     paymentMethod: "cash",
@@ -26,7 +26,7 @@ export const InstallmentPaymentPage = () => {
 
   useEffect(() => {
     if (id) {
-      ContractPaymentApi.getById(id)
+      InstallmentApi.getById(id)
         .then((data) => {
           setPayment(data);
 
@@ -84,7 +84,7 @@ export const InstallmentPaymentPage = () => {
     e.preventDefault();
     setLoading(true);
 
-    const payload: UpdateContractPayment = {
+    const payload: UpdateInstallment = {
       ...form,
       photo: null,
       referenceNumber: form.referenceNumber || undefined,
@@ -95,7 +95,7 @@ export const InstallmentPaymentPage = () => {
     // Otherwise, ignore photo for now
 
     try {
-      await ContractPaymentApi.update(id!, {
+      await InstallmentApi.update(id!, {
         paymentMethod: payload.paymentMethod,
         referenceNumber: payload.referenceNumber,
         amountPaid: payload.amountPaid,

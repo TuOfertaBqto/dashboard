@@ -4,10 +4,10 @@ import { userApi, type User } from "../api/user";
 import { ContractApi, type ResponseCountContract } from "../api/contract";
 import { useCallback, useEffect, useState } from "react";
 import {
-  ContractPaymentApi,
+  InstallmentApi,
   type VendorPaymentsTotals,
   type VendorsWithDebts,
-} from "../api/contract-payment";
+} from "../api/installment";
 import { formatMoney } from "../utils/formatMoney";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 
@@ -42,8 +42,8 @@ export default function Profile() {
       // Solo si el perfil existe, obtenemos estadísticas y pagos
       const [statsData, paymentsData, customersData] = await Promise.all([
         ContractApi.countContractsByVendor(userId),
-        ContractPaymentApi.getOneVendorPaymentsSummary(userId),
-        ContractPaymentApi.getOverdueCustomersByOneVendor(userId),
+        InstallmentApi.getOneVendorPaymentsSummary(userId),
+        InstallmentApi.getOverdueCustomersByOneVendor(userId),
       ]);
 
       setStats(statsData);

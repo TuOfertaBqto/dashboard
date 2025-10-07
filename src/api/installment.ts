@@ -1,7 +1,7 @@
 import { api } from "./api";
 import type { Contract } from "./contract";
 
-export type ContractPayment = {
+export type Installment = {
   id: string;
   createdAt: string;
   updatedAt: string;
@@ -32,14 +32,14 @@ type ProductPaymentDTO = {
   quantity: number;
 };
 
-export type CreateContractPayment = {
+export type CreateInstallment = {
   contractId: string;
   startContract: string;
   agreementContract: "weekly" | "fortnightly";
   products: ProductPaymentDTO[];
 };
 
-export type UpdateContractPayment = {
+export type UpdateInstallment = {
   contract?: string;
 
   paymentMethod:
@@ -95,82 +95,80 @@ export type VendorPaymentsTotals = GlobalPaymentsTotals & {
   lastName: string;
 };
 
-export const ContractPaymentApi = {
-  create: async (data: CreateContractPayment): Promise<ContractPayment[]> => {
+export const InstallmentApi = {
+  create: async (data: CreateInstallment): Promise<Installment[]> => {
     try {
-      const res = await api.post("/contract-payment", data);
+      const res = await api.post("/installment", data);
       return res.data;
     } catch (error) {
-      console.error("Error creating contract-payment:", error);
-      return [] as ContractPayment[];
+      console.error("Error creating installment:", error);
+      return [] as Installment[];
     }
   },
 
-  getAllByVendor: async (vendorId: string): Promise<ContractPayment[]> => {
+  getAllByVendor: async (vendorId: string): Promise<Installment[]> => {
     try {
-      const res = await api.get(`/contract-payment/vendor/${vendorId}`);
+      const res = await api.get(`/installment/vendor/${vendorId}`);
       return res.data;
     } catch (error) {
-      console.error("Error fetching contract-payment:", error);
+      console.error("Error fetching installment:", error);
       return [];
     }
   },
 
-  getAllByContractId: async (id: string): Promise<ContractPayment[]> => {
+  getAllByContractId: async (id: string): Promise<Installment[]> => {
     try {
-      const res = await api.get(`/contract-payment/contract/${id}`);
+      const res = await api.get(`/installment/contract/${id}`);
       return res.data;
     } catch (error) {
-      console.error("Error fetching contract-payment by ContractId:", error);
-      return [] as ContractPayment[];
+      console.error("Error fetching installment by ContractId:", error);
+      return [] as Installment[];
     }
   },
 
-  getById: async (id: string): Promise<ContractPayment> => {
+  getById: async (id: string): Promise<Installment> => {
     try {
-      const res = await api.get(`/contract-payment/${id}`);
+      const res = await api.get(`/installment/${id}`);
       return res.data;
     } catch (error) {
-      console.error("Error fetching contract-payment by ID:", error);
+      console.error("Error fetching installment by ID:", error);
       throw error;
     }
   },
 
-  update: async (id: string, data: UpdateContractPayment) => {
+  update: async (id: string, data: UpdateInstallment) => {
     try {
-      const res = await api.patch(`/contract-payment/${id}`, data);
+      const res = await api.patch(`/installment/${id}`, data);
       return res.data;
     } catch (error) {
-      console.error("Error updating contract-payment:", error);
+      console.error("Error updating installment:", error);
       return {};
     }
   },
 
   getOverdueCustomersByVendor: async (): Promise<VendorsWithDebts[]> => {
     try {
-      const res = await api.get(
-        "/contract-payment/overdue/customers-by-vendor"
-      );
+      const res = await api.get("/installment/overdue/customers-by-vendor");
       return res.data;
     } catch (error) {
-      console.error("Error fetching contract-payment:", error);
+      console.error("Error fetching installment:", error);
       return [];
     }
   },
 
   canVendorRequest: async (): Promise<boolean> => {
     try {
-      const res = await api.get("/contract-payment/vendor/can-request");
+      const res = await api.get("/installment/vendor/can-request");
       return res.data;
     } catch (error) {
-      console.error("Error fetching contract-payment:", error);
+      console.error("Error fetching installment:", error);
       return false;
     }
   },
 
   getGlobalPaymentsSummary: async (): Promise<GlobalPaymentsTotals> => {
     try {
-      const res = await api.get("/contract-payment/payments-summary");
+      const res = await api.get("/installment/payments-summary");
       return res.data;
     } catch (error) {
       console.error("Error fetching payments-summary global:", error);
@@ -180,7 +178,7 @@ export const ContractPaymentApi = {
 
   getVendorPaymentsSummary: async (): Promise<VendorPaymentsTotals[]> => {
     try {
-      const res = await api.get("/contract-payment/vendor/payments-summary");
+      const res = await api.get("/installment/vendor/payments-summary");
       return res.data;
     } catch (error) {
       console.error("Error fetching payments-summary global:", error);
@@ -192,9 +190,7 @@ export const ContractPaymentApi = {
     id: string
   ): Promise<VendorPaymentsTotals> => {
     try {
-      const res = await api.get(
-        `contract-payment/vendor/${id}/payments-summary`
-      );
+      const res = await api.get(`installment/vendor/${id}/payments-summary`);
       return res.data;
     } catch (error) {
       console.error("Error fetching payments-summary by vendor:", error);
@@ -207,7 +203,7 @@ export const ContractPaymentApi = {
   ): Promise<VendorsWithDebts> => {
     try {
       const res = await api.get(
-        `contract-payment/overdue/${id}/customers-by-vendor`
+        `installment/overdue/${id}/customers-by-vendor`
       );
       return res.data;
     } catch (error) {

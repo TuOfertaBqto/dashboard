@@ -8,7 +8,7 @@ import {
   TruckIcon,
   XCircleIcon,
 } from "@heroicons/react/24/outline";
-import { ContractPaymentApi } from "../api/contract-payment";
+import { InstallmentApi } from "../api/installment";
 import { DebtsReportPDF } from "../components/pdf/DebtsReportPDF";
 import dayjs from "dayjs";
 import { pdf } from "@react-pdf/renderer";
@@ -31,7 +31,7 @@ export default function Dashboard() {
   const handleDownloadPDF = async () => {
     try {
       setIsDownloading(true);
-      const vendors = await ContractPaymentApi.getOverdueCustomersByVendor();
+      const vendors = await InstallmentApi.getOverdueCustomersByVendor();
 
       const blob = await pdf(<DebtsReportPDF vendors={vendors} />).toBlob();
       const url = URL.createObjectURL(blob);
@@ -52,8 +52,8 @@ export default function Dashboard() {
     try {
       setIsDownloadingVendorTotals(true);
 
-      const vendors = await ContractPaymentApi.getVendorPaymentsSummary();
-      const globalTotals = await ContractPaymentApi.getGlobalPaymentsSummary();
+      const vendors = await InstallmentApi.getVendorPaymentsSummary();
+      const globalTotals = await InstallmentApi.getGlobalPaymentsSummary();
 
       const blob = await pdf(
         <VendorsTotalsPDF totals={globalTotals} vendors={vendors} />

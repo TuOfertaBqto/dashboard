@@ -6,9 +6,9 @@ import { useAuth } from "../auth/useAuth";
 import type { UserRole } from "../api/user";
 import { InstallmentModal } from "../components/InstallmentModal";
 import {
-  ContractPaymentApi,
-  type ContractPayment,
-} from "../api/contract-payment";
+  InstallmentApi,
+  type Installment,
+} from "../api/installment";
 import { InventoryApi } from "../api/inventory";
 import { ContractProductApi } from "../api/contract-product";
 
@@ -19,7 +19,7 @@ export default function RequestedContractsPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [installments, setInstallments] = useState<ContractPayment[]>([]);
+  const [installments, setInstallments] = useState<Installment[]>([]);
   const [contractSelected, setContractSelected] = useState<Contract | null>(
     null
   );
@@ -83,7 +83,7 @@ export default function RequestedContractsPage() {
   const handleCardClick = async (contract: Contract) => {
     setContractSelected(contract);
     try {
-      const res = await ContractPaymentApi.getAllByContractId(contract.id);
+      const res = await InstallmentApi.getAllByContractId(contract.id);
 
       setInstallments(res);
       setIsModalOpen(true);

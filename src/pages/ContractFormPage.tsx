@@ -10,7 +10,7 @@ import { userApi, type User } from "../api/user";
 import { ProductApi, type Product } from "../api/product";
 import { InventoryApi } from "../api/inventory";
 import { InventoryMovApi } from "../api/inventory-movement";
-import { ContractPaymentApi } from "../api/contract-payment";
+import { InstallmentApi } from "../api/installment";
 import { ContractProductApi } from "../api/contract-product";
 
 export default function ContractFormPage() {
@@ -108,7 +108,7 @@ export default function ContractFormPage() {
           await ContractProductApi.updateProducts(p.id, "dispatched");
         }
 
-        await ContractPaymentApi.create({
+        await InstallmentApi.create({
           contractId: contractToDispatch.id,
           agreementContract: contractToDispatch.agreement,
           startContract: contractToDispatch.startDate.split("T")[0],

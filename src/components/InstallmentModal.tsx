@@ -1,6 +1,6 @@
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import type { Contract } from "../api/contract";
-import type { ContractPayment } from "../api/contract-payment";
+import type { Installment } from "../api/installment";
 import { generateInstallmentsFromContract } from "../utils/generateInstallments";
 import { translatePaymentMethod } from "../utils/translations";
 import MyPdfDocument from "./pdf/MyPdfDocument";
@@ -17,7 +17,7 @@ interface Props {
   open: boolean;
   isRequest: boolean;
   onClose: () => void;
-  payments: ContractPayment[];
+  payments: Installment[];
   contract?: Contract | null;
 }
 

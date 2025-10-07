@@ -7,7 +7,7 @@ import {
   Text,
   View,
 } from "@react-pdf/renderer";
-import type { ContractPayment } from "../../api/contract-payment";
+import type { Installment } from "../../api/installment";
 import { numeroALetras } from "../../utils/numero-a-letras";
 import { translatePaymentMethod } from "../../utils/translations";
 import dayjs from "dayjs";
@@ -93,7 +93,7 @@ interface Props {
   fechaInicio: string;
   descripcion: string[];
   montoTotal: number;
-  cuotas: ContractPayment[];
+  cuotas: Installment[];
   cantidadProductos: number;
   documentIdPhoto: string;
 }

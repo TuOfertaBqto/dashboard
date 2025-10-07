@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import type { Contract } from "../api/contract";
-import type { ContractPayment } from "../api/contract-payment";
+import type { Installment } from "../api/installment";
 
 function getNextSaturday(): dayjs.Dayjs {
   const today = dayjs();
@@ -11,8 +11,8 @@ function getNextSaturday(): dayjs.Dayjs {
 
 export function generateInstallmentsFromContract(
   contract: Contract
-): ContractPayment[] {
-  const payments: ContractPayment[] = [];
+): Installment[] {
+  const payments: Installment[] = [];
 
   const intervalDays = contract.agreement === "weekly" ? 7 : 14;
 

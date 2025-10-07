@@ -6,7 +6,7 @@ import {
   StyleSheet,
   Font,
 } from "@react-pdf/renderer";
-import type { VendorsWithDebts } from "../../api/contract-payment";
+import type { VendorsWithDebts } from "../../api/installment";
 
 Font.register({
   family: "Calibri",

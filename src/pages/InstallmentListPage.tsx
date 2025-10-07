@@ -2,16 +2,16 @@ import classNames from "classnames";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import {
-  ContractPaymentApi,
-  type ContractPayment,
-} from "../api/contract-payment";
+  InstallmentApi,
+  type Installment,
+} from "../api/installment";
 import { useNavigate, useParams } from "react-router-dom";
 import { userApi } from "../api/user";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 
 export const InstallmentListPage = () => {
   const { id } = useParams();
-  const [installments, setInstallments] = useState<ContractPayment[]>([]);
+  const [installments, setInstallments] = useState<Installment[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [pageTitle, setPageTitle] = useState<string>("Cuotas por cobrar");
   const navigate = useNavigate();
@@ -30,7 +30,7 @@ export const InstallmentListPage = () => {
         setPageTitle(
           `Cuotas por cobrar de T${userData.code} ${userData.firstName} ${userData.lastName}`
         );
-        const res = await ContractPaymentApi.getAllByVendor(id);
+        const res = await InstallmentApi.getAllByVendor(id);
         setInstallments(res);
       } catch (err) {
         console.log("Error loading installments", err);
