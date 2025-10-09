@@ -1,5 +1,15 @@
 import { api } from "./api";
 import type { Contract } from "./contract";
+import type { Payment } from "./payment";
+
+type InstallmentPayment = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: null;
+  payment: Payment;
+  amount: string;
+};
 
 export type Installment = {
   id: string;
@@ -7,23 +17,11 @@ export type Installment = {
   updatedAt: string;
   deletedAt: null;
   contract: Contract;
-  paymentMethod:
-    | "binance"
-    | "paypal"
-    | "zelle"
-    | "mobile_payment"
-    | "bank_transfer"
-    | "cash"
-    | "discount"
-    | null;
-  referenceNumber: null;
-  photo: null;
-  owner: null;
   dueDate: string;
   installmentAmount: number;
-  amountPaid: null;
   paidAt?: string;
   debt?: string;
+  installmentPayments: InstallmentPayment[];
 };
 
 type ProductPaymentDTO = {
@@ -54,7 +52,7 @@ export type UpdateInstallment = {
 
   photo?: string | null;
 
-  owner?: string;
+  owner: string;
 
   amountPaid: number | string;
 
@@ -133,16 +131,6 @@ export const InstallmentApi = {
     } catch (error) {
       console.error("Error fetching installment by ID:", error);
       throw error;
-    }
-  },
-
-  update: async (id: string, data: UpdateInstallment) => {
-    try {
-      const res = await api.patch(`/installment/${id}`, data);
-      return res.data;
-    } catch (error) {
-      console.error("Error updating installment:", error);
-      return {};
     }
   },
 

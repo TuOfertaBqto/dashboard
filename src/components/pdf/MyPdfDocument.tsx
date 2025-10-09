@@ -340,7 +340,9 @@ export const MyPdfDocument = ({
                   ${cuota.installmentAmount}
                 </Text>
                 <Text style={[styles.tableCol, { width: "25%" }]}>
-                  {translatePaymentMethod(cuota.paymentMethod ?? "")}
+                  {translatePaymentMethod(
+                    cuota.installmentPayments[0].payment.type ?? ""
+                  )}
                 </Text>
                 <Text style={[styles.tableCol, { width: "20%" }]}>
                   {cuota.debt ? "$" + cuota.debt : ""}

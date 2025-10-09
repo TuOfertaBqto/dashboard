@@ -6,6 +6,7 @@ import {
   type UpdateInstallment,
 } from "../api/installment";
 import dayjs from "dayjs";
+import { PaymentApi } from "../api/payment";
 
 export const InstallmentPaymentPage = () => {
   const { id } = useParams();
@@ -88,20 +89,22 @@ export const InstallmentPaymentPage = () => {
       ...form,
       photo: null,
       referenceNumber: form.referenceNumber || undefined,
-      owner: form.owner || undefined,
+      owner: form.owner,
     };
 
     // If photo upload is supported, handle it separately in the API or add logic here
     // Otherwise, ignore photo for now
 
     try {
-      await InstallmentApi.update(id!, {
-        paymentMethod: payload.paymentMethod,
-        referenceNumber: payload.referenceNumber,
-        amountPaid: payload.amountPaid,
-        paidAt: payload.paidAt,
+      await PaymentApi.create(id!, {
+        amount: Number(payload.amountPaid),
         owner: payload.owner,
+        paidAt: payload.paidAt,
+        photo: payload.photo,
+        referenceNumber: payload.referenceNumber,
+        type: payload.paymentMethod,
       });
+
       navigate(-1);
     } catch (error) {
       console.error("Error al registrar pago:", error);
@@ -119,7 +122,12 @@ export const InstallmentPaymentPage = () => {
         Contrato: C#{payment.contract.code}
       </p>
       <p className="text-sm text-gray-600">
-        Monto a pagar: ${payment.installmentAmount - (payment.amountPaid ?? 0)}
+        Monto a pagar: $
+        {payment.installmentAmount -
+          (payment.installmentPayments.reduce(
+            (total, ip) => total + Number(ip.amount),
+            0
+          ) ?? 0)}
       </p>
 
       <form

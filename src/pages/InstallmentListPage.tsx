@@ -1,10 +1,7 @@
 import classNames from "classnames";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
-import {
-  InstallmentApi,
-  type Installment,
-} from "../api/installment";
+import { InstallmentApi, type Installment } from "../api/installment";
 import { useNavigate, useParams } from "react-router-dom";
 import { userApi } from "../api/user";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
@@ -95,7 +92,12 @@ export const InstallmentListPage = () => {
                         {i.contract.customerId.lastName}
                       </td>
                       <td className="p-3">
-                        ${i.installmentAmount - (i.amountPaid ?? 0)}
+                        $
+                        {i.installmentAmount -
+                          (i.installmentPayments.reduce(
+                            (total, ip) => total + Number(ip.amount),
+                            0
+                          ) ?? 0)}
                       </td>
                       <td className="p-3">
                         {dayjs(i.dueDate.split("T")[0]).format("DD-MM-YYYY")}
