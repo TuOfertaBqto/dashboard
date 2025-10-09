@@ -192,6 +192,7 @@ export const InstallmentPaymentPage = () => {
             value={form.owner}
             onChange={handleChange}
             className="w-full border p-2 rounded"
+            required
           />
         </div>
 
