@@ -93,12 +93,15 @@ export const InstallmentListPage = () => {
                       </td>
                       <td className="p-3">
                         $
-                        {i.installmentAmount -
-                          (i.installmentPayments.reduce(
+                        {(
+                          i.installmentAmount -
+                          (i.installmentPayments?.reduce(
                             (total, ip) => total + Number(ip.amount),
                             0
-                          ) ?? 0)}
+                          ) || 0)
+                        ).toFixed(2)}
                       </td>
+
                       <td className="p-3">
                         {dayjs(i.dueDate.split("T")[0]).format("DD-MM-YYYY")}
                       </td>
