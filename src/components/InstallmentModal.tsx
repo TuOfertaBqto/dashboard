@@ -141,7 +141,11 @@ export const InstallmentModal = ({
                   let IconComponent = null;
                   let number = "";
 
-                  if (p.installmentPayments[0]?.payment.type === "discount") {
+                  if (
+                    ["discount", "payment_agreement"].includes(
+                      p.installmentPayments[0]?.payment.type ?? ""
+                    )
+                  ) {
                     dueDateClass = "bg-blue-100 text-blue-700";
                     IconComponent = InformationCircleIcon;
                   } else if (p.paidAt) {
@@ -202,7 +206,7 @@ export const InstallmentModal = ({
                                 (sum, ip) => sum + Number(ip.amount),
                                 0
                               );
-                              return total > 0 ? `$${total.toFixed(2)}` : "—";
+                              return `$${total.toFixed(2)}`;
                             })()
                           : "—"}
                       </td>

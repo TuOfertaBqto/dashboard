@@ -13,6 +13,7 @@ export type Payment = {
     | "bank_transfer"
     | "cash"
     | "discount"
+    | "payment_agreement"
     | null;
   referenceNumber?: number;
   photo?: string | null;
