@@ -1,6 +1,6 @@
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import type { Contract } from "../api/contract";
-import type { ContractPayment } from "../api/contract-payment";
+import type { Installment } from "../api/installment";
 import { generateInstallmentsFromContract } from "../utils/generateInstallments";
 import { translatePaymentMethod } from "../utils/translations";
 import MyPdfDocument from "./pdf/MyPdfDocument";
@@ -17,7 +17,7 @@ interface Props {
   open: boolean;
   isRequest: boolean;
   onClose: () => void;
-  payments: ContractPayment[];
+  payments: Installment[];
   contract?: Contract | null;
 }
 
@@ -141,7 +141,7 @@ export const InstallmentModal = ({
                   let IconComponent = null;
                   let number = "";
 
-                  if (p.paymentMethod === "discount") {
+                  if (p.installmentPayments[0]?.payment.type === "discount") {
                     dueDateClass = "bg-blue-100 text-blue-700";
                     IconComponent = InformationCircleIcon;
                   } else if (p.paidAt) {
@@ -195,10 +195,25 @@ export const InstallmentModal = ({
                       </td>
                       <td className="p-2">${p.installmentAmount}</td>
                       <td className="p-2">
-                        {p.amountPaid ? `$${p.amountPaid}` : "—"}
+                        {p.installmentPayments &&
+                        p.installmentPayments.length > 0
+                          ? (() => {
+                              const total = p.installmentPayments.reduce(
+                                (sum, ip) => sum + Number(ip.amount),
+                                0
+                              );
+                              return total > 0 ? `$${total.toFixed(2)}` : "—";
+                            })()
+                          : "—"}
                       </td>
+
                       <td className="p-2 hidden md:table-cell md:w-[15%]">
-                        {translatePaymentMethod(p.paymentMethod ?? "")}
+                        {p.installmentPayments &&
+                        p.installmentPayments.length > 0
+                          ? translatePaymentMethod(
+                              p.installmentPayments[0]?.payment?.type ?? ""
+                            )
+                          : ""}
                       </td>
                       <td className="p-2">
                         {p.paidAt

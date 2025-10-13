@@ -11,7 +11,7 @@ import { ProductApi, type Product } from "../api/product";
 import Select from "react-select";
 import { PlusCircleIcon, TrashIcon } from "@heroicons/react/24/outline";
 import dayjs from "dayjs";
-import { ContractPaymentApi } from "../api/contract-payment";
+import { InstallmentApi } from "../api/installment";
 import { useAuth } from "../auth/useAuth";
 import { ContractProductApi } from "../api/contract-product";
 import { ConfirmModal } from "../components/ConfirmModal";
@@ -95,7 +95,7 @@ export default function ContractRequestFormPage() {
   useEffect(() => {
     const fetchValidation = async () => {
       try {
-        const validateOverdue = await ContractPaymentApi.canVendorRequest();
+        const validateOverdue = await InstallmentApi.canVendorRequest();
         setCanRequest(validateOverdue);
 
         if (!validateOverdue) {

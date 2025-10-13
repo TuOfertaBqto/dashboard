@@ -1,17 +1,14 @@
 import classNames from "classnames";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
-import {
-  ContractPaymentApi,
-  type ContractPayment,
-} from "../api/contract-payment";
+import { InstallmentApi, type Installment } from "../api/installment";
 import { useNavigate, useParams } from "react-router-dom";
 import { userApi } from "../api/user";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 
 export const InstallmentListPage = () => {
   const { id } = useParams();
-  const [installments, setInstallments] = useState<ContractPayment[]>([]);
+  const [installments, setInstallments] = useState<Installment[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [pageTitle, setPageTitle] = useState<string>("Cuotas por cobrar");
   const navigate = useNavigate();
@@ -30,7 +27,7 @@ export const InstallmentListPage = () => {
         setPageTitle(
           `Cuotas por cobrar de T${userData.code} ${userData.firstName} ${userData.lastName}`
         );
-        const res = await ContractPaymentApi.getAllByVendor(id);
+        const res = await InstallmentApi.getAllByVendor(id);
         setInstallments(res);
       } catch (err) {
         console.log("Error loading installments", err);
@@ -95,8 +92,16 @@ export const InstallmentListPage = () => {
                         {i.contract.customerId.lastName}
                       </td>
                       <td className="p-3">
-                        ${i.installmentAmount - (i.amountPaid ?? 0)}
+                        $
+                        {(
+                          i.installmentAmount -
+                          (i.installmentPayments?.reduce(
+                            (total, ip) => total + Number(ip.amount),
+                            0
+                          ) || 0)
+                        ).toFixed(2)}
                       </td>
+
                       <td className="p-3">
                         {dayjs(i.dueDate.split("T")[0]).format("DD-MM-YYYY")}
                       </td>

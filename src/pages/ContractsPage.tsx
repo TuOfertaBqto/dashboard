@@ -5,9 +5,9 @@ import { ContractApi, type Contract } from "../api/contract";
 import { useNavigate, useParams } from "react-router-dom";
 import { InventoryMovApi } from "../api/inventory-movement";
 import {
-  ContractPaymentApi,
-  type ContractPayment,
-} from "../api/contract-payment";
+  InstallmentApi,
+  type Installment,
+} from "../api/installment";
 import { InstallmentModal } from "../components/InstallmentModal";
 import dayjs from "dayjs";
 import { ContractProductApi } from "../api/contract-product";
@@ -31,7 +31,7 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
   const [contractSelected, setContractSelected] = useState<Contract | null>(
     null
   );
-  const [installments, setInstallments] = useState<ContractPayment[]>([]);
+  const [installments, setInstallments] = useState<Installment[]>([]);
   const [dispatchDate, setDispatchDate] = useState<string>(
     dayjs().format("YYYY-MM-DD")
   );
@@ -42,7 +42,7 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
   const handleRowClick = async (contract: Contract) => {
     setContractSelected(contract);
     try {
-      const res = await ContractPaymentApi.getAllByContractId(contract.id);
+      const res = await InstallmentApi.getAllByContractId(contract.id);
 
       setInstallments(res);
       setIsModalOpen(true);
@@ -161,7 +161,7 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
       }
 
       // TODO: Crear los contract Payments
-      await ContractPaymentApi.create({
+      await InstallmentApi.create({
         contractId: contractToDispatch.id,
         agreementContract: contractToDispatch.agreement,
         startContract: dispatchDate,

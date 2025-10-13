@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import type { Contract } from "../api/contract";
-import type { ContractPayment } from "../api/contract-payment";
+import type { Installment } from "../api/installment";
 
 function getNextSaturday(): dayjs.Dayjs {
   const today = dayjs();
@@ -11,8 +11,8 @@ function getNextSaturday(): dayjs.Dayjs {
 
 export function generateInstallmentsFromContract(
   contract: Contract
-): ContractPayment[] {
-  const payments: ContractPayment[] = [];
+): Installment[] {
+  const payments: Installment[] = [];
 
   const intervalDays = contract.agreement === "weekly" ? 7 : 14;
 
@@ -57,14 +57,30 @@ export function generateInstallmentsFromContract(
       updatedAt: new Date().toISOString(),
       deletedAt: null,
       contract,
-      paymentMethod: null,
-      referenceNumber: null,
-      photo: null,
-      owner: null,
       dueDate: dueDate.toISOString(),
-      amountPaid: null,
       debt: payments.length === 0 ? contract.totalPrice.toString() : undefined,
       installmentAmount: periodPayment,
+      installmentPayments: [
+        {
+          id: crypto.randomUUID(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          deletedAt: null,
+          payment: {
+            id: crypto.randomUUID(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            deletedAt: null,
+            type: null,
+            referenceNumber: 0,
+            photo: null,
+            owner: "",
+            amount: "0",
+            paidAt: "",
+          },
+          amount: "",
+        },
+      ],
     });
 
     installmentIndex++;

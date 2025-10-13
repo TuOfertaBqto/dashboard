@@ -9,7 +9,7 @@ import {
 import type {
   GlobalPaymentsTotals,
   VendorPaymentsTotals,
-} from "../../api/contract-payment";
+} from "../../api/installment";
 import { formatMoney } from "../../utils/formatMoney";
 
 Font.register({

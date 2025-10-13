@@ -7,7 +7,7 @@ import {
   Text,
   View,
 } from "@react-pdf/renderer";
-import type { ContractPayment } from "../../api/contract-payment";
+import type { Installment } from "../../api/installment";
 import { numeroALetras } from "../../utils/numero-a-letras";
 import { translatePaymentMethod } from "../../utils/translations";
 import dayjs from "dayjs";
@@ -93,7 +93,7 @@ interface Props {
   fechaInicio: string;
   descripcion: string[];
   montoTotal: number;
-  cuotas: ContractPayment[];
+  cuotas: Installment[];
   cantidadProductos: number;
   documentIdPhoto: string;
 }
@@ -340,7 +340,9 @@ export const MyPdfDocument = ({
                   ${cuota.installmentAmount}
                 </Text>
                 <Text style={[styles.tableCol, { width: "25%" }]}>
-                  {translatePaymentMethod(cuota.paymentMethod ?? "")}
+                  {translatePaymentMethod(
+                    cuota.installmentPayments[0]?.payment.type ?? ""
+                  )}
                 </Text>
                 <Text style={[styles.tableCol, { width: "20%" }]}>
                   {cuota.debt ? "$" + cuota.debt : ""}
