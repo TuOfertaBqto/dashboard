@@ -7,6 +7,7 @@ export function translatePaymentMethod(method: string): string {
     bank_transfer: "Transferencia bancaria",
     cash: "Efectivo",
     discount: "Descuento",
+    payment_agreement: "Convenio",
   };
 
   return translations[method] ?? method;
