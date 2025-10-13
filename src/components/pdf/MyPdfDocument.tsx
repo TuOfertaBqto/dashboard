@@ -341,7 +341,7 @@ export const MyPdfDocument = ({
                 </Text>
                 <Text style={[styles.tableCol, { width: "25%" }]}>
                   {translatePaymentMethod(
-                    cuota.installmentPayments[0].payment.type ?? ""
+                    cuota.installmentPayments[0]?.payment.type ?? ""
                   )}
                 </Text>
                 <Text style={[styles.tableCol, { width: "20%" }]}>
