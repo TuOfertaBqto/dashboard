@@ -118,9 +118,20 @@ export default function ContractRequestFormPage() {
   ) => {
     setForm((prev) => ({
       ...prev,
-      products: prev.products.map((prod, i) =>
-        i === index ? { ...prod, [field]: value } : prod
-      ),
+      products: prev.products.map((prod, i) => {
+        if (i !== index) return prod;
+
+        const numericFields: (keyof CreateContractProduct)[] = [
+          "price",
+          "installmentAmount",
+        ];
+
+        const newValue: CreateContractProduct[K] = numericFields.includes(field)
+          ? (parseFloat(String(value)) as CreateContractProduct[K])
+          : value;
+
+        return { ...prod, [field]: newValue };
+      }),
     }));
   };
 
@@ -366,8 +377,8 @@ export default function ContractRequestFormPage() {
                     </label>
                     <input
                       type="number"
-                      min="1"
-                      step="1"
+                      min="0.01"
+                      step="0.01"
                       className={`w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${
                         isMain ? "bg-gray-100 cursor-not-allowed" : "bg-white"
                       }`}
@@ -376,8 +387,8 @@ export default function ContractRequestFormPage() {
                       onChange={(e) => {
                         if (isMain) return;
 
-                        const intValue = parseInt(e.target.value, 10) || 0;
-                        setProductField(index, "price", intValue);
+                        const floatValue = parseFloat(e.target.value) || 0;
+                        setProductField(index, "price", floatValue);
                       }}
                       required
                       readOnly={isMain}
@@ -391,8 +402,8 @@ export default function ContractRequestFormPage() {
                     </label>
                     <input
                       type="number"
-                      min="1"
-                      step="1"
+                      min="0.01"
+                      step="0.01"
                       className={`w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${
                         isMain ? "bg-gray-100 cursor-not-allowed" : "bg-white"
                       }`}
@@ -401,8 +412,8 @@ export default function ContractRequestFormPage() {
                       onChange={(e) => {
                         if (isMain) return;
 
-                        const intValue = parseInt(e.target.value, 10) || 0;
-                        setProductField(index, "installmentAmount", intValue);
+                        const floatValue = parseFloat(e.target.value) || 0;
+                        setProductField(index, "installmentAmount", floatValue);
                       }}
                       required
                       readOnly={isMain}
@@ -429,7 +440,7 @@ export default function ContractRequestFormPage() {
             })}
 
             <div className="text-right text-lg font-semibold">
-              Total: ${form.totalPrice.toFixed(2)}
+              Total: ${form.totalPrice}
             </div>
 
             {/* Botón agregar producto */}

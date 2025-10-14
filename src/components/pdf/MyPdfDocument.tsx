@@ -243,7 +243,7 @@ export const MyPdfDocument = ({
           <View style={[styles.tableRow, { fontWeight: "bold" }]}>
             <Text style={[styles.tableCol, { width: "20%" }]}>MONTO:</Text>
             <Text style={[styles.tableCol, { width: "20%" }]}>
-              ${montoTotal.toFixed(2)}
+              ${montoTotal}
             </Text>
             <Text style={[styles.tableCol, { width: "40%" }]}>
               FECHA DE CULMINACIÓN:

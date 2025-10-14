@@ -108,7 +108,7 @@ export const InstallmentModal = ({
                   Total
                 </span>
                 <span className="text-lg font-bold text-green-600">
-                  ${contract?.totalPrice.toFixed(2)}
+                  ${contract?.totalPrice}
                 </span>
               </div>
             </div>
