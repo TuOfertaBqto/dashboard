@@ -377,8 +377,8 @@ export default function ContractRequestFormPage() {
                     </label>
                     <input
                       type="number"
-                      min="1"
-                      step="1"
+                      min="0.01"
+                      step="0.01"
                       className={`w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${
                         isMain ? "bg-gray-100 cursor-not-allowed" : "bg-white"
                       }`}
@@ -402,8 +402,8 @@ export default function ContractRequestFormPage() {
                     </label>
                     <input
                       type="number"
-                      min="1"
-                      step="1"
+                      min="0.01"
+                      step="0.01"
                       className={`w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${
                         isMain ? "bg-gray-100 cursor-not-allowed" : "bg-white"
                       }`}
