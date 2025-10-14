@@ -4,10 +4,7 @@ import { ContractTable } from "../components/ContractTable";
 import { ContractApi, type Contract } from "../api/contract";
 import { useNavigate, useParams } from "react-router-dom";
 import { InventoryMovApi } from "../api/inventory-movement";
-import {
-  InstallmentApi,
-  type Installment,
-} from "../api/installment";
+import { InstallmentApi, type Installment } from "../api/installment";
 import { InstallmentModal } from "../components/InstallmentModal";
 import dayjs from "dayjs";
 import { ContractProductApi } from "../api/contract-product";
@@ -59,7 +56,6 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
 
       if (mode === "vendor" && id) {
         const userData = await userApi.getById(id);
-        console.log(userData);
 
         if (!userData.id) {
           setContracts([]);
