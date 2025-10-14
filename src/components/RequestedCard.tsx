@@ -68,7 +68,7 @@ export function RequestedCard({
         </div>
 
         <p className="text-xs text-gray-500 mb-3">
-          {dayjs(contract.createdAt).utc().local().fromNow()}
+          {dayjs.utc(contract.createdAt).add(-4, "hour").fromNow()}
         </p>
       </div>
 
