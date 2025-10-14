@@ -440,7 +440,7 @@ export default function ContractRequestFormPage() {
             })}
 
             <div className="text-right text-lg font-semibold">
-              Total: ${form.totalPrice.toFixed(2)}
+              Total: ${form.totalPrice}
             </div>
 
             {/* Botón agregar producto */}
