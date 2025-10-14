@@ -5,10 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/useAuth";
 import type { UserRole } from "../api/user";
 import { InstallmentModal } from "../components/InstallmentModal";
-import {
-  InstallmentApi,
-  type Installment,
-} from "../api/installment";
+import { InstallmentApi, type Installment } from "../api/installment";
 import { InventoryApi } from "../api/inventory";
 import { ContractProductApi } from "../api/contract-product";
 
