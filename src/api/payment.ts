@@ -49,4 +49,25 @@ export const PaymentApi = {
       return {} as Payment;
     }
   },
+
+  getSummaryByType: async (
+    start: string,
+    end: string
+  ): Promise<
+    {
+      type: string;
+      total: number;
+      count: number;
+    }[]
+  > => {
+    try {
+      const res = await api.get("/payment/summary", {
+        params: { startDate: start, endDate: end },
+      });
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching payment summary:", error);
+      return [];
+    }
+  },
 };
