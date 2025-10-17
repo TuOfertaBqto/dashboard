@@ -39,6 +39,12 @@ export type CreatePayment = {
   paidAt: string;
 };
 
+export type PaymentSummary = {
+  type: string;
+  total: number;
+  count: number;
+};
+
 export const PaymentApi = {
   create: async (id: string, data: CreatePayment): Promise<Payment> => {
     try {
@@ -53,13 +59,7 @@ export const PaymentApi = {
   getSummaryByType: async (
     start: string,
     end: string
-  ): Promise<
-    {
-      type: string;
-      total: number;
-      count: number;
-    }[]
-  > => {
+  ): Promise<PaymentSummary[]> => {
     try {
       const res = await api.get("/payment/summary", {
         params: { startDate: start, endDate: end },
