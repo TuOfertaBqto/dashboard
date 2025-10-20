@@ -106,7 +106,7 @@ export default function Dashboard() {
   }, [start, end, fetchSummary]);
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-1 md:p-6 space-y-6">
       <h1 className="text-2xl font-bold">Bienvenido al Dashboard</h1>
       {loading ? (
         <p className="text-gray-500">Cargando...</p>
