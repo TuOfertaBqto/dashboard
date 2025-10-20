@@ -39,6 +39,12 @@ export type CreatePayment = {
   paidAt: string;
 };
 
+export type PaymentSummary = {
+  type: string;
+  total: number;
+  count: number;
+};
+
 export const PaymentApi = {
   create: async (id: string, data: CreatePayment): Promise<Payment> => {
     try {
@@ -47,6 +53,21 @@ export const PaymentApi = {
     } catch (error) {
       console.error("Error creating payment:", error);
       return {} as Payment;
+    }
+  },
+
+  getSummaryByType: async (
+    start: string,
+    end: string
+  ): Promise<PaymentSummary[]> => {
+    try {
+      const res = await api.get("/payment/summary", {
+        params: { startDate: start, endDate: end },
+      });
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching payment summary:", error);
+      return [];
     }
   },
 };
