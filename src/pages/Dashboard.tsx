@@ -1,21 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
 import { ContractApi, type ResponseCountContract } from "../api/contract";
 import { userApi, type VendorStats } from "../api/user";
-import {
-  ArrowDownTrayIcon,
-  CheckCircleIcon,
-  ClipboardDocumentCheckIcon,
-  TruckIcon,
-  XCircleIcon,
-} from "@heroicons/react/24/outline";
+import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import { InstallmentApi } from "../api/installment";
 import { DebtsReportPDF } from "../components/pdf/DebtsReportPDF";
 import dayjs from "dayjs";
 import { pdf } from "@react-pdf/renderer";
 import { VendorsTotalsPDF } from "../components/pdf/VendorsTotalsPDF";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { SummaryPayment } from "../components/dashboard/SummaryPayment";
 import { PaymentApi, type PaymentSummary } from "../api/payment";
+import { ContractCountCard } from "../components/dashboard/ContractCountCard";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -117,59 +112,7 @@ export default function Dashboard() {
         <p className="text-gray-500">Cargando...</p>
       ) : (
         <>
-          {stats && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Link
-                to="/contracts/status/active"
-                className="flex items-center bg-green-50 shadow-md rounded-2xl p-6 cursor-pointer hover:shadow-lg transition"
-              >
-                <CheckCircleIcon className="h-10 w-10 text-green-600 mr-4" />
-                <div>
-                  <p className="text-gray-600">Contratos Activos</p>
-                  <p className="text-2xl font-bold">{stats.activeContracts}</p>
-                </div>
-              </Link>
-
-              <Link
-                to="/contracts/status/to-dispatch"
-                className="flex items-center bg-blue-50 shadow-md rounded-2xl p-6 cursor-pointer hover:shadow-lg transition"
-              >
-                <TruckIcon className="h-10 w-10 text-blue-600 mr-4" />
-                <div>
-                  <p className="text-gray-600">Por despachar</p>
-                  <p className="text-2xl font-bold">
-                    {stats.pendingToDispatch}
-                  </p>
-                </div>
-              </Link>
-
-              <Link
-                to="/contracts/status/canceled"
-                className="flex items-center bg-red-50 shadow-md rounded-2xl p-6 cursor-pointer hover:shadow-lg transition"
-              >
-                <XCircleIcon className="h-10 w-10 text-red-600 mr-4" />
-                <div>
-                  <p className="text-gray-600">Cancelados</p>
-                  <p className="text-2xl font-bold">
-                    {stats.canceledContracts}
-                  </p>
-                </div>
-              </Link>
-
-              <Link
-                to="/contracts/status/completed"
-                className="flex items-center bg-gray-50 shadow-md rounded-2xl p-6 cursor-pointer hover:shadow-lg transition"
-              >
-                <ClipboardDocumentCheckIcon className="h-10 w-10 text-gray-600 mr-4" />
-                <div>
-                  <p className="text-gray-600">Finalizados</p>
-                  <p className="text-2xl font-bold">
-                    {stats.completedContracts}
-                  </p>
-                </div>
-              </Link>
-            </div>
-          )}
+          {stats && <ContractCountCard stats={stats} />}
 
           <SummaryPayment
             payments={paymentSummary}
