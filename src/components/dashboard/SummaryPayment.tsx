@@ -9,7 +9,7 @@ import {
   InformationCircleIcon,
 } from "@heroicons/react/24/outline";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import { useEffect, useState, type JSX } from "react";
+import { useEffect, useMemo, useState, type JSX } from "react";
 import { PaymentReportPDF } from "../pdf/PaymentReportPDF";
 
 const paymentConfig: Record<
@@ -76,6 +76,11 @@ export const SummaryPayment = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const reportDocument = useMemo(
+    () => <PaymentReportPDF payments={payments} start={start} end={end} />,
+    [payments, start, end]
+  );
+
   useEffect(() => {
     const fetchData = async () => {
       if (!start || !end) {
@@ -140,9 +145,7 @@ export const SummaryPayment = ({
           </div>
 
           <PDFDownloadLink
-            document={
-              <PaymentReportPDF payments={payments} start={start} end={end} />
-            }
+            document={reportDocument}
             fileName={`reporte-pagos-${start}-a-${end}.pdf`}
           >
             {({ loading: pdfLoading }) => (
