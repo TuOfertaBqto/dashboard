@@ -93,11 +93,18 @@ export const Sidebar = () => {
       route: "/dashboard",
     });
   } else if (userRole === "vendor") {
-    generalMenuItems.unshift({
-      name: "Solicitudes",
-      icon: <DocumentArrowUpIcon className="h-5 w-5" />,
-      route: "/requests",
-    });
+    generalMenuItems.unshift(
+      {
+        name: "Reportes",
+        icon: <SquaresPlusIcon className="h-5 w-5" />,
+        route: `/profile/${user?.id}`,
+      },
+      {
+        name: "Solicitudes",
+        icon: <DocumentArrowUpIcon className="h-5 w-5" />,
+        route: "/requests",
+      }
+    );
   }
 
   const otherMenuItems: MenuItem[] = [

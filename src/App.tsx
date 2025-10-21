@@ -44,7 +44,7 @@ function App() {
             index
             element={
               user?.role === "vendor" ? (
-                <Navigate to="/requests" replace />
+                <Navigate to={`/profile/${user.id}`} replace />
               ) : ["main", "admin"].includes(user?.role ?? "") ? (
                 <Navigate to="/dashboard" replace />
               ) : (
