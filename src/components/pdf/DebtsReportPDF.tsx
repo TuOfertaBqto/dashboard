@@ -75,16 +75,17 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#34495E",
   },
-
   contractText: {
     fontSize: 11,
   },
-  contractRow: {
+  contractContainer: {
     marginLeft: 40,
-    marginBottom: 3,
-    padding: 5,
+    marginBottom: 6,
+    paddingVertical: 5,
     borderBottomWidth: 0.5,
     borderBottomColor: "#BDC3C7",
+  },
+  contractRow: {
     flexDirection: "row",
   },
   col1: {
@@ -92,15 +93,22 @@ const styles = StyleSheet.create({
     textAlign: "left",
   },
   col2: {
-    width: 100,
+    width: 150,
     textAlign: "left",
     marginHorizontal: "auto",
   },
   col3: {
-    width: 100,
+    width: 70,
     textAlign: "right",
   },
+  productList: {
+    marginTop: 3,
+  },
 
+  productItem: {
+    fontSize: 9,
+    color: "#555",
+  },
   contractAmount: {
     fontSize: 11,
     fontWeight: "bold",
@@ -151,21 +159,37 @@ export function DebtsReportPDF({ vendors }: { vendors: VendorsWithDebts[] }) {
                       : overdueNumbers.map((n) => `#${n}`).join(", ");
 
                   return (
-                    <View key={contract.contractId} style={styles.contractRow}>
-                      <Text style={[styles.contractText, styles.col1]}>
-                        Contrato: #{contract.contractCode}
-                      </Text>
-
-                      <Text style={[styles.contractText, styles.col2]}>
-                        Cuotas: {contract.overdueInstallments}{" "}
-                        <Text style={{ fontStyle: "italic", color: "#555" }}>
-                          ({cuotasDisplay})
+                    <View
+                      key={contract.contractId}
+                      style={styles.contractContainer}
+                    >
+                      {/* Primera fila: contrato, cuotas, monto */}
+                      <View style={styles.contractRow}>
+                        <Text style={[styles.contractText, styles.col1]}>
+                          Contrato: #{contract.contractCode}
                         </Text>
-                      </Text>
 
-                      <Text style={[styles.contractAmount, styles.col3]}>
-                        ${contract.overdueAmount}
-                      </Text>
+                        <Text style={[styles.contractText, styles.col2]}>
+                          Cuotas: {contract.overdueInstallments}{" "}
+                          <Text style={{ fontStyle: "italic", color: "#555" }}>
+                            ({cuotasDisplay})
+                          </Text>
+                        </Text>
+
+                        <Text style={[styles.contractAmount, styles.col3]}>
+                          ${contract.overdueAmount}
+                        </Text>
+                      </View>
+
+                      {contract.products?.length > 0 && (
+                        <View style={styles.productList}>
+                          {contract.products.map((p) => (
+                            <Text key={p.productId} style={styles.productItem}>
+                              - {p.productName} x {p.quantity}
+                            </Text>
+                          ))}
+                        </View>
+                      )}
                     </View>
                   );
                 })}
