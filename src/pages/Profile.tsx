@@ -1,7 +1,11 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../auth/useAuth";
 import { userApi, type User } from "../api/user";
-import { ContractApi, type ResponseCountContract } from "../api/contract";
+import {
+  ContractApi,
+  type Contract,
+  type ResponseCountContract,
+} from "../api/contract";
 import { useCallback, useEffect, useState } from "react";
 import {
   InstallmentApi,
@@ -10,6 +14,7 @@ import {
 } from "../api/installment";
 import { formatMoney } from "../utils/formatMoney";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { InstallmentModal } from "../components/InstallmentModal";
 
 export default function Profile() {
   const { id } = useParams<{ id: string }>();
@@ -20,9 +25,21 @@ export default function Profile() {
   const [loading, setLoading] = useState<boolean>(false);
   const [payments, setPayments] = useState<VendorPaymentsTotals | null>(null);
   const [customers, setCustomers] = useState<VendorsWithDebts | null>(null);
+  const [selectedContract, setSelectedContract] = useState<Contract>();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const userId =
     id && (user?.role === "main" || user?.role === "admin") ? id : user?.id;
+
+  const handleOpenInstallments = async (contractId: string) => {
+    try {
+      const contract = await ContractApi.getById(contractId);
+      setSelectedContract(contract);
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error("Error fetching contract", error);
+    }
+  };
 
   const fetchData = useCallback(async () => {
     if (!userId) return;
@@ -180,16 +197,23 @@ export default function Profile() {
                     return (
                       <li
                         key={c.contractId}
-                        className="grid grid-cols-[150px_auto_100px] items-center border-b last:border-0 py-1 text-sm"
+                        onClick={() => handleOpenInstallments(c.contractId)}
+                        className="grid grid-cols-[150px_auto_100px] items-center border rounded-lg hover:shadow-md cursor-pointer transition-all duration-200 hover:bg-gray-50 py-2 px-3 text-sm"
                       >
                         {/* Columna 1 */}
-                        <span className="text-gray-700">
-                          Contrato: #{c.contractCode}
+                        <span className="text-gray-800 font-medium">
+                          Contrato:{" "}
+                          <span className="text-blue-600 font-semibold">
+                            #{c.contractCode}
+                          </span>
                         </span>
 
                         {/* Columna 2 */}
                         <span className="text-gray-600 justify-self-center text-center">
-                          Cuotas: {c.overdueInstallments}{" "}
+                          Cuotas:{" "}
+                          <span className="font-medium text-gray-800">
+                            {c.overdueInstallments}
+                          </span>{" "}
                           <span className="italic text-gray-500">
                             ({cuotasDisplay})
                           </span>
@@ -213,6 +237,12 @@ export default function Profile() {
           <span>Todos los clientes se encuentran al día</span>
         </div>
       )}
+      <InstallmentModal
+        open={isModalOpen}
+        isRequest
+        onClose={() => setIsModalOpen(false)}
+        contract={selectedContract}
+      />
     </div>
   );
 }
