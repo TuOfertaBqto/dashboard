@@ -1,6 +1,6 @@
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import type { Contract } from "../api/contract";
-import type { Installment } from "../api/installment";
+import { InstallmentApi, type Installment } from "../api/installment";
 import { generateInstallmentsFromContract } from "../utils/generateInstallments";
 import { translatePaymentMethod } from "../utils/translations";
 import MyPdfDocument from "./pdf/MyPdfDocument";
@@ -12,27 +12,49 @@ import {
   InformationCircleIcon,
 } from "@heroicons/react/24/outline";
 import dayjs from "dayjs";
+import { useEffect, useState } from "react";
 
 interface Props {
   open: boolean;
   isRequest: boolean;
   onClose: () => void;
-  payments: Installment[];
-  contract?: Contract | null;
+  contract?: Contract;
 }
 
 export const InstallmentModal = ({
   open,
   isRequest,
   onClose,
-  payments,
   contract,
 }: Props) => {
-  if (!open) return null;
-  const effectivePayments =
-    payments.length === 0 && contract
-      ? generateInstallmentsFromContract(contract)
-      : payments;
+  const [payments, setPayments] = useState<Installment[]>([]);
+
+  useEffect(() => {
+    if (!open || !contract?.id) return;
+
+    setPayments([]);
+
+    const fetchInstallments = async () => {
+      try {
+        const res = await InstallmentApi.getAllByContractId(contract.id);
+
+        if (res && res.length > 0) {
+          setPayments(res);
+        } else {
+          const generated = generateInstallmentsFromContract(contract);
+          setPayments(generated);
+        }
+      } catch (err) {
+        console.error("Error al obtener cuotas:", err);
+        const generated = generateInstallmentsFromContract(contract);
+        setPayments(generated);
+      }
+    };
+
+    fetchInstallments();
+  }, [open, contract]);
+
+  if (!open || !contract || payments.length == 0) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -136,7 +158,7 @@ export const InstallmentModal = ({
                 </tr>
               </thead>
               <tbody>
-                {effectivePayments.map((p, index) => {
+                {payments.map((p, index) => {
                   let dueDateClass = "";
                   let IconComponent = null;
                   let number = "";
@@ -162,10 +184,10 @@ export const InstallmentModal = ({
                   }
 
                   if (
-                    effectivePayments[0] &&
-                    effectivePayments[1] &&
-                    effectivePayments[0].installmentAmount >
-                      effectivePayments[1].installmentAmount
+                    payments[0] &&
+                    payments[1] &&
+                    payments[0].installmentAmount >
+                      payments[1].installmentAmount
                   ) {
                     if (index === 0) {
                       number = "Inicial";
@@ -257,7 +279,7 @@ export const InstallmentModal = ({
                         ) || ["Sin productos"]
                       }
                       montoTotal={contract?.totalPrice ?? 0}
-                      cuotas={effectivePayments}
+                      cuotas={payments}
                       cantidadProductos={
                         contract?.products.reduce(
                           (total, p) => total + p.quantity,
