@@ -150,7 +150,7 @@ export const MyPdfDocument = ({
             En la ciudad de Barquisimeto, {fechaEnPalabras(fechaInicio)},
             intervienen a la celebración del presente contrato de afiliación y
             apertura de línea de crédito, para compras bajo el sistema de
-            crédito, por una parte, el ciudadano{" "}
+            crédito, por una parte, la ciudadana{" "}
             <Text style={{ fontWeight: "bold", fontStyle: "italic" }}>
               ENDRINA MEDINA
             </Text>
@@ -158,7 +158,7 @@ export const MyPdfDocument = ({
             <Text style={{ fontWeight: "bold", fontStyle: "italic" }}>
               V-21.058.133
             </Text>
-            , domiciliado en Barquisimeto, Edo. Lara, por la interpuesta persona
+            , domiciliada en Barquisimeto, Edo. Lara, por la interpuesta persona
             del propietario y/o representante legal que suscribe el presente
             contrato, a quien en adelante se le denominará el “EL VENDEDOR” ; y,
             por otra parte, el(la) ciudadano(a){" "}
