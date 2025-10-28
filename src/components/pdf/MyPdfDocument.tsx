@@ -152,11 +152,11 @@ export const MyPdfDocument = ({
             apertura de línea de crédito, para compras bajo el sistema de
             crédito, por una parte, el ciudadano{" "}
             <Text style={{ fontWeight: "bold", fontStyle: "italic" }}>
-              EIVAR PÉREZ
+              ENDRINA MEDINA
             </Text>
             , mayor de edad, titular de la cédula de identidad{" "}
             <Text style={{ fontWeight: "bold", fontStyle: "italic" }}>
-              V-20.010.478
+              V-21.058.133
             </Text>
             , domiciliado en Barquisimeto, Edo. Lara, por la interpuesta persona
             del propietario y/o representante legal que suscribe el presente
