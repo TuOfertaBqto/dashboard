@@ -4,7 +4,7 @@ import { ContractTable } from "../components/ContractTable";
 import { ContractApi, type Contract } from "../api/contract";
 import { useNavigate, useParams } from "react-router-dom";
 import { InventoryMovApi } from "../api/inventory-movement";
-import { InstallmentApi, type Installment } from "../api/installment";
+import { InstallmentApi } from "../api/installment";
 import { InstallmentModal } from "../components/InstallmentModal";
 import dayjs from "dayjs";
 import { ContractProductApi } from "../api/contract-product";
@@ -25,28 +25,13 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
   const [contractToDispatch, setContractToDispatch] = useState<Contract | null>(
     null
   );
-  const [contractSelected, setContractSelected] = useState<Contract | null>(
-    null
-  );
-  const [installments, setInstallments] = useState<Installment[]>([]);
+  const [contractSelected, setContractSelected] = useState<Contract>();
   const [dispatchDate, setDispatchDate] = useState<string>(
     dayjs().format("YYYY-MM-DD")
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [pageTitle, setPageTitle] = useState<string>("Contratos");
-
-  const handleRowClick = async (contract: Contract) => {
-    setContractSelected(contract);
-    try {
-      const res = await InstallmentApi.getAllByContractId(contract.id);
-
-      setInstallments(res);
-      setIsModalOpen(true);
-    } catch (err) {
-      console.error("Error al obtener cuotas:", err);
-    }
-  };
 
   const fetchContracts = useCallback(async () => {
     setLoading(true);
@@ -202,7 +187,10 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
               if (selected) setContractToDelete(selected);
             }}
             onDispatch={(contract) => setContractToDispatch(contract)}
-            onRowClick={handleRowClick}
+            onRowClick={(contract) => {
+              setContractSelected(contract);
+              setIsModalOpen(true);
+            }}
           />
         </>
       ) : (
@@ -212,7 +200,6 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
         open={isModalOpen}
         isRequest={false}
         onClose={() => setIsModalOpen(false)}
-        payments={installments}
         contract={contractSelected}
       />
 

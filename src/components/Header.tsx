@@ -107,12 +107,16 @@ export const Header = () => {
 
           <div className="absolute top-18 left-0 w-full bg-[#1f2937] text-white shadow-md z-50 animate-slide-down md:hidden">
             <ul className="flex flex-col divide-y divide-gray-200">
-              {(user?.role == "main" || user?.role == "admin") && (
+              {["main", "admin", "vendor"].includes(user?.role ?? "") && (
                 <li
                   className="p-4 flex items-center gap-2 active:bg-[#111827]"
                   onClick={() => {
                     setIsMenuOpen(false);
-                    navigate("/dashboard");
+                    const path =
+                      user?.role === "vendor"
+                        ? `/profile/${user.id}`
+                        : "/dashboard";
+                    navigate(path);
                   }}
                 >
                   <SquaresPlusIcon className="w-5 h-5" />

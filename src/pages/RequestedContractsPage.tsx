@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/useAuth";
 import type { UserRole } from "../api/user";
 import { InstallmentModal } from "../components/InstallmentModal";
-import { InstallmentApi, type Installment } from "../api/installment";
 import { InventoryApi } from "../api/inventory";
 import { ContractProductApi } from "../api/contract-product";
 
@@ -16,10 +15,7 @@ export default function RequestedContractsPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [installments, setInstallments] = useState<Installment[]>([]);
-  const [contractSelected, setContractSelected] = useState<Contract | null>(
-    null
-  );
+  const [contractSelected, setContractSelected] = useState<Contract>();
 
   const fetchRequestedContracts = async (isFirstTime = false) => {
     if (isFirstTime) setLoading(true);
@@ -77,18 +73,6 @@ export default function RequestedContractsPage() {
     fetchRequestedContracts();
   };
 
-  const handleCardClick = async (contract: Contract) => {
-    setContractSelected(contract);
-    try {
-      const res = await InstallmentApi.getAllByContractId(contract.id);
-
-      setInstallments(res);
-      setIsModalOpen(true);
-    } catch (err) {
-      console.error("Error al obtener cuotas:", err);
-    }
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -116,7 +100,10 @@ export default function RequestedContractsPage() {
               key={contract.id}
               role={user?.role as UserRole}
               contract={contract}
-              onClick={handleCardClick}
+              onClick={(contract) => {
+                setContractSelected(contract);
+                setIsModalOpen(true);
+              }}
               onApprove={(id) => handleApprove(id)}
               onCancel={(id) => handleCancel(id)}
               onDelete={(id) => handleDelete(id)}
@@ -129,7 +116,6 @@ export default function RequestedContractsPage() {
         open={isModalOpen}
         isRequest
         onClose={() => setIsModalOpen(false)}
-        payments={installments}
         contract={contractSelected}
       />
     </div>

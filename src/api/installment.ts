@@ -65,6 +65,7 @@ type ContractDebt = {
   overdueInstallments: number;
   overdueAmount: number;
   overdueNumbers: number[];
+  products: { productId: string; productName: string; quantity: number }[];
 };
 
 type CustomerWithDebt = {
