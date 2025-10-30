@@ -8,6 +8,7 @@ import {
   View,
 } from "@react-pdf/renderer";
 import type { Installment } from "../../api/installment";
+import type { Contract } from "../../api/contract";
 import { numeroALetras } from "../../utils/numero-a-letras";
 import { translatePaymentMethod } from "../../utils/translations";
 import dayjs from "dayjs";
@@ -43,7 +44,6 @@ Font.register({
   ],
 });
 
-// Estilos
 const styles = StyleSheet.create({
   page: {
     fontFamily: "Calibri",
@@ -86,35 +86,32 @@ const styles = StyleSheet.create({
 });
 
 interface Props {
-  name: string;
-  lastName: string;
-  cedula: string;
-  direccion: string;
-  fechaInicio: string;
-  descripcion: string[];
-  montoTotal: number;
-  cuotas: Installment[];
-  cantidadProductos: number;
-  documentIdPhoto: string;
+  contract: Contract;
+  installments: Installment[];
 }
 
 const SIGNATURE_VENDOR = import.meta.env.VITE_SIGNATURE_VENDOR;
 
-export const MyPdfDocument = ({
-  name,
-  lastName,
-  cedula,
-  direccion,
-  fechaInicio,
-  descripcion,
-  montoTotal,
-  cuotas,
-  cantidadProductos,
-  documentIdPhoto,
-}: Props) => {
-  const cantidadLetras = numeroALetras(montoTotal).toUpperCase();
+export const MyPdfDocument = ({ contract, installments }: Props) => {
+  const name = contract.customerId.firstName.trim().toUpperCase();
+  const lastName = contract.customerId.lastName.trim().toUpperCase();
+  const documentId = contract.customerId.documentId;
+  const address = contract.customerId.adress;
+  const startDate =
+    contract.startDate?.split("T")[0] ?? dayjs().format("YYYY-MM-DD");
+  const description = contract.products.map(
+    (p) => `(${p.quantity}) ${p.product.name}`
+  ) || ["Sin productos"];
+  const totalPrice = contract.totalPrice;
+  const quantityProducts = contract.products.reduce(
+    (total, p) => total + p.quantity,
+    0
+  );
+  const documentIdPhoto = contract.customerId.documentIdPhoto;
+
+  const cantidadLetras = numeroALetras(totalPrice).toUpperCase();
   const debt = Math.min(
-    ...cuotas
+    ...installments
       .map((c) => (c.debt == null ? NaN : Number(c.debt)))
       .filter((d) => !isNaN(d))
   );
@@ -147,7 +144,7 @@ export const MyPdfDocument = ({
             CONTRATO DE COMPRA A CRÉDITO PARTES CONTRATANTES
           </Text>
           <Text style={{ textAlign: "justify" }} wrap={false}>
-            En la ciudad de Barquisimeto, {fechaEnPalabras(fechaInicio)},
+            En la ciudad de Barquisimeto, {fechaEnPalabras(startDate)},
             intervienen a la celebración del presente contrato de afiliación y
             apertura de línea de crédito, para compras bajo el sistema de
             crédito, por una parte, la ciudadana{" "}
@@ -166,9 +163,9 @@ export const MyPdfDocument = ({
               {name} {lastName}
             </Text>
             , venezolano, mayor de edad, titular de la cédula de identidad{" "}
-            <Text style={{ fontWeight: "bold" }}>V-{cedula}</Text>{" "}
+            <Text style={{ fontWeight: "bold" }}>V-{documentId}</Text>{" "}
             <Text style={{ fontWeight: "bold", fontStyle: "italic" }}>
-              Domiciliado: {direccion}
+              Domiciliado: {address}
             </Text>
             , quien en adelante y para efectos de este contrato se le denominará{" "}
             <Text style={{ fontWeight: "bold", fontStyle: "italic" }}>
@@ -181,14 +178,14 @@ export const MyPdfDocument = ({
               “EL VENDEDOR”
             </Text>{" "}
             se compromete a vender y “EL CLIENTE” a adquirir el/los siguiente(s)
-            producto(s): {descripcion.join(", ")}, con seis (6) meses de
+            producto(s): {description.join(", ")}, con seis (6) meses de
             garantía por defectos de fábrica. SEGUNDA: Precio y forma de pago,
             el precio total{" "}
             <Text style={{ fontWeight: "bold", fontStyle: "italic" }}>
-              {cantidadLetras} DOLARES AMERICANOS {montoTotal} US $
+              {cantidadLetras} DOLARES AMERICANOS {totalPrice} US $
             </Text>
-            , a ser pagado por “EL CLIENTE” en cuotas de acuerdo al siguiente
-            calendario:
+            , a ser pagado por “EL CLIENTE” en installments de acuerdo al
+            siguiente calendario:
           </Text>
         </View>
 
@@ -211,7 +208,7 @@ export const MyPdfDocument = ({
               ]}
             >
               <Text>FECHA INICIO:</Text>
-              <Text>{dayjs(fechaInicio).format("DD-MM-YYYY")}</Text>
+              <Text>{dayjs(startDate).format("DD-MM-YYYY")}</Text>
             </View>
           </View>
 
@@ -226,7 +223,7 @@ export const MyPdfDocument = ({
                 },
               ]}
             >
-              <Text style={{ width: "80%" }}>{descripcion.join("\n")}</Text>
+              <Text style={{ width: "80%" }}>{description.join("\n")}</Text>
               <View
                 style={{
                   width: "20%",
@@ -235,7 +232,7 @@ export const MyPdfDocument = ({
                   fontWeight: "bold",
                 }}
               >
-                <Text>{cantidadProductos} UNID.</Text>
+                <Text>{quantityProducts} UNID.</Text>
               </View>
             </View>
           </View>
@@ -243,15 +240,15 @@ export const MyPdfDocument = ({
           <View style={[styles.tableRow, { fontWeight: "bold" }]}>
             <Text style={[styles.tableCol, { width: "20%" }]}>MONTO:</Text>
             <Text style={[styles.tableCol, { width: "20%" }]}>
-              ${montoTotal}
+              ${totalPrice}
             </Text>
             <Text style={[styles.tableCol, { width: "40%" }]}>
               FECHA DE CULMINACIÓN:
             </Text>
             <Text style={[styles.tableCol, { width: "20%" }]}>
-              {dayjs(cuotas[cuotas.length - 1].dueDate.split("T")[0]).format(
-                "DD-MM-YYYY"
-              )}
+              {dayjs(
+                installments[installments.length - 1].dueDate.split("T")[0]
+              ).format("DD-MM-YYYY")}
             </Text>
           </View>
           <View style={[styles.tableRow, styles.header]}>
@@ -317,7 +314,7 @@ export const MyPdfDocument = ({
             </View>
           </View>
 
-          {cuotas.map((cuota, index) => {
+          {installments.map((cuota, index) => {
             return (
               <View style={styles.tableRow} key={index}>
                 <Text style={[styles.tableCol, { width: "20%" }]}>
