@@ -1,12 +1,52 @@
-import dayjs from "dayjs";
 import type { Contract } from "../api/contract";
 import type { Installment } from "../api/installment";
 
-function getNextSaturday(): dayjs.Dayjs {
-  const today = dayjs();
-  const day = today.day();
-  const daysToAdd = day === 6 ? 7 : 6 - day;
-  return today.add(daysToAdd, "day").startOf("day");
+function getNextSaturday(
+  fromDate: string | Date,
+  type: "weekly" | "fortnightly",
+  isFirst = false
+): Date {
+  const date =
+    typeof fromDate === "string"
+      ? new Date(fromDate + "T00:00:00")
+      : new Date(fromDate);
+
+  const day = date.getDay();
+  const diff = day === 6 ? 7 : 6 - day;
+
+  const offset = type === "fortnightly" && !isFirst ? diff + 7 : diff;
+
+  date.setDate(date.getDate() + offset);
+  date.setHours(0, 0, 0, 0);
+
+  return date;
+}
+
+export function getNextFortnight(fromDate: string | Date): Date {
+  const date =
+    typeof fromDate === "string"
+      ? new Date(fromDate + "T00:00:00")
+      : new Date(fromDate);
+
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const day = date.getDate();
+
+  const fifteenth = new Date(year, month, 15, 0, 0, 0, 0);
+
+  const lastOfMonth = new Date(year, month + 1, 0, 0, 0, 0, 0);
+
+  let nextDate: Date;
+
+  if (day < 15) {
+    nextDate = fifteenth;
+  } else if (day >= 15 && day < lastOfMonth.getDate()) {
+    nextDate = lastOfMonth;
+  } else {
+    nextDate = new Date(year, month + 1, 15, 0, 0, 0, 0);
+  }
+
+  return nextDate;
 }
 
 export function generateInstallmentsFromContract(
@@ -14,12 +54,13 @@ export function generateInstallmentsFromContract(
 ): Installment[] {
   const payments: Installment[] = [];
 
-  const intervalDays = contract.agreement === "weekly" ? 7 : 14;
-
   const remainingProducts = contract.products.map((p) => {
     let adjustedInstallment = p.installmentAmount * p.quantity;
 
-    if (contract.agreement === "fortnightly") {
+    if (
+      contract.agreement === "fortnightly" ||
+      contract.agreement === "fifteen_and_last"
+    ) {
       adjustedInstallment *= 2;
     }
 
@@ -31,7 +72,8 @@ export function generateInstallmentsFromContract(
     };
   });
 
-  let installmentIndex = 0;
+  let dueDateTemp = new Date();
+  let isFirst = true;
 
   while (remainingProducts.some((p) => p.remainingBalance > 0)) {
     let periodPayment = 0;
@@ -47,9 +89,11 @@ export function generateInstallmentsFromContract(
         }
       }
     });
-    const startDate = new Date(getNextSaturday().toString());
-    const dueDate = new Date(startDate);
-    dueDate.setDate(startDate.getDate() + installmentIndex * intervalDays);
+
+    const dueDate =
+      contract.agreement === "fifteen_and_last"
+        ? getNextFortnight(dueDateTemp)
+        : getNextSaturday(dueDateTemp, contract.agreement, isFirst);
 
     payments.push({
       id: crypto.randomUUID(),
@@ -83,7 +127,8 @@ export function generateInstallmentsFromContract(
       ],
     });
 
-    installmentIndex++;
+    dueDateTemp = dueDate;
+    isFirst = false;
   }
 
   return payments;
