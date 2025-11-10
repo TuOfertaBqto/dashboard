@@ -270,7 +270,10 @@ export default function ContractRequestFormPage() {
                 onChange={(e) =>
                   setForm({
                     ...form,
-                    agreement: e.target.value as "weekly" | "fortnightly",
+                    agreement: e.target.value as
+                      | "weekly"
+                      | "fortnightly"
+                      | "fifteen_and_last",
                   })
                 }
                 className="w-full border p-2 rounded"
@@ -278,7 +281,10 @@ export default function ContractRequestFormPage() {
                 disabled={!canRequest}
               >
                 <option value="weekly">Semanal</option>
-                <option value="fortnightly">Quincenal</option>
+                <option value="fortnightly">Quincenal (Sábados)</option>
+                <option value="fifteen_and_last">
+                  Quincenal (15 y último de mes)
+                </option>
               </select>
             </div>
           </div>

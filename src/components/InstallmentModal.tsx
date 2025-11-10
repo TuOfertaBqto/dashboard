@@ -260,35 +260,8 @@ export const InstallmentModal = ({
                 <PDFDownloadLink
                   document={
                     <MyPdfDocument
-                      name={
-                        contract?.customerId.firstName.trim().toUpperCase() ??
-                        ""
-                      }
-                      lastName={
-                        contract?.customerId.lastName.trim().toUpperCase() ?? ""
-                      }
-                      cedula={contract?.customerId.documentId ?? ""}
-                      direccion={contract?.customerId.adress ?? ""}
-                      fechaInicio={
-                        contract?.startDate?.split("T")[0] ??
-                        dayjs().format("YYYY-MM-DD")
-                      }
-                      descripcion={
-                        contract?.products.map(
-                          (p) => `(${p.quantity}) ${p.product.name}`
-                        ) || ["Sin productos"]
-                      }
-                      montoTotal={contract?.totalPrice ?? 0}
-                      cuotas={payments}
-                      cantidadProductos={
-                        contract?.products.reduce(
-                          (total, p) => total + p.quantity,
-                          0
-                        ) ?? 0
-                      }
-                      documentIdPhoto={
-                        contract?.customerId.documentIdPhoto ?? ""
-                      }
+                      contract={contract}
+                      installments={payments}
                     />
                   }
                   fileName={`Contrato ${

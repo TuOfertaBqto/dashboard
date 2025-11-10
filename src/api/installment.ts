@@ -33,7 +33,7 @@ type ProductPaymentDTO = {
 export type CreateInstallment = {
   contractId: string;
   startContract: string;
-  agreementContract: "weekly" | "fortnightly";
+  agreementContract: "weekly" | "fortnightly" | "fifteen_and_last";
   products: ProductPaymentDTO[];
 };
 
