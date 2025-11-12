@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ContractApi, type ResponseCountContract } from "../api/contract";
 import { userApi, type VendorStats } from "../api/user";
 import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
-import { InstallmentApi } from "../api/installment";
+import { InstallmentApi, type GlobalPaymentsTotals } from "../api/installment";
 import { DebtsReportPDF } from "../components/pdf/DebtsReportPDF";
 import dayjs from "dayjs";
 import { pdf } from "@react-pdf/renderer";
@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { SummaryPayment } from "../components/dashboard/SummaryPayment";
 import { PaymentApi, type PaymentSummary } from "../api/payment";
 import { ContractCountCard } from "../components/dashboard/ContractCountCard";
+import { Balance } from "../components/dashboard/Balance";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -26,6 +27,12 @@ export default function Dashboard() {
     const d = new Date();
     d.setDate(d.getDate() - 7);
     return d;
+  });
+  const [globalTotals, setGlobalTotals] = useState<GlobalPaymentsTotals>({
+    totalAmountPaid: 0,
+    totalOverdueDebt: 0,
+    totalPendingBalance: 0,
+    totalDebt: 0,
   });
 
   const handleDownloadPDF = async () => {
@@ -53,7 +60,6 @@ export default function Dashboard() {
       setIsDownloadingVendorTotals(true);
 
       const vendors = await InstallmentApi.getVendorPaymentsSummary();
-      const globalTotals = await InstallmentApi.getGlobalPaymentsSummary();
 
       const blob = await pdf(
         <VendorsTotalsPDF totals={globalTotals} vendors={vendors} />
@@ -86,13 +92,15 @@ export default function Dashboard() {
       try {
         setLoading(true);
 
-        const [contracts, vendorsStats] = await Promise.all([
+        const [contracts, vendorsStats, totals] = await Promise.all([
           ContractApi.getCount(),
           userApi.getVendorStats(),
+          InstallmentApi.getGlobalPaymentsSummary(),
         ]);
 
         setStats(contracts);
         setVendors(vendorsStats);
+        setGlobalTotals(totals);
 
         await fetchSummary(start.toISOString(), end.toISOString());
       } catch (error) {
@@ -113,6 +121,8 @@ export default function Dashboard() {
       ) : (
         <>
           {stats && <ContractCountCard stats={stats} />}
+
+          <Balance totals={globalTotals} />
 
           <SummaryPayment
             payments={paymentSummary}
