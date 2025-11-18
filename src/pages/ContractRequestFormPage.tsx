@@ -28,7 +28,6 @@ export default function ContractRequestFormPage() {
     customerId: "",
     requestDate: dayjs().format("YYYY-MM-DD"),
     agreement: "weekly",
-    installmentAmount: 0,
     products: [],
     totalPrice: 0,
   });
@@ -59,7 +58,6 @@ export default function ContractRequestFormPage() {
           setInitialData(contract);
           setForm({
             customerId: contract.customerId.id,
-            installmentAmount: contract.installmentAmount,
             agreement: contract.agreement,
             requestDate: contract.requestDate,
             totalPrice: contract.totalPrice,
