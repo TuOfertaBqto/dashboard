@@ -37,6 +37,7 @@ export type CreatePayment = {
   owner: string;
   amount: number;
   paidAt: string;
+  accountId?: string;
 };
 
 export type PaymentSummary = {
