@@ -12,6 +12,10 @@ import { SummaryPayment } from "../components/dashboard/SummaryPayment";
 import { PaymentApi, type PaymentSummary } from "../api/payment";
 import { ContractCountCard } from "../components/dashboard/ContractCountCard";
 import { Balance } from "../components/dashboard/Balance";
+import {
+  PaymentAccountApi,
+  type TotalsByAccount,
+} from "../api/payment-account";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -19,6 +23,9 @@ export default function Dashboard() {
   const [stats, setStats] = useState<ResponseCountContract>();
   const [vendors, setVendors] = useState<VendorStats[]>([]);
   const [paymentSummary, setPaymentSummary] = useState<PaymentSummary[]>([]);
+  const [paymentByAccount, setPaymentByAccount] = useState<TotalsByAccount[]>(
+    []
+  );
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const [isDownloadingVendorTotals, setIsDownloadingVendorTotals] =
     useState<boolean>(false);
@@ -83,8 +90,13 @@ export default function Dashboard() {
   };
 
   const fetchSummary = useCallback(async (start: string, end: string) => {
-    const data = await PaymentApi.getSummaryByType(start, end);
-    setPaymentSummary(data);
+    const [summary, totalsByAccount] = await Promise.all([
+      PaymentApi.getSummaryByType(start, end),
+      PaymentAccountApi.getTotalsByAccount(start, end),
+    ]);
+
+    setPaymentSummary(summary);
+    setPaymentByAccount(totalsByAccount);
   }, []);
 
   useEffect(() => {
@@ -126,6 +138,7 @@ export default function Dashboard() {
 
           <SummaryPayment
             payments={paymentSummary}
+            paymentByAccount={paymentByAccount}
             initialStart={start.toISOString().split("T")[0]}
             initialEnd={end.toISOString().split("T")[0]}
             onFetch={fetchSummary}

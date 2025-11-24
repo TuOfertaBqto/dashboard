@@ -8,9 +8,11 @@ import {
 } from "@react-pdf/renderer";
 import { translatePaymentMethod } from "../../utils/translations";
 import dayjs from "dayjs";
+import type { TotalsByAccount } from "../../api/payment-account";
 
 interface PaymentReportPDFProps {
   payments: { type: string; total: number; count: number }[];
+  paymentByAccount: TotalsByAccount[];
   start: string;
   end: string;
 }
@@ -97,6 +99,7 @@ const styles = StyleSheet.create({
 
 export const PaymentReportPDF = ({
   payments,
+  paymentByAccount,
   start,
   end,
 }: PaymentReportPDFProps) => {
@@ -116,8 +119,12 @@ export const PaymentReportPDF = ({
         <Text style={styles.title}>Reporte de Pagos</Text>
         <Text style={styles.date}>{now}</Text>
 
-        <Text style={styles.subheader}>Desde: {startDate}</Text>
-        <Text style={styles.subheader}>Hasta: {endDate}</Text>
+        <View style={{ flexDirection: "row" }}>
+          <Text style={styles.subheader}>Desde: {startDate}</Text>
+          <Text style={[styles.subheader, { marginLeft: 20 }]}>
+            Hasta: {endDate}
+          </Text>
+        </View>
 
         <View style={styles.table}>
           <View style={[styles.tableRow, styles.tableHeader]}>
@@ -144,6 +151,7 @@ export const PaymentReportPDF = ({
               borderTopWidth: 1,
               borderTopColor: "#999",
               backgroundColor: "#f2f2f2",
+              marginBottom: 10,
             },
           ]}
         >
@@ -155,6 +163,70 @@ export const PaymentReportPDF = ({
             {totalCount}
           </Text>
         </View>
+
+        {paymentByAccount.map((acc, i) => {
+          const totalAmount = acc.totalMobile + acc.totalTransfer;
+          const totalCount = acc.countMobile + acc.countTransfer;
+
+          return (
+            <View key={i} style={{ marginBottom: 10 }}>
+              <Text
+                style={[
+                  styles.subheader,
+                  { marginTop: 8, fontSize: 12, fontWeight: "bold" },
+                ]}
+              >
+                Cuenta: {acc.owner}
+              </Text>
+
+              {/* Tabla de pagos por cuenta */}
+              <View style={styles.table}>
+                <View style={[styles.tableRow, styles.tableHeader]}>
+                  <Text style={styles.tableCell}>Tipo</Text>
+                  <Text style={styles.tableCell}>Monto Total</Text>
+                  <Text style={styles.tableCell}>Cantidad</Text>
+                </View>
+
+                <View style={styles.tableRow}>
+                  <Text style={styles.tableCell}>Pago móvil</Text>
+                  <Text style={styles.tableCell}>
+                    ${acc.totalMobile.toFixed(2)}
+                  </Text>
+                  <Text style={styles.tableCell}>{acc.countMobile}</Text>
+                </View>
+
+                <View style={styles.tableRow}>
+                  <Text style={styles.tableCell}>Transferencia bancaria</Text>
+                  <Text style={styles.tableCell}>
+                    ${acc.totalTransfer.toFixed(2)}
+                  </Text>
+                  <Text style={styles.tableCell}>{acc.countTransfer}</Text>
+                </View>
+
+                <View
+                  style={[
+                    styles.tableRow,
+                    {
+                      borderTopWidth: 1,
+                      borderTopColor: "#999",
+                      backgroundColor: "#f2f2f2",
+                    },
+                  ]}
+                >
+                  <Text style={[styles.tableCell, { fontWeight: "bold" }]}>
+                    TOTAL
+                  </Text>
+                  <Text style={[styles.tableCell, { fontWeight: "bold" }]}>
+                    ${totalAmount.toFixed(2)}
+                  </Text>
+                  <Text style={[styles.tableCell, { fontWeight: "bold" }]}>
+                    {totalCount}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          );
+        })}
 
         <Text style={styles.footer}>Generado: {now}</Text>
       </Page>

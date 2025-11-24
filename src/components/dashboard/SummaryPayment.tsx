@@ -11,6 +11,7 @@ import {
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { useEffect, useMemo, useState, type JSX } from "react";
 import { PaymentReportPDF } from "../pdf/PaymentReportPDF";
+import type { TotalsByAccount } from "../../api/payment-account";
 
 const paymentConfig: Record<
   string,
@@ -60,6 +61,7 @@ const paymentConfig: Record<
 
 interface PaymentSummaryProps {
   payments: { type: string; total: number; count: number }[];
+  paymentByAccount: TotalsByAccount[];
   initialStart: string;
   initialEnd: string;
   onFetch: (start: string, end: string) => Promise<void>;
@@ -67,6 +69,7 @@ interface PaymentSummaryProps {
 
 export const SummaryPayment = ({
   payments,
+  paymentByAccount,
   initialStart,
   initialEnd,
   onFetch,
@@ -77,8 +80,15 @@ export const SummaryPayment = ({
   const [error, setError] = useState<string | null>(null);
 
   const reportDocument = useMemo(
-    () => <PaymentReportPDF payments={payments} start={start} end={end} />,
-    [payments, start, end]
+    () => (
+      <PaymentReportPDF
+        payments={payments}
+        paymentByAccount={paymentByAccount}
+        start={start}
+        end={end}
+      />
+    ),
+    [payments, paymentByAccount, start, end]
   );
 
   useEffect(() => {
