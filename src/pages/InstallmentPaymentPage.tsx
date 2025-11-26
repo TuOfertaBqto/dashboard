@@ -7,12 +7,14 @@ import {
 } from "../api/installment";
 import dayjs from "dayjs";
 import { PaymentApi } from "../api/payment";
+import { AccountApi, type Account } from "../api/account";
 
 export const InstallmentPaymentPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [payment, setPayment] = useState<Installment | null>(null);
   const [loading, setLoading] = useState(false);
+  const [account, setAccount] = useState<Account[]>();
   //const [, setPhoto] = useState<File | null>(null);
 
   const [form, setForm] = useState<UpdateInstallment>({
@@ -23,27 +25,54 @@ export const InstallmentPaymentPage = () => {
     paidAt: dayjs().format("YYYY-MM-DD"),
     owner: "",
     photo: "",
+    accountId: undefined,
   });
 
   useEffect(() => {
-    if (id) {
-      InstallmentApi.getById(id)
-        .then((data) => {
-          setPayment(data);
+    const fetchData = async () => {
+      if (!id) return;
 
-          setForm((prev) => ({
-            ...prev,
-            contract: data.contract.id,
-          }));
-        })
-        .catch(() => navigate(-1));
-    }
+      try {
+        const [data, accountData] = await Promise.all([
+          InstallmentApi.getById(id),
+          AccountApi.getAll(),
+        ]);
+
+        setAccount(accountData);
+        setPayment(data);
+
+        setForm((prev) => ({
+          ...prev,
+          contract: data.contract.id,
+        }));
+      } catch (error) {
+        console.error("Error fetching installment:", error);
+        navigate(-1);
+      }
+    };
+
+    fetchData();
   }, [id, navigate]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
+
+    if (name === "paymentMethod") {
+      const method = value as UpdateInstallment["paymentMethod"];
+      setForm((prev) => ({
+        ...prev,
+        [name]: method,
+        referenceNumber: value === "cash" ? undefined : prev.referenceNumber,
+        accountId:
+          value === "mobile_payment" || value === "bank_transfer"
+            ? prev.accountId
+            : undefined,
+      }));
+      return;
+    }
+
     if (name === "amountPaid") {
       if (
         value === "" ||
@@ -103,6 +132,7 @@ export const InstallmentPaymentPage = () => {
         photo: payload.photo,
         referenceNumber: payload.referenceNumber,
         type: payload.paymentMethod,
+        accountId: payload.accountId,
       });
 
       navigate(-1);
@@ -169,20 +199,22 @@ export const InstallmentPaymentPage = () => {
           </select>
         </div>
 
-        <div>
-          <label className="block text-sm mb-1">Referencia</label>
-          <input
-            type="number"
-            name="referenceNumber"
-            value={form.referenceNumber}
-            onChange={handleChange}
-            onWheel={(e) => e.currentTarget.blur()}
-            min={1}
-            step={1}
-            required={form.paymentMethod !== "cash"}
-            className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-          />
-        </div>
+        {form.paymentMethod !== "cash" && (
+          <div>
+            <label className="block text-sm mb-1">Referencia</label>
+            <input
+              type="number"
+              name="referenceNumber"
+              value={form.referenceNumber}
+              onChange={handleChange}
+              onWheel={(e) => e.currentTarget.blur()}
+              min={1}
+              step={1}
+              required
+              className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            />
+          </div>
+        )}
 
         <div>
           <label className="block text-sm mb-1">Titular / Propietario</label>
@@ -195,6 +227,27 @@ export const InstallmentPaymentPage = () => {
             required
           />
         </div>
+
+        {(form.paymentMethod === "mobile_payment" ||
+          form.paymentMethod === "bank_transfer") && (
+          <div>
+            <label className="block text-sm mb-1">Cuenta</label>
+            <select
+              name="accountId"
+              value={form.accountId}
+              onChange={handleChange}
+              className="w-full border p-2 rounded"
+              required
+            >
+              <option value="">Seleccione</option>
+              {account?.map((acc) => (
+                <option key={acc.id} value={acc.id}>
+                  {acc.owner}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div>
           <label className="block text-sm mb-1">Fecha de pago</label>

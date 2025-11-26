@@ -39,7 +39,6 @@ export type CreateInstallment = {
 
 export type UpdateInstallment = {
   contract?: string;
-
   paymentMethod:
     | "binance"
     | "paypal"
@@ -47,16 +46,12 @@ export type UpdateInstallment = {
     | "mobile_payment"
     | "bank_transfer"
     | "cash";
-
   referenceNumber?: number | string;
-
   photo?: string | null;
-
   owner: string;
-
   amountPaid: number | string;
-
   paidAt: string;
+  accountId?: string;
 };
 
 type ContractDebt = {

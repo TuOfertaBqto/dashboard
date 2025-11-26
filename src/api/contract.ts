@@ -27,7 +27,6 @@ export type CreateContract = {
 export type CreateContractRequest = {
   customerId: string;
   requestDate: string;
-  installmentAmount: number;
   agreement: "weekly" | "fortnightly" | "fifteen_and_last";
   totalPrice: number;
   products: CreateContractProduct[];
@@ -41,7 +40,6 @@ export type Contract = {
   requestDate: string;
   startDate: string;
   endDate: string;
-  installmentAmount: number;
   agreement: "weekly" | "fortnightly" | "fifteen_and_last";
   totalPrice: number;
   status: "canceled" | "pending" | "approved";
