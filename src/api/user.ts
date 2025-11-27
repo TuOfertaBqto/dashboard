@@ -61,13 +61,13 @@ export const userApi = {
     }
   },
 
-  getProfile: async (id: string): Promise<User | null> => {
+  getProfile: async (id: string): Promise<User> => {
     try {
       const res = await api.get(`/user/profile/${id}`);
       return res.data;
     } catch (error) {
       console.error("Error fetching profile by ID:", error);
-      return null;
+      return null as unknown as User;
     }
   },
 
