@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ContractApi, type ResponseCountContract } from "../api/contract";
-import { userApi, type VendorStats } from "../api/user";
+import { userApi, type User, type VendorStats } from "../api/user";
 import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import { InstallmentApi, type GlobalPaymentsTotals } from "../api/installment";
 import { DebtsReportPDF } from "../components/pdf/DebtsReportPDF";
@@ -16,9 +16,11 @@ import {
   PaymentAccountApi,
   type TotalsByAccount,
 } from "../api/payment-account";
+import { useAuth } from "../auth/useAuth";
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [loading, setLoading] = useState<boolean>(true);
   const [stats, setStats] = useState<ResponseCountContract>();
   const [vendors, setVendors] = useState<VendorStats[]>([]);
@@ -29,32 +31,45 @@ export default function Dashboard() {
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const [isDownloadingVendorTotals, setIsDownloadingVendorTotals] =
     useState<boolean>(false);
-  const [end] = useState(() => new Date());
-  const [start] = useState(() => {
+  const start = useMemo(() => {
     const d = new Date();
     d.setDate(d.getDate() - 7);
     return d;
-  });
+  }, []);
+
+  const end = useMemo(() => new Date(), []);
   const [globalTotals, setGlobalTotals] = useState<GlobalPaymentsTotals>({
     totalAmountPaid: 0,
     totalOverdueDebt: 0,
     totalPendingBalance: 0,
     totalDebt: 0,
   });
+  const [profile, setProfile] = useState<User>();
+  const firstName = useMemo(
+    () => profile?.firstName?.split(" ")[0] ?? "",
+    [profile?.firstName]
+  );
+
+  const downloadPDF = async (blobPromise: Promise<Blob>, filename: string) => {
+    const blob = await blobPromise;
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
 
   const handleDownloadPDF = async () => {
     try {
       setIsDownloading(true);
+      const now = dayjs().format("YYYYMMDD");
       const vendors = await InstallmentApi.getOverdueCustomersByVendor();
 
-      const blob = await pdf(<DebtsReportPDF vendors={vendors} />).toBlob();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      const now = dayjs().format("YYYYMMDD");
-      link.download = `Cuotas atrasadas ${now}.pdf`;
-      link.click();
-      URL.revokeObjectURL(url);
+      await downloadPDF(
+        pdf(<DebtsReportPDF vendors={vendors} />).toBlob(),
+        `Cuotas atrasadas ${now}.pdf`
+      );
     } catch (error) {
       console.error("Error al generar el reporte:", error);
     } finally {
@@ -65,20 +80,15 @@ export default function Dashboard() {
   const downloadVendorsTotalsPDF = async () => {
     try {
       setIsDownloadingVendorTotals(true);
-
+      const now = dayjs().format("YYYYMMDD");
       const vendors = await InstallmentApi.getVendorPaymentsSummary();
 
-      const blob = await pdf(
-        <VendorsTotalsPDF totals={globalTotals} vendors={vendors} />
-      ).toBlob();
-
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      const now = dayjs().format("YYYYMMDD");
-      link.download = `Relacion vencimiento vendedores ${now}.pdf`;
-      link.click();
-      URL.revokeObjectURL(url);
+      await downloadPDF(
+        pdf(
+          <VendorsTotalsPDF totals={globalTotals} vendors={vendors} />
+        ).toBlob(),
+        `Relacion vencimiento vendedores ${now}.pdf`
+      );
     } catch (error) {
       console.error(
         "Error al generar el reporte Relacion vencimiento vendedores:",
@@ -101,18 +111,22 @@ export default function Dashboard() {
 
   useEffect(() => {
     const loadData = async () => {
+      if (!user?.id) return;
       try {
         setLoading(true);
 
-        const [contracts, vendorsStats, totals] = await Promise.all([
-          ContractApi.getCount(),
-          userApi.getVendorStats(),
-          InstallmentApi.getGlobalPaymentsSummary(),
-        ]);
+        const [contracts, vendorsStats, totals, profileResult] =
+          await Promise.all([
+            ContractApi.getCount(),
+            userApi.getVendorStats(),
+            InstallmentApi.getGlobalPaymentsSummary(),
+            userApi.getProfile(user.id),
+          ]);
 
         setStats(contracts);
         setVendors(vendorsStats);
         setGlobalTotals(totals);
+        setProfile(profileResult);
 
         await fetchSummary(start.toISOString(), end.toISOString());
       } catch (error) {
@@ -123,15 +137,16 @@ export default function Dashboard() {
     };
 
     loadData();
-  }, [start, end, fetchSummary]);
+  }, [start, end, fetchSummary, user?.id]);
 
   return (
     <div className="md:p-6 space-y-6">
-      <h1 className="text-2xl font-bold">Bienvenido al Dashboard</h1>
       {loading ? (
         <p className="text-gray-500">Cargando...</p>
       ) : (
         <>
+          <h1 className="text-2xl font-bold">Hola {firstName}</h1>
+
           {stats && <ContractCountCard stats={stats} />}
 
           <Balance totals={globalTotals} />
