@@ -38,6 +38,18 @@ export const ContractProductApi = {
     }
   },
 
+  getVendorEarnings: async (vendorId: string): Promise<{ total: number }> => {
+    try {
+      const res = await api.get(
+        `/contract-product/vendor/${vendorId}/earnings`
+      );
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching getVendorEarnings:", error);
+      return {} as { total: number };
+    }
+  },
+
   updateBulk: async (updateBulk: UpdateContractProducts[]) => {
     try {
       const res = await api.patch(`/contract-product`, updateBulk);
