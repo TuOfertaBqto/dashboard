@@ -15,6 +15,7 @@ import {
 import { formatMoney } from "../utils/formatMoney";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { InstallmentModal } from "../components/InstallmentModal";
+import { ContractProductApi } from "../api/contract-product";
 
 export default function Profile() {
   const { id } = useParams<{ id: string }>();
@@ -27,6 +28,7 @@ export default function Profile() {
   const [customers, setCustomers] = useState<VendorsWithDebts | null>(null);
   const [selectedContract, setSelectedContract] = useState<Contract>();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [balance, setBalance] = useState<number>(0);
 
   const userId =
     id && (user?.role === "main" || user?.role === "admin") ? id : user?.id;
@@ -57,15 +59,18 @@ export default function Profile() {
       setProfile(profileData);
 
       // Solo si el perfil existe, obtenemos estadísticas y pagos
-      const [statsData, paymentsData, customersData] = await Promise.all([
-        ContractApi.countContractsByVendor(userId),
-        InstallmentApi.getOneVendorPaymentsSummary(userId),
-        InstallmentApi.getOverdueCustomersByOneVendor(userId),
-      ]);
+      const [statsData, paymentsData, customersData, balanceData] =
+        await Promise.all([
+          ContractApi.countContractsByVendor(userId),
+          InstallmentApi.getOneVendorPaymentsSummary(userId),
+          InstallmentApi.getOverdueCustomersByOneVendor(userId),
+          ContractProductApi.getVendorEarnings(userId),
+        ]);
 
       setStats(statsData);
       setPayments(paymentsData);
       setCustomers(customersData);
+      setBalance(balanceData.total);
     } catch (err) {
       console.error("Error loading profile", err);
     } finally {
@@ -96,13 +101,30 @@ export default function Profile() {
 
       {/* Perfil */}
       {profile && (
-        <section className="bg-white rounded-2xl shadow p-4 md:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h2 className="text-xl font-bold text-gray-800">
+        <section className="bg-white rounded-2xl shadow p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="flex flex-col">
+            <h2 className="text-2xl font-semibold text-gray-800 leading-tight">
               {profile.firstName} {profile.lastName}
             </h2>
-            <p className="text-gray-500">{profile.email}</p>
+            <p className="text-gray-500 text-sm mt-1">{profile.email}</p>
           </div>
+
+          {profile.role !== "main" && (
+            <>
+              <div className="w-full h-px bg-gray-200 md:hidden" />
+              <div className="flex flex-col text-left md:text-right">
+                <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+                  Ganancias
+                </p>
+                <p className="text-3xl font-bold text-green-600 mt-1">
+                  $
+                  {balance.toLocaleString("es-ES", {
+                    minimumFractionDigits: 2,
+                  })}
+                </p>
+              </div>
+            </>
+          )}
         </section>
       )}
 
