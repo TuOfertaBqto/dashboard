@@ -44,13 +44,18 @@ export const ContractProductApi = {
     }
   },
 
-  getDispatchedTotals: async (): Promise<ProductDispatchedTotals[]> => {
+  getDispatchedTotals: async (
+    page = 1,
+    limit = 10
+  ): Promise<{ data: ProductDispatchedTotals[]; total: number }> => {
     try {
-      const res = await api.get("/contract-product/dispatched");
+      const res = await api.get("/contract-product/dispatched", {
+        params: { page, limit },
+      });
       return res.data;
     } catch (error) {
       console.error("Error fetching getDispatchedTotals:", error);
-      return [];
+      return { data: [], total: 0 };
     }
   },
 
