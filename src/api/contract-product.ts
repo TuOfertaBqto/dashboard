@@ -25,7 +25,7 @@ type UpdateContractProducts = {
   installmentAmount?: number;
 };
 
-type ProductDispatchedTotals = {
+export type ProductDispatchedTotals = {
   productId: string;
   productName: string;
   totalDispatched: string;
