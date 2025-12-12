@@ -17,14 +17,25 @@ import {
   type TotalsByAccount,
 } from "../api/payment-account";
 import { useAuth } from "../auth/useAuth";
+import {
+  ContractProductApi,
+  type ProductDispatchedTotals,
+} from "../api/contract-product";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [loading, setLoading] = useState<boolean>(true);
+  const [loadingProduct, setLoadingProduct] = useState<boolean>(true);
   const [stats, setStats] = useState<ResponseCountContract>();
   const [vendors, setVendors] = useState<VendorStats[]>([]);
   const [paymentSummary, setPaymentSummary] = useState<PaymentSummary[]>([]);
+  const [products, setProducts] = useState<{
+    data: ProductDispatchedTotals[];
+    total: number;
+  }>();
+  const [currentPage, setCurrentPage] = useState(1);
+  const limit = 10;
   const [paymentByAccount, setPaymentByAccount] = useState<TotalsByAccount[]>(
     []
   );
@@ -99,6 +110,24 @@ export default function Dashboard() {
     }
   };
 
+  const onPageChange = async (page: number) => {
+    if (page < 1) return;
+
+    if (!products) return;
+
+    const totalPages = Math.ceil(products.total / limit);
+    if (page > totalPages) return;
+
+    setCurrentPage(page);
+    setLoadingProduct(true);
+    const productData = await ContractProductApi.getDispatchedTotals(
+      page,
+      limit
+    );
+    setProducts(productData);
+    setLoadingProduct(false);
+  };
+
   const fetchSummary = useCallback(async (start: string, end: string) => {
     const [summary, totalsByAccount] = await Promise.all([
       PaymentApi.getSummaryByType(start, end),
@@ -114,19 +143,24 @@ export default function Dashboard() {
       if (!user?.id) return;
       try {
         setLoading(true);
+        setLoadingProduct(true);
 
-        const [contracts, vendorsStats, totals, profileResult] =
+        const [contracts, vendorsStats, totals, profileResult, productData] =
           await Promise.all([
             ContractApi.getCount(),
             userApi.getVendorStats(),
             InstallmentApi.getGlobalPaymentsSummary(),
             userApi.getProfile(user.id),
+            ContractProductApi.getDispatchedTotals(1, 10),
           ]);
 
         setStats(contracts);
         setVendors(vendorsStats);
         setGlobalTotals(totals);
         setProfile(profileResult);
+        setProducts(productData);
+
+        setLoadingProduct(false);
 
         await fetchSummary(start.toISOString(), end.toISOString());
       } catch (error) {
@@ -213,6 +247,135 @@ export default function Dashboard() {
                 </button>
               </div>
             </div>
+          </div>
+
+          <div className="bg-white shadow-lg rounded-2xl p-6 mt-4">
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">
+              Productos más despachados
+            </h2>
+
+            <div className="hidden md:block overflow-x-auto">
+              {loadingProduct ? (
+                <table className="min-w-full border-collapse">
+                  <thead>
+                    <tr className="bg-gray-100 text-left">
+                      <th className="px-4 py-2 border-b">Producto</th>
+                      <th className="px-4 py-2 border-b text-center">
+                        Despachos
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[...Array(10)].map((_, i) => (
+                      <tr key={i} className="animate-pulse">
+                        <td className="px-4 py-3 border-b">
+                          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                        </td>
+                        <td className="px-4 py-3 border-b text-center">
+                          <div className="h-4 bg-gray-200 rounded w-10 mx-auto"></div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <table className="min-w-full border-collapse">
+                  <thead>
+                    <tr className="bg-gray-100 text-left">
+                      <th className="px-4 py-2 border-b">Producto</th>
+                      <th className="px-4 py-2 border-b text-center">
+                        Despachos
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {products?.data.map((p) => (
+                      <tr
+                        key={p.productId}
+                        className="hover:bg-gray-50 active:bg-gray-100 cursor-pointer transition"
+                      >
+                        <td className="px-4 py-2 border-b whitespace-nowrap">
+                          {p.productName}
+                        </td>
+                        <td className="px-4 py-2 border-b text-center font-semibold text-blue-700">
+                          {p.totalDispatched}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            <div className="md:hidden space-y-3">
+              {loadingProduct
+                ? [...Array(10)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="border rounded-lg p-4 bg-gray-50 shadow-sm animate-pulse"
+                    >
+                      <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                      <div className="h-4 bg-gray-200 rounded w-1/3 mt-2"></div>
+                    </div>
+                  ))
+                : products?.data.map((p) => (
+                    <div
+                      key={p.productId}
+                      className="border rounded-lg p-4 bg-gray-50 shadow-sm"
+                    >
+                      <p className="font-semibold text-gray-800">
+                        {p.productName}
+                      </p>
+                      <p className="text-sm mt-1">
+                        <span className="font-medium text-gray-600">
+                          Despachos:
+                        </span>{" "}
+                        <span className="font-semibold text-blue-700">
+                          {p.totalDispatched}
+                        </span>
+                      </p>
+                    </div>
+                  ))}
+            </div>
+
+            {products && (
+              <div className="flex justify-center items-center gap-3 mt-5">
+                <button
+                  onClick={() => onPageChange(currentPage - 1)}
+                  disabled={currentPage === 1 || loadingProduct}
+                  className={`px-4 py-2 rounded-xl border text-sm font-medium transition-all
+          ${
+            currentPage === 1 || loadingProduct
+              ? "text-gray-400 border-gray-200 cursor-not-allowed"
+              : "text-gray-700 border-gray-300 hover:bg-gray-100"
+          }
+        `}
+                >
+                  Anterior
+                </button>
+
+                <span className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-xl whitespace-nowrap min-w-fit flex-shrink-0">
+                  Página {currentPage} de {Math.ceil(products.total / limit)}
+                </span>
+
+                <button
+                  onClick={() => onPageChange(currentPage + 1)}
+                  disabled={
+                    currentPage >= Math.ceil(products.total / limit) ||
+                    loadingProduct
+                  }
+                  className={`px-4 py-2 rounded-xl border text-sm font-medium transition-all
+          ${
+            currentPage >= Math.ceil(products.total / limit) || loadingProduct
+              ? "text-gray-400 border-gray-200 cursor-not-allowed"
+              : "text-gray-700 border-gray-300 hover:bg-gray-100"
+          }
+        `}
+                >
+                  Siguiente
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="bg-white shadow-md rounded-2xl p-4 overflow-x-auto">

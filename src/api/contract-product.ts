@@ -25,6 +25,12 @@ type UpdateContractProducts = {
   installmentAmount?: number;
 };
 
+export type ProductDispatchedTotals = {
+  productId: string;
+  productName: string;
+  totalDispatched: string;
+};
+
 export const ContractProductApi = {
   getToDispatchQuantity: async (productId: string): Promise<number> => {
     try {
@@ -35,6 +41,21 @@ export const ContractProductApi = {
     } catch (error) {
       console.error("Error fetching to-dispatch quantity:", error);
       return 0;
+    }
+  },
+
+  getDispatchedTotals: async (
+    page = 1,
+    limit = 10
+  ): Promise<{ data: ProductDispatchedTotals[]; total: number }> => {
+    try {
+      const res = await api.get("/contract-product/dispatched", {
+        params: { page, limit },
+      });
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching getDispatchedTotals:", error);
+      return { data: [], total: 0 };
     }
   },
 
