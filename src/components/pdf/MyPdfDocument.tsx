@@ -147,15 +147,15 @@ export const MyPdfDocument = ({ contract, installments }: Props) => {
             En la ciudad de Barquisimeto, {fechaEnPalabras(startDate)},
             intervienen a la celebración del presente contrato de afiliación y
             apertura de línea de crédito, para compras bajo el sistema de
-            crédito, por una parte, la ciudadana{" "}
+            crédito, por una parte, el ciudadano{" "}
             <Text style={{ fontWeight: "bold", fontStyle: "italic" }}>
-              ENDRINA MEDINA
+              EIVAR PÉREZ
             </Text>
             , mayor de edad, titular de la cédula de identidad{" "}
             <Text style={{ fontWeight: "bold", fontStyle: "italic" }}>
-              V-21.058.133
+              V-20.010.478
             </Text>
-            , domiciliada en Barquisimeto, Edo. Lara, por la interpuesta persona
+            , domiciliado en Barquisimeto, Edo. Lara, por la interpuesta persona
             del propietario y/o representante legal que suscribe el presente
             contrato, a quien en adelante se le denominará el “EL VENDEDOR” ; y,
             por otra parte, el(la) ciudadano(a){" "}
@@ -384,26 +384,95 @@ export const MyPdfDocument = ({ contract, installments }: Props) => {
             <Text style={{ fontWeight: "bold" }}>TERCERO: </Text>
             Obligaciones de{" "}
             <Text style={{ fontWeight: "bold", fontStyle: "italic" }}>
-              “EL CLIENTE”, “EL CLIENTE”
+              “EL CLIENTE”
+            </Text>
+            ,{" "}
+            <Text style={{ fontWeight: "bold", fontStyle: "italic" }}>
+              “EL CLIENTE”
             </Text>{" "}
             se compromete a realizar los pagos en las fechas establecidas y a
-            informar a “EL VENDEDOR” en caso de cambios de contacto o retrasos
-            justificados.
-            {"\n\n"}
+            informar a{" "}
+            <Text style={{ fontWeight: "bold", fontStyle: "italic" }}>
+              “EL VENDEDOR”
+            </Text>{" "}
+            en caso de cambios de contacto o retrasos justificados.
+          </Text>
+
+          <Text style={{ textAlign: "justify", marginTop: 8 }}>
             <Text style={{ fontWeight: "bold" }}>CUARTO: </Text>
             Obligaciones de{" "}
             <Text style={{ fontWeight: "bold", fontStyle: "italic" }}>
-              “EL VENDEDOR”, “EL VENDEDOR”
+              “EL VENDEDOR”
+            </Text>
+            ,{" "}
+            <Text style={{ fontWeight: "bold", fontStyle: "italic" }}>
+              “EL VENDEDOR”
             </Text>{" "}
             garantiza la entrega del producto en buen estado al momento del
             acuerdo y brindará soporte en caso de defectos atribuibles a la
             fabricación.
-            {"\n\n"}
+          </Text>
+
+          <Text style={{ textAlign: "justify", marginTop: 8 }}>
             <Text style={{ fontWeight: "bold" }}>QUINTO: </Text>
+            <Text style={{ fontWeight: "bold", fontStyle: "italic" }}>
+              Condición Resolutoria por Incumplimiento de Pago y Restitución del
+              Bien
+            </Text>
+            , en caso de que{" "}
+            <Text style={{ fontWeight: "bold" }}>“EL CLIENTE” </Text>
+            no realice el pago total del precio acordado en la fecha estipulada
+            en el calendario de la{" "}
+            <Text style={{ fontStyle: "italic" }}>SEGUNDA CLÁUSULA</Text>, se
+            entenderá que el presente contrato se resuelve automáticamente, sin
+            necesidad de requerimiento judicial o extrajudicial.
+          </Text>
+
+          <Text style={{ textAlign: "justify", marginTop: 8 }}>
+            <Text style={{ fontWeight: "bold" }}>SEXTO: </Text>
+            Obligación de Restitución, como consecuencia de la resolución
+            automática del contrato,{" "}
+            <Text style={{ fontWeight: "bold" }}>“EL CLIENTE” </Text>
+            se obliga voluntariamente a:
+          </Text>
+
+          <View style={{ paddingLeft: 20, marginTop: 6 }}>
+            <Text>
+              1. Entregar inmediatamente el{" "}
+              <Text style={{ fontWeight: "bold" }}>“PRODUCTO” </Text>a{" "}
+              <Text style={{ fontWeight: "bold" }}>“EL VENDEDOR” </Text>
+              en el mismo estado que fue recibido, dentro de los 15 días
+              siguientes a la fecha de incumplimiento.
+            </Text>
+
+            <Text style={{ marginTop: 4 }}>
+              2. Permitir el acceso a{" "}
+              <Text style={{ fontWeight: "bold" }}>“EL VENDEDOR” </Text>o a
+              quien éste designe para la recuperación del{" "}
+              <Text style={{ fontWeight: "bold" }}>“PRODUCTO”</Text>.
+            </Text>
+          </View>
+
+          <Text style={{ textAlign: "justify", marginTop: 8 }}>
+            <Text style={{ fontWeight: "bold" }}>SÉPTIMO: </Text>
+            Consecuencias del Incumplimiento de la Restitución, el
+            incumplimiento de la obligación de la restitución del{" "}
+            <Text style={{ fontWeight: "bold" }}>“PRODUCTO” </Text>
+            facultará al{" "}
+            <Text style={{ fontWeight: "bold" }}>“EL VENDEDOR” </Text>
+            para iniciar las acciones legales correspondientes para su
+            recuperación y/o reclamar los daños y perjuicios ocasionados, sin
+            perjuicio de la resolución del contrato.
+          </Text>
+
+          {/* OCTAVO */}
+          <Text style={{ textAlign: "justify", marginTop: 8 }}>
+            <Text style={{ fontWeight: "bold" }}>OCTAVO: </Text>
             Aceptación, ambas partes aceptan los términos descritos en este
             contrato, firmando en señal de conformidad.
           </Text>
         </View>
+
         <View
           style={{
             flexDirection: "row",
