@@ -156,4 +156,14 @@ export const ContractApi = {
       return {} as ResponseCountContract;
     }
   },
+
+  countRequest: async (): Promise<number> => {
+    try {
+      const res = await api.get("/contract/count/request");
+      return res.data;
+    } catch (error) {
+      console.error("error counting request:", error);
+      return 0;
+    }
+  },
 };
