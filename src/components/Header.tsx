@@ -12,14 +12,17 @@ import {
 import { useAuth } from "../auth/useAuth";
 import { useState } from "react";
 import { ConfirmModal } from "./ConfirmModal";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useRequests } from "../contexts/requests/useRequests";
 
 export const Header = () => {
-  const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+  const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
+  const { requestsCount } = useRequests();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   return (
     <>
@@ -28,23 +31,26 @@ export const Header = () => {
           Panel Administrativo
         </div>
 
-        <div className="md:hidden">
-          {isMenuOpen ? (
-            <button
-              onClick={() => setIsMenuOpen(false)}
-              className="h-6 w-6 text-gray-70"
-            >
+        <div className="md:hidden relative">
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="relative"
+          >
+            {isMenuOpen ? (
               <XMarkIcon className="h-6 w-6 text-gray-700" />
-            </button>
-          ) : (
-            <button
-              onClick={() => {
-                setIsMenuOpen(true);
-              }}
-            >
+            ) : (
               <Bars3Icon className="h-6 w-6 text-gray-700" />
-            </button>
-          )}
+            )}
+
+            {requestsCount > 0 &&
+              !isMenuOpen &&
+              location.pathname !== "/requests" && (
+                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75 animate-ping"></span>
+                  <span className="relative inline-flex h-3 w-3 rounded-full bg-red-600 border-2 border-white"></span>
+                </span>
+              )}
+          </button>
         </div>
 
         <div className="flex items-center gap-4">
@@ -132,7 +138,9 @@ export const Header = () => {
                   }}
                 >
                   <DocumentArrowUpIcon className="w-5 h-5" />
-                  Solicitudes
+                  {user?.role == "main" && requestsCount > 0
+                    ? `Solicitudes (${requestsCount})`
+                    : "Solicitudes"}
                 </li>
               )}
               {user?.role !== "vendor" && (
