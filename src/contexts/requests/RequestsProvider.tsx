@@ -13,7 +13,7 @@ export const RequestsProvider = ({
 
   const refreshRequestsCount = useCallback(async () => {
     if (!user) return;
-    if (!["main", "admin", "super_admin"].includes(user.role)) return;
+    if (!["main", "super_admin"].includes(user.role)) return;
 
     const count = await ContractApi.countRequest();
     setRequestsCount(count);
