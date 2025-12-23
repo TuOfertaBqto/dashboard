@@ -15,6 +15,7 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/useAuth";
 import { ConfirmModal } from "./ConfirmModal";
+import { useRequests } from "../contexts/requests/useRequests";
 
 interface SubMenuItem {
   name: string;
@@ -36,6 +37,7 @@ export const Sidebar = () => {
   const { logout, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { requestsCount } = useRequests();
 
   const userRole = user?.role ?? "";
 
@@ -81,7 +83,8 @@ export const Sidebar = () => {
         route: "/dashboard",
       },
       {
-        name: "Solicitudes",
+        name:
+          requestsCount > 0 ? `Solicitudes (${requestsCount})` : "Solicitudes",
         icon: <DocumentArrowUpIcon className="h-5 w-5" />,
         route: "/requests",
       }

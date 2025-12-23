@@ -7,6 +7,7 @@ import type { UserRole } from "../api/user";
 import { InstallmentModal } from "../components/InstallmentModal";
 import { InventoryApi } from "../api/inventory";
 import { ContractProductApi } from "../api/contract-product";
+import { useRequests } from "../contexts/requests/useRequests";
 
 export default function RequestedContractsPage() {
   const navigate = useNavigate();
@@ -16,6 +17,8 @@ export default function RequestedContractsPage() {
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [contractSelected, setContractSelected] = useState<Contract>();
+
+  const { refreshRequestsCount } = useRequests();
 
   const fetchRequestedContracts = async (isFirstTime = false) => {
     if (isFirstTime) setLoading(true);
@@ -54,7 +57,8 @@ export default function RequestedContractsPage() {
       })
     );
 
-    fetchRequestedContracts();
+    await Promise.all([fetchRequestedContracts(), refreshRequestsCount()]);
+
     return contractApproved;
   };
 
@@ -63,14 +67,14 @@ export default function RequestedContractsPage() {
       status: "canceled",
     });
 
-    fetchRequestedContracts();
+    await Promise.all([fetchRequestedContracts(), refreshRequestsCount()]);
 
     return contractCanceled;
   };
 
   const handleDelete = async (id: string): Promise<void> => {
     await ContractApi.remove(id);
-    fetchRequestedContracts();
+    await Promise.all([fetchRequestedContracts(), refreshRequestsCount()]);
   };
 
   return (
