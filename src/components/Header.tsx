@@ -44,7 +44,8 @@ export const Header = () => {
 
             {requestsCount > 0 &&
               !isMenuOpen &&
-              location.pathname !== "/requests" && (
+              location.pathname !== "/requests" &&
+              user?.role == "main" && (
                 <span className="absolute -top-1 -right-1 flex h-3 w-3">
                   <span className="absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75 animate-ping"></span>
                   <span className="relative inline-flex h-3 w-3 rounded-full bg-red-600 border-2 border-white"></span>
