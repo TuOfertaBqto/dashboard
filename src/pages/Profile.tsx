@@ -97,7 +97,10 @@ export default function Profile() {
     return { label: "Crítica", color: "text-red-600" };
   }
 
-  if (loading) return <p className="p-4">Cargando...</p>;
+  if (loading)
+    return (
+      <div className="p-6 text-gray-500 animate-pulse">Cargando perfil...</div>
+    );
 
   if (!userId || profile === null)
     return <p className="p-4">Usuario no encontrado</p>;
