@@ -265,7 +265,7 @@ export default function Profile() {
                       <li
                         key={c.contractId}
                         onClick={() => handleOpenInstallments(c.contractId)}
-                        className="grid grid-cols-[150px_auto_100px] items-center border rounded-lg hover:shadow-sm cursor-pointer transition-all duration-200 hover:bg-gray-50 py-2 px-3 text-sm"
+                        className="grid grid-cols-[100px_auto_80px] items-center border rounded-lg hover:shadow-sm cursor-pointer transition-all duration-200 hover:bg-gray-50 py-2 px-3 text-sm"
                       >
                         {/* Columna 1 */}
                         <span className="text-gray-800 font-medium">
