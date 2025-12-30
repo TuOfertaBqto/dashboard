@@ -13,7 +13,11 @@ import {
   type VendorsWithDebts,
 } from "../api/installment";
 import { formatMoney } from "../utils/formatMoney";
-import { ArrowLeftIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowLeftIcon,
+  ClockIcon,
+  CurrencyDollarIcon,
+} from "@heroicons/react/24/outline";
 import { InstallmentModal } from "../components/InstallmentModal";
 import { ContractProductApi } from "../api/contract-product";
 
@@ -91,10 +95,25 @@ export default function Profile() {
   }, [fetchData]);
 
   function getEffectivenessLevel(avgDays: number) {
-    if (avgDays <= 5) return { label: "Excelente", color: "text-emerald-600" };
-    if (avgDays <= 15) return { label: "Buena", color: "text-amber-600" };
-    if (avgDays <= 30) return { label: "Regular", color: "text-orange-600" };
-    return { label: "Crítica", color: "text-red-600" };
+    if (avgDays <= 5)
+      return {
+        label: "Excelente",
+        color: "text-green-600",
+        bgColor: "bg-green-50",
+      };
+    if (avgDays <= 15)
+      return {
+        label: "Buena",
+        color: "text-amber-600",
+        bgColor: "bg-amber-50",
+      };
+    if (avgDays <= 30)
+      return {
+        label: "Regular",
+        color: "text-orange-600",
+        bgColor: "bg-orange-50",
+      };
+    return { label: "Crítica", color: "text-red-600", bgColor: "bg-red-50" };
   }
 
   if (loading)
@@ -130,19 +149,27 @@ export default function Profile() {
       <section className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
         {/* Ganancias */}
         {profile?.role !== "main" && (
-          <div className="bg-white rounded-2xl shadow-sm p-5 flex flex-col">
-            <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-              Ganancias
-            </p>
+          <div className="bg-white rounded-2xl shadow-sm p-5 flex items-center gap-4">
+            {/* Icono */}
+            <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-green-50">
+              <CurrencyDollarIcon className="w-7 h-7 text-green-600" />
+            </div>
 
-            <p className="mt-2 text-3xl font-semibold text-green-600">
-              $
-              {balance.toLocaleString("es-ES", {
-                minimumFractionDigits: 2,
-              })}
-            </p>
+            {/* Contenido */}
+            <div className="flex flex-col">
+              <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+                Ganancias
+              </p>
 
-            <span className="mt-1 text-xs text-gray-400">Total acumulado</span>
+              <p className="mt-1 text-2xl sm:text-3xl font-semibold text-green-600">
+                $
+                {balance.toLocaleString("es-ES", {
+                  minimumFractionDigits: 2,
+                })}
+              </p>
+
+              <span className="text-xs text-gray-400">Total acumulado</span>
+            </div>
           </div>
         )}
 
@@ -151,23 +178,31 @@ export default function Profile() {
           const effectiveness = getEffectivenessLevel(avgEffectiveness);
 
           return (
-            <div className="bg-white rounded-2xl shadow-sm p-5 flex flex-col">
-              <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-                Efectividad de cobro
-              </p>
-
-              <p className="mt-2 text-3xl font-semibold text-gray-800">
-                {avgEffectiveness.toFixed(2)}{" "}
-                <span className="text-base font-medium text-gray-400">
-                  días
-                </span>
-              </p>
-
-              <span
-                className={`mt-1 text-sm font-medium ${effectiveness.color}`}
+            <div className="bg-white rounded-2xl shadow-sm p-5 flex items-center gap-4">
+              {/* Icono */}
+              <div
+                className={`flex items-center justify-center w-14 h-14 rounded-xl  ${effectiveness.bgColor}`}
               >
-                {effectiveness.label}
-              </span>
+                <ClockIcon className={`w-7 h-7 ${effectiveness.color}`} />
+              </div>
+
+              {/* Contenido */}
+              <div className="flex flex-col">
+                <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+                  Efectividad de cobro
+                </p>
+
+                <p className="mt-1 text-2xl sm:text-3xl font-semibold text-gray-800">
+                  {avgEffectiveness.toFixed(2)}{" "}
+                  <span className="text-base font-medium text-gray-400">
+                    días
+                  </span>
+                </p>
+
+                <span className={`text-sm font-medium ${effectiveness.color}`}>
+                  {effectiveness.label}
+                </span>
+              </div>
             </div>
           );
         })()}
@@ -265,7 +300,7 @@ export default function Profile() {
                       <li
                         key={c.contractId}
                         onClick={() => handleOpenInstallments(c.contractId)}
-                        className="grid grid-cols-[100px_auto_80px] items-center border rounded-lg hover:shadow-sm cursor-pointer transition-all duration-200 hover:bg-gray-50 py-2 px-3 text-sm"
+                        className="grid grid-cols-[100px_auto_100px] items-center border rounded-lg hover:shadow-sm cursor-pointer transition-all duration-200 hover:bg-gray-50 py-2 px-3 text-sm"
                       >
                         {/* Columna 1 */}
                         <span className="text-gray-800 font-medium">
