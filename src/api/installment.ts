@@ -195,4 +195,16 @@ export const InstallmentApi = {
       return {} as VendorsWithDebts;
     }
   },
+
+  getVendorEffectiveness: async (vendorId: string): Promise<number> => {
+    try {
+      const res = await api.get(
+        `installment/vendor/${vendorId}/collection-effectiveness`
+      );
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching Vendor Effectiveness", error);
+      return 0;
+    }
+  },
 };

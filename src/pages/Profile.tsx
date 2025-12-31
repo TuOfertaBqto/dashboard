@@ -13,7 +13,11 @@ import {
   type VendorsWithDebts,
 } from "../api/installment";
 import { formatMoney } from "../utils/formatMoney";
-import { ArrowLeftIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowLeftIcon,
+  ClockIcon,
+  CurrencyDollarIcon,
+} from "@heroicons/react/24/outline";
 import { InstallmentModal } from "../components/InstallmentModal";
 import { ContractProductApi } from "../api/contract-product";
 
@@ -29,6 +33,7 @@ export default function Profile() {
   const [selectedContract, setSelectedContract] = useState<Contract>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [balance, setBalance] = useState<number>(0);
+  const [avgEffectiveness, setAvgEffectiveness] = useState<number>(0);
 
   const userId =
     id && (user?.role === "main" || user?.role === "admin") ? id : user?.id;
@@ -59,18 +64,25 @@ export default function Profile() {
       setProfile(profileData);
 
       // Solo si el perfil existe, obtenemos estadísticas y pagos
-      const [statsData, paymentsData, customersData, balanceData] =
-        await Promise.all([
-          ContractApi.countContractsByVendor(userId),
-          InstallmentApi.getOneVendorPaymentsSummary(userId),
-          InstallmentApi.getOverdueCustomersByOneVendor(userId),
-          ContractProductApi.getVendorEarnings(userId),
-        ]);
+      const [
+        statsData,
+        paymentsData,
+        customersData,
+        balanceData,
+        effectivenessData,
+      ] = await Promise.all([
+        ContractApi.countContractsByVendor(userId),
+        InstallmentApi.getOneVendorPaymentsSummary(userId),
+        InstallmentApi.getOverdueCustomersByOneVendor(userId),
+        ContractProductApi.getVendorEarnings(userId),
+        InstallmentApi.getVendorEffectiveness(userId),
+      ]);
 
       setStats(statsData);
       setPayments(paymentsData);
       setCustomers(customersData);
       setBalance(balanceData.total);
+      setAvgEffectiveness(effectivenessData);
     } catch (err) {
       console.error("Error loading profile", err);
     } finally {
@@ -82,7 +94,32 @@ export default function Profile() {
     fetchData();
   }, [fetchData]);
 
-  if (loading) return <p className="p-4">Cargando...</p>;
+  function getEffectivenessLevel(avgDays: number) {
+    if (avgDays <= 5)
+      return {
+        label: "Excelente",
+        color: "text-green-600",
+        bgColor: "bg-green-50",
+      };
+    if (avgDays <= 15)
+      return {
+        label: "Buena",
+        color: "text-amber-600",
+        bgColor: "bg-amber-50",
+      };
+    if (avgDays <= 30)
+      return {
+        label: "Regular",
+        color: "text-orange-600",
+        bgColor: "bg-orange-50",
+      };
+    return { label: "Crítica", color: "text-red-600", bgColor: "bg-red-50" };
+  }
+
+  if (loading)
+    return (
+      <div className="p-6 text-gray-500 animate-pulse">Cargando perfil...</div>
+    );
 
   if (!userId || profile === null)
     return <p className="p-4">Usuario no encontrado</p>;
@@ -101,56 +138,99 @@ export default function Profile() {
 
       {/* Perfil */}
       {profile && (
-        <section className="bg-white rounded-2xl shadow p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="flex flex-col">
-            <h2 className="text-2xl font-semibold text-gray-800 leading-tight">
-              {profile.firstName} {profile.lastName}
-            </h2>
-            <p className="text-gray-500 text-sm mt-1">{profile.email}</p>
-          </div>
-
-          {profile.role !== "main" && (
-            <>
-              <div className="w-full h-px bg-gray-200 md:hidden" />
-              <div className="flex flex-col text-left md:text-right">
-                <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-                  Ganancias
-                </p>
-                <p className="text-3xl font-bold text-green-600 mt-1">
-                  $
-                  {balance.toLocaleString("es-ES", {
-                    minimumFractionDigits: 2,
-                  })}
-                </p>
-              </div>
-            </>
-          )}
+        <section className="bg-white rounded-2xl shadow-sm p-6">
+          <h2 className="text-2xl font-semibold text-gray-800">
+            {profile.firstName} {profile.lastName}
+          </h2>
+          <p className="text-gray-500 text-sm mt-1">{profile.email}</p>
         </section>
       )}
+
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        {/* Ganancias */}
+        {profile?.role !== "main" && (
+          <div className="bg-white rounded-2xl shadow-sm p-5 flex items-center gap-4">
+            {/* Icono */}
+            <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-green-50">
+              <CurrencyDollarIcon className="w-7 h-7 text-green-600" />
+            </div>
+
+            {/* Contenido */}
+            <div className="flex flex-col">
+              <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+                Ganancias
+              </p>
+
+              <p className="mt-1 text-2xl sm:text-3xl font-semibold text-green-600">
+                $
+                {balance.toLocaleString("es-ES", {
+                  minimumFractionDigits: 2,
+                })}
+              </p>
+
+              <span className="text-xs text-gray-400">Total acumulado</span>
+            </div>
+          </div>
+        )}
+
+        {/* Efectividad de pago */}
+        {(() => {
+          const effectiveness = getEffectivenessLevel(avgEffectiveness);
+
+          return (
+            <div className="bg-white rounded-2xl shadow-sm p-5 flex items-center gap-4">
+              {/* Icono */}
+              <div
+                className={`flex items-center justify-center w-14 h-14 rounded-xl  ${effectiveness.bgColor}`}
+              >
+                <ClockIcon className={`w-7 h-7 ${effectiveness.color}`} />
+              </div>
+
+              {/* Contenido */}
+              <div className="flex flex-col">
+                <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+                  Efectividad de cobro
+                </p>
+
+                <p className="mt-1 text-2xl sm:text-3xl font-semibold text-gray-800">
+                  {avgEffectiveness.toFixed(2)}{" "}
+                  <span className="text-base font-medium text-gray-400">
+                    días
+                  </span>
+                </p>
+
+                <span className={`text-sm font-medium ${effectiveness.color}`}>
+                  {effectiveness.label}
+                </span>
+              </div>
+            </div>
+          );
+        })()}
+      </section>
 
       {/* Estadísticas de Contratos */}
       <section>
         <h3 className="text-lg font-semibold text-gray-700 mb-3">Contratos</h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div className="bg-white p-4 rounded-xl shadow-md text-center">
+          <div className="bg-white p-4 rounded-xl shadow-sm text-center">
             <p className="text-sm text-gray-500">Activos</p>
             <p className="text-lg font-bold text-green-700">
               {stats?.activeContracts}
             </p>
           </div>
-          <div className="bg-white p-4 rounded-xl shadow-md text-center">
+          <div className="bg-white p-4 rounded-xl shadow-sm text-center">
             <p className="text-sm text-gray-500">Pend. Despacho</p>
             <p className="text-lg font-bold text-blue-700">
               {stats?.pendingToDispatch}
             </p>
           </div>
-          <div className="bg-white p-4 rounded-xl shadow-md text-center">
+          <div className="bg-white p-4 rounded-xl shadow-sm text-center">
             <p className="text-sm text-gray-500">Cancelados</p>
             <p className="text-lg font-bold text-red-700">
               {stats?.canceledContracts}
             </p>
           </div>
-          <div className="bg-white p-4 rounded-xl shadow-md text-center">
+          <div className="bg-white p-4 rounded-xl shadow-sm text-center">
             <p className="text-sm text-gray-500">Completados</p>
             <p className="text-lg font-bold text-gray-700">
               {stats?.completedContracts}
@@ -165,25 +245,25 @@ export default function Profile() {
           Resumen de Pagos
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div className="bg-white p-4 rounded-xl shadow-md text-center">
+          <div className="bg-white p-4 rounded-xl shadow-sm text-center">
             <p className="text-sm text-gray-500">Cobrado</p>
             <p className="text-lg font-bold text-green-700">
               ${formatMoney(payments?.totalAmountPaid || 0)}
             </p>
           </div>
-          <div className="bg-white p-4 rounded-xl shadow-md text-center">
+          <div className="bg-white p-4 rounded-xl shadow-sm text-center">
             <p className="text-sm text-gray-500">Atrasado</p>
             <p className="text-lg font-bold text-red-700">
               ${formatMoney(payments?.totalOverdueDebt || 0)}
             </p>
           </div>
-          <div className="bg-white p-4 rounded-xl shadow-md text-center">
+          <div className="bg-white p-4 rounded-xl shadow-sm text-center">
             <p className="text-sm text-gray-500">Pendiente</p>
             <p className="text-lg font-bold text-yellow-700">
               ${formatMoney(payments?.totalPendingBalance || 0)}
             </p>
           </div>
-          <div className="bg-white p-4 rounded-xl shadow-md text-center">
+          <div className="bg-white p-4 rounded-xl shadow-sm text-center">
             <p className="text-sm text-gray-500">Deuda Total</p>
             <p className="text-lg font-bold text-gray-700">
               ${formatMoney(payments?.totalDebt || 0)}
@@ -220,7 +300,7 @@ export default function Profile() {
                       <li
                         key={c.contractId}
                         onClick={() => handleOpenInstallments(c.contractId)}
-                        className="grid grid-cols-[150px_auto_100px] items-center border rounded-lg hover:shadow-md cursor-pointer transition-all duration-200 hover:bg-gray-50 py-2 px-3 text-sm"
+                        className="grid grid-cols-[100px_auto_100px] items-center border rounded-lg hover:shadow-sm cursor-pointer transition-all duration-200 hover:bg-gray-50 py-2 px-3 text-sm"
                       >
                         {/* Columna 1 */}
                         <span className="text-gray-800 font-medium">
