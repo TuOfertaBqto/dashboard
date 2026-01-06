@@ -320,32 +320,44 @@ export const InstallmentModal = ({
           <div className="flex justify-end mt-6">
             {!isRequest && (
               <div>
-                <PDFDownloadLink
-                  document={
-                    <MyPdfDocument
-                      contract={contract}
-                      installments={payments}
-                    />
-                  }
-                  fileName={`Contrato ${
-                    contract?.customerId.firstName.split(" ")[0] +
-                    " " +
-                    contract?.customerId.lastName.split(" ")[0]
-                  }.pdf`}
-                >
-                  {({ loading }) => (
-                    <button
-                      type="button"
-                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-all mr-2 cursor-pointer"
-                      disabled={loading}
-                    >
-                      <ArrowDownTrayIcon className="w-5 h-5" />
-                      {loading ? "Generando PDF..." : "Descargar PDF"}
-                    </button>
-                  )}
-                </PDFDownloadLink>
+                {loading || payments.length === 0 ? (
+                  <button
+                    type="button"
+                    disabled
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-400 text-white rounded cursor-not-allowed mr-2"
+                  >
+                    <ArrowDownTrayIcon className="w-5 h-5" />
+                    Cargando cuotas...
+                  </button>
+                ) : (
+                  <PDFDownloadLink
+                    document={
+                      <MyPdfDocument
+                        contract={contract}
+                        installments={payments}
+                      />
+                    }
+                    fileName={`Contrato ${
+                      contract.customerId.firstName.split(" ")[0] +
+                      " " +
+                      contract.customerId.lastName.split(" ")[0]
+                    }.pdf`}
+                  >
+                    {({ loading: pdfLoading }) => (
+                      <button
+                        type="button"
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-all mr-2"
+                        disabled={pdfLoading}
+                      >
+                        <ArrowDownTrayIcon className="w-5 h-5" />
+                        {pdfLoading ? "Generando PDF..." : "Descargar PDF"}
+                      </button>
+                    )}
+                  </PDFDownloadLink>
+                )}
               </div>
             )}
+
             <button
               onClick={onClose}
               className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 cursor-pointer"
