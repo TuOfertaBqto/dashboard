@@ -93,11 +93,11 @@ export const userApi = {
 
   remove: async (id: string) => {
     try {
-      const res = await api.delete(`/user/${id}`);
+      const res = await api.patch(`/user/${id}/desactivate`);
       return res.data;
     } catch (error) {
-      console.error("Error removing user:", error);
-      return { msg: "error removing user" };
+      console.error("Error deactivating user:", error);
+      return { msg: "error deactivating user" };
     }
   },
 
