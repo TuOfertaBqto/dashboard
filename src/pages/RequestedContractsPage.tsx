@@ -93,8 +93,15 @@ export default function RequestedContractsPage() {
   };
 
   const handleDelete = async (id: string): Promise<void> => {
-    await ContractApi.remove(id);
-    await Promise.all([fetchRequestedContracts(), refreshRequestsCount()]);
+    const t = toast.loading("Eliminando solicitud...");
+    try {
+      await ContractApi.remove(id);
+      await Promise.all([fetchRequestedContracts(), refreshRequestsCount()]);
+      toast.success("Solicitud eliminada", { id: t });
+    } catch (err) {
+      console.error(err);
+      toast.error("No se pudo eliminar", { id: t });
+    }
   };
 
   return (
