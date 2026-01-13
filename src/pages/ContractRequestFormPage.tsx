@@ -175,12 +175,15 @@ export default function ContractRequestFormPage() {
         });
 
         await ContractProductApi.updateBulk(updatedProducts);
+        toast.success("Solicitud actualizada correctamente");
       } else {
         await ContractApi.create(form);
+        toast.success("Solicitud registrada exitosamente");
       }
       navigate("/requests");
     } catch (err) {
       console.error(err);
+      toast.error("Ocurrió un error al guardar la solicitud");
     } finally {
       setLoading(false);
     }
