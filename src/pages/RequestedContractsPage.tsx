@@ -67,7 +67,7 @@ export default function RequestedContractsPage() {
       return contractApproved;
     } catch (err) {
       console.error(err);
-      toast.error("No se pudo aprobar", { id: t });
+      toast.error("Error al aprobar la solicitud", { id: t });
       throw err;
     }
   };
@@ -82,12 +82,12 @@ export default function RequestedContractsPage() {
 
       await Promise.all([fetchRequestedContracts(), refreshRequestsCount()]);
 
-      toast.info("Solicitud cancelada", { id: t });
+      toast.success(`Solicitud #${contractCanceled.code} cancelada`, { id: t });
 
       return contractCanceled;
     } catch (err) {
       console.error(err);
-      toast.error("No se pudo cancelar", { id: t });
+      toast.error("Error al cancelar la solicitud", { id: t });
       throw err;
     }
   };
@@ -100,7 +100,7 @@ export default function RequestedContractsPage() {
       toast.success("Solicitud eliminada", { id: t });
     } catch (err) {
       console.error(err);
-      toast.error("No se pudo eliminar", { id: t });
+      toast.error("Hubo un error al eliminar la solicitud", { id: t });
     }
   };
 
