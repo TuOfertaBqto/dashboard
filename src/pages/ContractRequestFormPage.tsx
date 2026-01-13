@@ -215,8 +215,10 @@ export default function ContractRequestFormPage() {
       }
 
       setForm({ ...form, products: updated });
+      toast.success("Producto eliminado");
     } catch (error) {
       console.error("Error eliminando el producto:", error);
+      toast.error("No se pudo eliminar el producto");
     } finally {
       setIsRemoving(false);
       setShowModal(false);
