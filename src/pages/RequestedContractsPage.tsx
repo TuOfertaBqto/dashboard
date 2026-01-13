@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
-import { ContractApi, type Contract } from "../api/contract";
-import { RequestedCard } from "../components/RequestedCard";
-import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { useAuth } from "../auth/useAuth";
+import { useEffect, useState } from "react";
 import type { UserRole } from "../api/user";
-import { InstallmentModal } from "../components/InstallmentModal";
+import { useNavigate } from "react-router-dom";
 import { InventoryApi } from "../api/inventory";
+import { RequestedCard } from "../components/RequestedCard";
 import { ContractProductApi } from "../api/contract-product";
+import { ContractApi, type Contract } from "../api/contract";
 import { useRequests } from "../contexts/requests/useRequests";
+import { InstallmentModal } from "../components/InstallmentModal";
 
 export default function RequestedContractsPage() {
   const navigate = useNavigate();
@@ -40,26 +41,35 @@ export default function RequestedContractsPage() {
   }, []);
 
   const handleApprove = async (id: string): Promise<Contract> => {
-    const contractApproved = await ContractApi.update(id, {
-      status: "approved",
-    });
+    const t = toast.loading("Aprobando solicitud...");
 
-    await Promise.all(
-      contractApproved.products.map(async (p) => {
-        const [toDesp, stock] = await Promise.all([
-          ContractProductApi.getToDispatchQuantity(p.product.id),
-          InventoryApi.getStockByProductId(p.product.id),
-        ]);
+    try {
+      const contractApproved = await ContractApi.update(id, {
+        status: "approved",
+      });
 
-        const status = stock >= p.quantity + toDesp ? "to_dispatch" : "to_buy";
+      await Promise.all(
+        contractApproved.products.map(async (p) => {
+          const [toDesp, stock] = await Promise.all([
+            ContractProductApi.getToDispatchQuantity(p.product.id),
+            InventoryApi.getStockByProductId(p.product.id),
+          ]);
+          const status =
+            stock >= p.quantity + toDesp ? "to_dispatch" : "to_buy";
+          await ContractProductApi.updateProducts(p.id, status);
+        })
+      );
 
-        await ContractProductApi.updateProducts(p.id, status);
-      })
-    );
+      await Promise.all([fetchRequestedContracts(), refreshRequestsCount()]);
 
-    await Promise.all([fetchRequestedContracts(), refreshRequestsCount()]);
+      toast.success(`Solicitud #${contractApproved.code} aprobada`, { id: t });
 
-    return contractApproved;
+      return contractApproved;
+    } catch (err) {
+      console.error(err);
+      toast.error("No se pudo aprobar", { id: t });
+      throw err;
+    }
   };
 
   const handleCancel = async (id: string): Promise<Contract> => {
