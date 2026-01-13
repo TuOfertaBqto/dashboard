@@ -28,33 +28,90 @@ export const InstallmentModal = ({
   contract,
 }: Props) => {
   const [payments, setPayments] = useState<Installment[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!open || !contract?.id) return;
+    if (!contract?.id || !open) {
+      setPayments([]);
+      setLoading(false);
+      return;
+    }
 
-    setPayments([]);
+    let isMounted = true;
 
     const fetchInstallments = async () => {
+      setLoading(true);
+      setPayments([]); // 🔹 evita mostrar cuotas del contrato anterior
+
       try {
         const res = await InstallmentApi.getAllByContractId(contract.id);
+
+        if (!isMounted) return;
 
         if (res && res.length > 0) {
           setPayments(res);
         } else {
-          const generated = generateInstallmentsFromContract(contract);
-          setPayments(generated);
+          setPayments(generateInstallmentsFromContract(contract));
         }
       } catch (err) {
         console.error("Error al obtener cuotas:", err);
-        const generated = generateInstallmentsFromContract(contract);
-        setPayments(generated);
+        if (isMounted) {
+          setPayments(generateInstallmentsFromContract(contract));
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchInstallments();
-  }, [open, contract]);
 
-  if (!open || !contract || payments.length == 0) return null;
+    return () => {
+      isMounted = false;
+    };
+  }, [contract, open]);
+
+  const InstallmentSkeletonRow = () => (
+    <tr className="border-t animate-pulse">
+      {/* # */}
+      <td className="p-2">
+        <div className="h-3 bg-gray-200 rounded w-5" />
+      </td>
+
+      {/* Vencimiento */}
+      <td className="p-2">
+        <div className="h-5 bg-gray-200 rounded-full w-24 sm:w-32" />
+      </td>
+
+      {/* Monto */}
+      <td className="p-2">
+        <div className="h-3 bg-gray-200 rounded w-16 sm:w-20" />
+      </td>
+
+      {/* Pagado */}
+      <td className="p-2">
+        <div className="h-3 bg-gray-200 rounded w-14 sm:w-20" />
+      </td>
+
+      {/* Tipo (solo md+) */}
+      <td className="p-2 hidden md:table-cell">
+        <div className="h-3 bg-gray-200 rounded w-20 lg:w-24" />
+      </td>
+
+      {/* Fecha de pago */}
+      <td className="p-2">
+        <div className="h-3 bg-gray-200 rounded w-20 sm:w-24" />
+      </td>
+
+      {/* Saldo */}
+      <td className="p-2">
+        <div className="h-3 bg-gray-200 rounded w-12 sm:w-16" />
+      </td>
+    </tr>
+  );
+
+  if (!open || !contract) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -158,98 +215,104 @@ export const InstallmentModal = ({
                 </tr>
               </thead>
               <tbody>
-                {payments.map((p, index) => {
-                  let dueDateClass = "";
-                  let IconComponent = null;
-                  let number = "";
+                {loading
+                  ? [...Array(10)].map((_, i) => (
+                      <InstallmentSkeletonRow key={i} />
+                    ))
+                  : payments.map((p, index) => {
+                      let dueDateClass = "";
+                      let IconComponent = null;
+                      let number = "";
 
-                  if (
-                    ["discount", "payment_agreement"].includes(
-                      p.installmentPayments[0]?.payment.type ?? ""
-                    )
-                  ) {
-                    dueDateClass = "bg-blue-100 text-blue-700";
-                    IconComponent = InformationCircleIcon;
-                  } else if (p.paidAt) {
-                    dueDateClass = "bg-green-100 text-green-700";
-                    IconComponent = CheckCircleIcon;
-                  } else if (
-                    dayjs(p.dueDate.split("T")[0]).isBefore(dayjs(), "day")
-                  ) {
-                    dueDateClass = "bg-red-100 text-red-700";
-                    IconComponent = ExclamationCircleIcon;
-                  } else {
-                    dueDateClass = "bg-yellow-100 text-yellow-800";
-                    IconComponent = ClockIcon;
-                  }
+                      if (
+                        ["discount", "payment_agreement"].includes(
+                          p.installmentPayments[0]?.payment.type ?? ""
+                        )
+                      ) {
+                        dueDateClass = "bg-blue-100 text-blue-700";
+                        IconComponent = InformationCircleIcon;
+                      } else if (p.paidAt) {
+                        dueDateClass = "bg-green-100 text-green-700";
+                        IconComponent = CheckCircleIcon;
+                      } else if (
+                        dayjs(p.dueDate.split("T")[0]).isBefore(dayjs(), "day")
+                      ) {
+                        dueDateClass = "bg-red-100 text-red-700";
+                        IconComponent = ExclamationCircleIcon;
+                      } else {
+                        dueDateClass = "bg-yellow-100 text-yellow-800";
+                        IconComponent = ClockIcon;
+                      }
 
-                  if (
-                    payments[0] &&
-                    payments[1] &&
-                    payments[0].installmentAmount >
-                      payments[1].installmentAmount
-                  ) {
-                    if (index === 0) {
-                      number = "Inicial";
-                    } else {
-                      number = index.toString();
-                    }
-                  } else {
-                    number = (index + 1).toString();
-                  }
+                      if (
+                        payments[0] &&
+                        payments[1] &&
+                        payments[0].installmentAmount >
+                          payments[1].installmentAmount
+                      ) {
+                        if (index === 0) {
+                          number = "Inicial";
+                        } else {
+                          number = index.toString();
+                        }
+                      } else {
+                        number = (index + 1).toString();
+                      }
 
-                  return (
-                    <tr key={p.id} className="border-t">
-                      <td className="p-2">{number}</td>
-                      <td className="p-2">
-                        <span
-                          className={`
+                      return (
+                        <tr key={p.id} className="border-t">
+                          <td className="p-2">{number}</td>
+                          <td className="p-2">
+                            <span
+                              className={`
       inline-flex items-center gap-1 px-2 py-1 rounded-full font-semibold 
       ${dueDateClass} 
       max-w-full 
     `}
-                        >
-                          {IconComponent && (
-                            <IconComponent className="w-4 h-4 shrink-0" />
-                          )}
-                          <span className="truncate">
-                            {dayjs(p.dueDate.split("T")[0]).format(
-                              "DD-MM-YYYY"
-                            )}
-                          </span>
-                        </span>
-                      </td>
-                      <td className="p-2">${p.installmentAmount}</td>
-                      <td className="p-2">
-                        {p.installmentPayments &&
-                        p.installmentPayments.length > 0
-                          ? (() => {
-                              const total = p.installmentPayments.reduce(
-                                (sum, ip) => sum + Number(ip.amount),
-                                0
-                              );
-                              return `$${total.toFixed(2)}`;
-                            })()
-                          : "—"}
-                      </td>
+                            >
+                              {IconComponent && (
+                                <IconComponent className="w-4 h-4 shrink-0" />
+                              )}
+                              <span className="truncate">
+                                {dayjs(p.dueDate.split("T")[0]).format(
+                                  "DD-MM-YYYY"
+                                )}
+                              </span>
+                            </span>
+                          </td>
+                          <td className="p-2">${p.installmentAmount}</td>
+                          <td className="p-2">
+                            {p.installmentPayments &&
+                            p.installmentPayments.length > 0
+                              ? (() => {
+                                  const total = p.installmentPayments.reduce(
+                                    (sum, ip) => sum + Number(ip.amount),
+                                    0
+                                  );
+                                  return `$${total.toFixed(2)}`;
+                                })()
+                              : "—"}
+                          </td>
 
-                      <td className="p-2 hidden md:table-cell md:w-[15%]">
-                        {p.installmentPayments &&
-                        p.installmentPayments.length > 0
-                          ? translatePaymentMethod(
-                              p.installmentPayments[0]?.payment?.type ?? ""
-                            )
-                          : ""}
-                      </td>
-                      <td className="p-2">
-                        {p.paidAt
-                          ? dayjs(p.paidAt.split("T")[0]).format("DD-MM-YYYY")
-                          : "—"}
-                      </td>
-                      <td className="p-2">{p.debt ? "$" + p.debt : ""}</td>
-                    </tr>
-                  );
-                })}
+                          <td className="p-2 hidden md:table-cell md:w-[15%]">
+                            {p.installmentPayments &&
+                            p.installmentPayments.length > 0
+                              ? translatePaymentMethod(
+                                  p.installmentPayments[0]?.payment?.type ?? ""
+                                )
+                              : ""}
+                          </td>
+                          <td className="p-2">
+                            {p.paidAt
+                              ? dayjs(p.paidAt.split("T")[0]).format(
+                                  "DD-MM-YYYY"
+                                )
+                              : "—"}
+                          </td>
+                          <td className="p-2">{p.debt ? "$" + p.debt : ""}</td>
+                        </tr>
+                      );
+                    })}
               </tbody>
             </table>
           </div>
@@ -257,32 +320,44 @@ export const InstallmentModal = ({
           <div className="flex justify-end mt-6">
             {!isRequest && (
               <div>
-                <PDFDownloadLink
-                  document={
-                    <MyPdfDocument
-                      contract={contract}
-                      installments={payments}
-                    />
-                  }
-                  fileName={`Contrato ${
-                    contract?.customerId.firstName.split(" ")[0] +
-                    " " +
-                    contract?.customerId.lastName.split(" ")[0]
-                  }.pdf`}
-                >
-                  {({ loading }) => (
-                    <button
-                      type="button"
-                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-all mr-2 cursor-pointer"
-                      disabled={loading}
-                    >
-                      <ArrowDownTrayIcon className="w-5 h-5" />
-                      {loading ? "Generando PDF..." : "Descargar PDF"}
-                    </button>
-                  )}
-                </PDFDownloadLink>
+                {loading || payments.length === 0 ? (
+                  <button
+                    type="button"
+                    disabled
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-400 text-white rounded cursor-not-allowed mr-2"
+                  >
+                    <ArrowDownTrayIcon className="w-5 h-5" />
+                    Cargando cuotas...
+                  </button>
+                ) : (
+                  <PDFDownloadLink
+                    document={
+                      <MyPdfDocument
+                        contract={contract}
+                        installments={payments}
+                      />
+                    }
+                    fileName={`Contrato ${
+                      contract.customerId.firstName.split(" ")[0] +
+                      " " +
+                      contract.customerId.lastName.split(" ")[0]
+                    }.pdf`}
+                  >
+                    {({ loading: pdfLoading }) => (
+                      <button
+                        type="button"
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-all mr-2"
+                        disabled={pdfLoading}
+                      >
+                        <ArrowDownTrayIcon className="w-5 h-5" />
+                        {pdfLoading ? "Generando PDF..." : "Descargar PDF"}
+                      </button>
+                    )}
+                  </PDFDownloadLink>
+                )}
               </div>
             )}
+
             <button
               onClick={onClose}
               className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 cursor-pointer"
