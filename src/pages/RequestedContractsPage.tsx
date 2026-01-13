@@ -73,13 +73,23 @@ export default function RequestedContractsPage() {
   };
 
   const handleCancel = async (id: string): Promise<Contract> => {
-    const contractCanceled = await ContractApi.update(id, {
-      status: "canceled",
-    });
+    const t = toast.loading("Cancelando solicitud...");
 
-    await Promise.all([fetchRequestedContracts(), refreshRequestsCount()]);
+    try {
+      const contractCanceled = await ContractApi.update(id, {
+        status: "canceled",
+      });
 
-    return contractCanceled;
+      await Promise.all([fetchRequestedContracts(), refreshRequestsCount()]);
+
+      toast.info("Solicitud cancelada", { id: t });
+
+      return contractCanceled;
+    } catch (err) {
+      console.error(err);
+      toast.error("No se pudo cancelar", { id: t });
+      throw err;
+    }
   };
 
   const handleDelete = async (id: string): Promise<void> => {
