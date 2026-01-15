@@ -3,6 +3,7 @@ import {
   type Contract,
   type CreateContract,
 } from "../api/contract";
+import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { InventoryApi } from "../api/inventory";
 import { userApi, type User } from "../api/user";
@@ -51,6 +52,10 @@ export default function ContractFormPage() {
   }, [id]);
 
   const handleSubmit = async (data: CreateContract) => {
+    const t = toast.loading(
+      id ? "Actualizando contrato..." : "Creando contrato..."
+    );
+
     let contractToDispatch: Contract | null = null;
     try {
       if (id) {
@@ -73,6 +78,8 @@ export default function ContractFormPage() {
           //endDate,
           //startDate,
         });
+
+        toast.success("Contrato actualizado exitosamente", { id: t });
       } else {
         await Promise.all(
           data.products.map(async (p) => {
@@ -87,6 +94,8 @@ export default function ContractFormPage() {
         );
 
         contractToDispatch = await ContractApi.create(data);
+
+        toast.success("Contrato creado exitosamente", { id: t });
       }
 
       if (data.startDate && contractToDispatch) {
@@ -123,6 +132,7 @@ export default function ContractFormPage() {
       navigate("/vendors");
     } catch (err) {
       console.error("Error guardando contrato", err);
+      toast.error("Error al guardar el contrato", { id: t });
     }
   };
 
