@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import { toast } from "sonner";
 import { userApi } from "../api/user";
 import { InstallmentApi } from "../api/installment";
 import { useCallback, useEffect, useState } from "react";
@@ -98,6 +99,7 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
       setPageTitle(title);
     } catch (err) {
       console.log("Error loading contract", err);
+      toast.error("No se pudieron cargar los contratos");
       setContracts([]);
       setPageTitle("El usuario no existe o no se pudo cargar");
     } finally {
@@ -111,9 +113,19 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
 
   const handleDelete = async () => {
     if (!contractToDelete) return;
-    await ContractApi.remove(contractToDelete.id);
-    fetchContracts();
-    setContractToDelete(null);
+    try {
+      await ContractApi.remove(contractToDelete.id);
+      fetchContracts();
+
+      toast.success(
+        `Contrato C#${contractToDelete.code} eliminado correctamente`
+      );
+    } catch (err) {
+      console.error(err);
+      toast.error("Error al eliminar el contrato");
+    } finally {
+      setContractToDelete(null);
+    }
   };
 
   const handleDispatch = async () => {
@@ -154,8 +166,14 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
       });
 
       fetchContracts();
+      toast.success(
+        `Contrato C#${contractToDispatch.code} despachado con éxito`
+      );
     } catch (error) {
       console.error("Error al despachar contrato:", error);
+      toast.error(
+        `Error al despachar el contrato C#${contractToDispatch.code}`
+      );
     } finally {
       setContractToDispatch(null);
     }
@@ -206,14 +224,14 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
       <ConfirmModal
         open={!!contractToDelete}
         title="Eliminar contrato"
-        message={`¿Estás seguro que deseas eliminar el contrato "${contractToDelete?.code}"?`}
+        message={`¿Estás seguro que deseas eliminar el contrato C#${contractToDelete?.code}?`}
         onCancel={() => setContractToDelete(null)}
         onConfirm={handleDelete}
       />
 
       <ConfirmModal
         open={!!contractToDispatch}
-        title={`Despachar contrato #${contractToDispatch?.code}`}
+        title={`Despachar contrato C#${contractToDispatch?.code}`}
         message={
           <div className="flex flex-col w-full my-3">
             <label
