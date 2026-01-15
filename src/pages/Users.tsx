@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { UserTable } from "../components/UserTable";
-import { userApi, type User } from "../api/user";
 import { useNavigate } from "react-router-dom";
+import { userApi, type User } from "../api/user";
+import { UserTable } from "../components/UserTable";
 import { ConfirmModal } from "../components/ConfirmModal";
 
 export default function UsersPage() {

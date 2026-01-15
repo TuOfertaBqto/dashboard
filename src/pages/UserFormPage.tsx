@@ -1,8 +1,8 @@
+import { useAuth } from "../auth/useAuth";
 import { useEffect, useRef, useState } from "react";
+import { TrashIcon } from "@heroicons/react/24/outline";
 import { useNavigate, useParams } from "react-router-dom";
 import { userApi, type User, type UserRole } from "../api/user";
-import { useAuth } from "../auth/useAuth";
-import { TrashIcon } from "@heroicons/react/24/outline";
 
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;

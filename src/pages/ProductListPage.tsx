@@ -1,11 +1,11 @@
+import { useAuth } from "../auth/useAuth";
 import { useEffect, useState } from "react";
-import { ProductApi, type Product } from "../api/product";
 import { useNavigate } from "react-router-dom";
 import { ProductTable } from "../components/ProductTable";
 import { ConfirmModal } from "../components/ConfirmModal";
-import { InventoryApi, type Inventory } from "../api/inventory";
+import { ProductApi, type Product } from "../api/product";
 import { InventoryMovApi } from "../api/inventory-movement";
-import { useAuth } from "../auth/useAuth";
+import { InventoryApi, type Inventory } from "../api/inventory";
 
 export const ProductListPage = () => {
   const { user } = useAuth();

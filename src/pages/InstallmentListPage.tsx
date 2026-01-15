@@ -1,10 +1,10 @@
-import classNames from "classnames";
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
-import { InstallmentApi, type Installment } from "../api/installment";
-import { useNavigate, useParams } from "react-router-dom";
+import classNames from "classnames";
 import { userApi } from "../api/user";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { InstallmentApi, type Installment } from "../api/installment";
 
 export const InstallmentListPage = () => {
   const { id } = useParams();

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { ProductApi, type CreateProduct, type Product } from "../api/product";
 import { ProductForm } from "../components/ProductForm";
+import { useNavigate, useParams } from "react-router-dom";
 import { CategoryApi, type Category } from "../api/category";
+import { ProductApi, type CreateProduct, type Product } from "../api/product";
 
 export const ProductFormPage = () => {
   const { id } = useParams();

@@ -1,7 +1,7 @@
-import { Link, Navigate } from "react-router-dom";
-import { useAuth } from "../../auth/useAuth";
 import { useState } from "react";
 import { AuthApi } from "../../api/auth";
+import { useAuth } from "../../auth/useAuth";
+import { Link, Navigate } from "react-router-dom";
 
 export default function ForgotPasswordPage() {
   const { token, user } = useAuth();

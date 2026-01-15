@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { AuthApi } from "../../api/auth";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../auth/useAuth";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 
 export default function ResetPasswordPage() {
   const { token, user } = useAuth();
