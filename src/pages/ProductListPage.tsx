@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 import { useAuth } from "../auth/useAuth";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -26,6 +27,7 @@ export const ProductListPage = () => {
       setInventory(res);
     } catch (err) {
       console.log("Error loading inventory", err);
+      toast.error("Error al cargar el inventario");
     } finally {
       setLoading(false);
     }
@@ -35,9 +37,11 @@ export const ProductListPage = () => {
     if (!productToDelete) return;
     try {
       await ProductApi.remove(productToDelete.id);
+      toast.success("Producto eliminado correctamente");
       fetchProducts();
     } catch (error) {
       console.error("Error al eliminar producto:", error);
+      toast.error("Error al eliminar el producto");
     } finally {
       setProductToDelete(null);
     }
@@ -169,9 +173,11 @@ export const ProductListPage = () => {
               quantity,
               type: "in",
             });
+            toast.success("Inventario registrado correctamente");
             fetchProducts();
           } catch (err) {
             console.error("Error al ingresar inventario:", err);
+            toast.error("No se pudo ingresar el inventario");
           } finally {
             setOpenInventoryModal(false);
             setSelectedProductId("");
