@@ -8,6 +8,7 @@ import { PaymentApi } from "../api/payment";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AccountApi, type Account } from "../api/account";
+import { toast } from "sonner";
 
 export const InstallmentPaymentPage = () => {
   const { id } = useParams();
@@ -113,6 +114,7 @@ export const InstallmentPaymentPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    const t = toast.loading("Registrando pago...");
 
     const payload: UpdateInstallment = {
       ...form,
@@ -135,10 +137,12 @@ export const InstallmentPaymentPage = () => {
         accountId: payload.accountId,
       });
 
-      navigate(-1);
+      toast.success("Pago registrado exitosamente", { id: t });
     } catch (error) {
       console.error("Error al registrar pago:", error);
+      toast.error("Hubo un error al registrar el pago.", { id: t });
     } finally {
+      navigate(-1);
       setLoading(false);
     }
   };
