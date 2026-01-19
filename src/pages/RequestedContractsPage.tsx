@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
-import { ContractApi, type Contract } from "../api/contract";
-import { RequestedCard } from "../components/RequestedCard";
-import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { useAuth } from "../auth/useAuth";
+import { useEffect, useState } from "react";
 import type { UserRole } from "../api/user";
-import { InstallmentModal } from "../components/InstallmentModal";
+import { useNavigate } from "react-router-dom";
 import { InventoryApi } from "../api/inventory";
+import { RequestedCard } from "../components/RequestedCard";
 import { ContractProductApi } from "../api/contract-product";
+import { ContractApi, type Contract } from "../api/contract";
 import { useRequests } from "../contexts/requests/useRequests";
+import { InstallmentModal } from "../components/InstallmentModal";
 
 export default function RequestedContractsPage() {
   const navigate = useNavigate();
@@ -40,41 +41,67 @@ export default function RequestedContractsPage() {
   }, []);
 
   const handleApprove = async (id: string): Promise<Contract> => {
-    const contractApproved = await ContractApi.update(id, {
-      status: "approved",
-    });
+    const t = toast.loading("Aprobando solicitud...");
 
-    await Promise.all(
-      contractApproved.products.map(async (p) => {
-        const [toDesp, stock] = await Promise.all([
-          ContractProductApi.getToDispatchQuantity(p.product.id),
-          InventoryApi.getStockByProductId(p.product.id),
-        ]);
+    try {
+      const contractApproved = await ContractApi.update(id, {
+        status: "approved",
+      });
 
-        const status = stock >= p.quantity + toDesp ? "to_dispatch" : "to_buy";
+      await Promise.all(
+        contractApproved.products.map(async (p) => {
+          const [toDesp, stock] = await Promise.all([
+            ContractProductApi.getToDispatchQuantity(p.product.id),
+            InventoryApi.getStockByProductId(p.product.id),
+          ]);
+          const status =
+            stock >= p.quantity + toDesp ? "to_dispatch" : "to_buy";
+          await ContractProductApi.updateProducts(p.id, status);
+        })
+      );
 
-        await ContractProductApi.updateProducts(p.id, status);
-      })
-    );
+      await Promise.all([fetchRequestedContracts(), refreshRequestsCount()]);
 
-    await Promise.all([fetchRequestedContracts(), refreshRequestsCount()]);
+      toast.success(`Solicitud #${contractApproved.code} aprobada`, { id: t });
 
-    return contractApproved;
+      return contractApproved;
+    } catch (err) {
+      console.error(err);
+      toast.error("Error al aprobar la solicitud", { id: t });
+      throw err;
+    }
   };
 
   const handleCancel = async (id: string): Promise<Contract> => {
-    const contractCanceled = await ContractApi.update(id, {
-      status: "canceled",
-    });
+    const t = toast.loading("Cancelando solicitud...");
 
-    await Promise.all([fetchRequestedContracts(), refreshRequestsCount()]);
+    try {
+      const contractCanceled = await ContractApi.update(id, {
+        status: "canceled",
+      });
 
-    return contractCanceled;
+      await Promise.all([fetchRequestedContracts(), refreshRequestsCount()]);
+
+      toast.success(`Solicitud #${contractCanceled.code} cancelada`, { id: t });
+
+      return contractCanceled;
+    } catch (err) {
+      console.error(err);
+      toast.error("Error al cancelar la solicitud", { id: t });
+      throw err;
+    }
   };
 
   const handleDelete = async (id: string): Promise<void> => {
-    await ContractApi.remove(id);
-    await Promise.all([fetchRequestedContracts(), refreshRequestsCount()]);
+    const t = toast.loading("Eliminando solicitud...");
+    try {
+      await ContractApi.remove(id);
+      await Promise.all([fetchRequestedContracts(), refreshRequestsCount()]);
+      toast.success("Solicitud eliminada", { id: t });
+    } catch (err) {
+      console.error(err);
+      toast.error("Hubo un error al eliminar la solicitud", { id: t });
+    }
   };
 
   return (

@@ -1,25 +1,25 @@
-import { useNavigate, useParams } from "react-router-dom";
-import { useAuth } from "../auth/useAuth";
-import { userApi, type User } from "../api/user";
 import {
   ContractApi,
   type Contract,
   type ResponseCountContract,
 } from "../api/contract";
-import { useCallback, useEffect, useState } from "react";
 import {
   InstallmentApi,
   type VendorPaymentsTotals,
   type VendorsWithDebts,
 } from "../api/installment";
-import { formatMoney } from "../utils/formatMoney";
 import {
   ArrowLeftIcon,
   ClockIcon,
   CurrencyDollarIcon,
 } from "@heroicons/react/24/outline";
-import { InstallmentModal } from "../components/InstallmentModal";
+import { useAuth } from "../auth/useAuth";
+import { userApi, type User } from "../api/user";
+import { formatMoney } from "../utils/formatMoney";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { ContractProductApi } from "../api/contract-product";
+import { InstallmentModal } from "../components/InstallmentModal";
 
 export default function Profile() {
   const { id } = useParams<{ id: string }>();

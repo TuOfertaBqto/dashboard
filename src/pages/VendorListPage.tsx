@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { userApi, type User } from "../api/user";
 import { VendorCard } from "../components/VendorCard";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
-import { useNavigate } from "react-router-dom";
 
 export const VendorListPage = () => {
   const navigate = useNavigate();

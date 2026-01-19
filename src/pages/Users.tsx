@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { UserTable } from "../components/UserTable";
-import { userApi, type User } from "../api/user";
 import { useNavigate } from "react-router-dom";
+import { userApi, type User } from "../api/user";
+import { UserTable } from "../components/UserTable";
 import { ConfirmModal } from "../components/ConfirmModal";
+import { toast } from "sonner";
 
 export default function UsersPage() {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ export default function UsersPage() {
       setUsers(data);
     } catch (err) {
       console.error("Error al cargar usuarios:", err);
+      toast.error("No se pudieron cargar los usuarios.");
     } finally {
       setLoading(false);
     }
@@ -32,9 +34,12 @@ export default function UsersPage() {
     try {
       await userApi.remove(userToDelete.id);
 
+      toast.success("Usuario eliminado correctamente");
+
       fetchUsers();
     } catch (err) {
       console.error("Error eliminando usuario", err);
+      toast.error("Error eliminando el usuario");
     } finally {
       setUserToDelete(null);
     }

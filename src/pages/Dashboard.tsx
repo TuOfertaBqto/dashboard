@@ -1,26 +1,26 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { ContractApi, type ResponseCountContract } from "../api/contract";
-import { userApi, type User, type VendorStats } from "../api/user";
-import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
-import { InstallmentApi, type GlobalPaymentsTotals } from "../api/installment";
-import { DebtsReportPDF } from "../components/pdf/DebtsReportPDF";
 import dayjs from "dayjs";
-import { pdf } from "@react-pdf/renderer";
-import { VendorsTotalsPDF } from "../components/pdf/VendorsTotalsPDF";
-import { useNavigate } from "react-router-dom";
-import { SummaryPayment } from "../components/dashboard/SummaryPayment";
-import { PaymentApi, type PaymentSummary } from "../api/payment";
-import { ContractCountCard } from "../components/dashboard/ContractCountCard";
-import { Balance } from "../components/dashboard/Balance";
 import {
   PaymentAccountApi,
   type TotalsByAccount,
 } from "../api/payment-account";
-import { useAuth } from "../auth/useAuth";
 import {
   ContractProductApi,
   type ProductDispatchedTotals,
 } from "../api/contract-product";
+import { pdf } from "@react-pdf/renderer";
+import { useAuth } from "../auth/useAuth";
+import { useNavigate } from "react-router-dom";
+import { Balance } from "../components/dashboard/Balance";
+import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
+import { PaymentApi, type PaymentSummary } from "../api/payment";
+import { DebtsReportPDF } from "../components/pdf/DebtsReportPDF";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { userApi, type User, type VendorStats } from "../api/user";
+import { VendorsTotalsPDF } from "../components/pdf/VendorsTotalsPDF";
+import { SummaryPayment } from "../components/dashboard/SummaryPayment";
+import { ContractApi, type ResponseCountContract } from "../api/contract";
+import { ContractCountCard } from "../components/dashboard/ContractCountCard";
+import { InstallmentApi, type GlobalPaymentsTotals } from "../api/installment";
 
 export default function Dashboard() {
   const navigate = useNavigate();
