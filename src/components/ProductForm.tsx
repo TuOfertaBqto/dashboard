@@ -25,6 +25,10 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
   const [loadingData, setLoadingData] = useState(true);
   const [stock, setStock] = useState<number | "">(0);
   const navigate = useNavigate();
+  const [isBCV, setIsBCV] = useState<boolean>(false);
+  const [priceUSDT, setPriceUSDT] = useState<number>(0);
+  const [priceEUR, setPriceEUR] = useState<number>(0);
+  const [weeks, setWeeks] = useState<number>(0);
 
   useEffect(() => {
     if (initialData) {
@@ -52,10 +56,33 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
     fetchStock();
   }, [initialData, id]);
 
+  useEffect(() => {
+    const fetchPrice = async () => {
+      try {
+        fetch("https://criptoya.com/api/binancep2p/usdt/ves")
+          .then((response) => response.json())
+          .then((data) => {
+            setPriceUSDT(data.ask);
+          })
+          .catch((error) => console.error("Error:", error));
+
+        fetch("https://api.dolarvzla.com/public/exchange-rate")
+          .then((response) => response.json())
+          .then((data) => {
+            setPriceEUR(data.current.eur);
+          })
+          .catch((error) => console.error("Error:", error));
+      } catch (error) {
+        console.error("Error al obtener precio Dolar api:", error);
+      }
+    };
+    fetchPrice();
+  }, []);
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     const { name, value } = e.target;
     if (["price", "installmentAmount"].includes(name)) {
@@ -91,6 +118,56 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const calculatePrice = (isBCV: boolean, purchasePrice: number) => {
+    let salePriceTemp = 0;
+
+    if (isBCV) {
+      salePriceTemp = purchasePrice * 2;
+    } else {
+      salePriceTemp = +(purchasePrice * 2 * (priceUSDT / priceEUR)).toFixed(2);
+    }
+
+    const candidates: {
+      x: number;
+      k: number;
+      product: number;
+      diff: number;
+    }[] = [];
+    const ki = salePriceTemp >= 150 ? 15 : 10;
+
+    for (let k = ki; k <= 20; k++) {
+      // x debe cumplir: x*k >= n y x múltiplo de 5
+      // entonces primero calculamos lo mínimo que debería ser x
+      let x = Math.ceil(salePriceTemp / k);
+
+      // pero x debe ser múltiplo de 5 → ajustamos hacia arriba al próximo múltiplo de 5
+      if (x % 5 !== 0) {
+        x = x + (5 - (x % 5));
+      }
+
+      const product = x * k;
+      const diff = Math.abs(product - salePriceTemp);
+
+      candidates.push({ x, k, product, diff });
+    }
+
+    // elegimos la más cercana
+    candidates.sort((a, b) => a.diff - b.diff);
+
+    setWeeks(candidates[0].k);
+    setForm((prev) => ({
+      ...prev,
+      installmentAmount: candidates[0].x,
+      price: candidates[0].product,
+    }));
+
+    return {
+      original: salePriceTemp,
+      bestTriad: candidates[0],
+      allTriads: candidates, // opcional
+    };
   };
 
   return loadingData ? (
@@ -154,40 +231,110 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
         </select>
       </div>
 
-      <div>
-        <label htmlFor="price" className="block mb-1 text-sm">
-          Precio ($)
-        </label>
-        <input
-          id="price"
-          name="price"
-          type="number"
-          min={1}
-          step={1}
-          value={form.price}
-          onChange={handleChange}
-          className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-          required
-          onWheel={(e) => e.currentTarget.blur()}
-        />
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex-1">
+          <label className="block mb-1 text-sm">Precio de compra ($)</label>
+          <input
+            id="purchasePrice"
+            name="purchasePrice"
+            type="number"
+            min={1}
+            step={1}
+            //value={form.purchasePrice}
+            onChange={(p) => {
+              const value = p.target.value;
+              const numericValue = value ? parseFloat(value) : 0;
+              const txt = calculatePrice(isBCV, numericValue);
+              console.log(txt);
+            }}
+            className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            required
+            onWheel={(e) => e.currentTarget.blur()}
+          />
+        </div>
+
+        {/* RADIO BCV */}
+        <div className="flex flex-col gap-2">
+          <label className="text-sm mb-1">¿BCV?</label>
+
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-1 text-sm cursor-pointer">
+              <input
+                type="radio"
+                name="isBCV"
+                checked={isBCV === true}
+                onChange={() => setIsBCV(true)}
+              />
+              Sí
+            </label>
+
+            <label className="flex items-center gap-1 text-sm cursor-pointer">
+              <input
+                type="radio"
+                name="isBCV"
+                checked={isBCV === false}
+                onChange={() => setIsBCV(false)}
+              />
+              No
+            </label>
+          </div>
+        </div>
       </div>
 
-      <div>
-        <label htmlFor="installmentAmount" className="block mb-1 text-sm">
-          Cuota semanal ($)
-        </label>
-        <input
-          id="installmentAmount"
-          name="installmentAmount"
-          type="number"
-          min={1}
-          step={1}
-          value={form.installmentAmount}
-          onChange={handleChange}
-          className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-          required
-          onWheel={(e) => e.currentTarget.blur()}
-        />
+      <div className="flex flex-col md:flex-row gap-4">
+        <div className="flex-1">
+          <label htmlFor="price" className="block mb-1 text-sm">
+            Precio ($)
+          </label>
+          <input
+            id="price"
+            name="price"
+            type="number"
+            min={1}
+            step={1}
+            value={form.price}
+            onChange={handleChange}
+            className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            required
+            onWheel={(e) => e.currentTarget.blur()}
+          />
+        </div>
+
+        <div className="flex-1">
+          <label htmlFor="installmentAmount" className="block mb-1 text-sm">
+            Semanas
+          </label>
+          <input
+            id="weeks"
+            name="weeks"
+            type="number"
+            min={1}
+            step={1}
+            value={weeks}
+            onChange={(e) => setWeeks(parseInt(e.target.value, 10))}
+            className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            required
+            onWheel={(e) => e.currentTarget.blur()}
+          />
+        </div>
+
+        <div className="flex-1">
+          <label htmlFor="installmentAmount" className="block mb-1 text-sm">
+            Cuota semanal ($)
+          </label>
+          <input
+            id="installmentAmount"
+            name="installmentAmount"
+            type="number"
+            min={1}
+            step={1}
+            value={form.installmentAmount}
+            onChange={handleChange}
+            className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            required
+            onWheel={(e) => e.currentTarget.blur()}
+          />
+        </div>
       </div>
 
       {id && user?.role === "main" && (
