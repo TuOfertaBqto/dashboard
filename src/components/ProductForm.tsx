@@ -62,14 +62,16 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
         fetch("https://criptoya.com/api/binancep2p/usdt/ves")
           .then((response) => response.json())
           .then((data) => {
-            setPriceUSDT(data.ask);
+            const dataParsed = Math.trunc(data.ask * 100) / 100;
+            setPriceUSDT(dataParsed);
           })
           .catch((error) => console.error("Error:", error));
 
         fetch("https://api.dolarvzla.com/public/exchange-rate")
           .then((response) => response.json())
           .then((data) => {
-            setPriceEUR(data.current.eur);
+            const dataParsed = Math.trunc(data.current.eur * 100) / 100;
+            setPriceEUR(dataParsed);
           })
           .catch((error) => console.error("Error:", error));
       } catch (error) {
@@ -175,218 +177,249 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
       <p className="text-gray-400">Cargando...</p>
     </div>
   ) : (
-    <form
-      onSubmit={handleSubmit}
-      className="bg-white p-6 rounded shadow space-y-4"
-    >
-      <div>
-        <label htmlFor="name" className="block mb-1 text-sm">
-          Nombre del producto
-        </label>
-        <input
-          id="name"
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-          className="w-full border p-2 rounded"
-          required
-          disabled={loading}
-          autoComplete="off"
-        />
-      </div>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="bg-white p-6 rounded shadow space-y-6">
+        <div>
+          <h3 className="text-lg font-semibold mb-4 border-b pb-1">
+            Información del producto
+          </h3>
 
-      <div>
-        <label htmlFor="description" className="block mb-1 text-sm">
-          Descripción
-        </label>
-        <textarea
-          id="description"
-          name="description"
-          value={form.description || ""}
-          onChange={handleChange}
-          className="w-full border p-2 rounded"
-          disabled={loading}
-        />
-      </div>
-
-      <div>
-        <label htmlFor="categoryId" className="block text-sm mb-1">
-          Categoría
-        </label>
-        <select
-          id="categoryId"
-          name="categoryId"
-          value={form.categoryId}
-          onChange={handleChange}
-          className="w-full border p-2 rounded"
-          required
-          disabled={loading}
-        >
-          <option value="">Seleccione una categoría</option>
-          {categories.map((cat) => (
-            <option key={cat.id} value={cat.id}>
-              {cat.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex-1">
-          <label className="block mb-1 text-sm">Precio de compra ($)</label>
-          <input
-            id="purchasePrice"
-            name="purchasePrice"
-            type="number"
-            min={1}
-            step={1}
-            //value={form.purchasePrice}
-            onChange={(p) => {
-              const value = p.target.value;
-              const numericValue = value ? parseFloat(value) : 0;
-              const txt = calculatePrice(isBCV, numericValue);
-              console.log(txt);
-            }}
-            className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-            required
-            onWheel={(e) => e.currentTarget.blur()}
-          />
-        </div>
-
-        {/* RADIO BCV */}
-        <div className="flex flex-col gap-2">
-          <label className="text-sm mb-1">¿BCV?</label>
-
-          <div className="flex items-center gap-3">
-            <label className="flex items-center gap-1 text-sm cursor-pointer">
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="name" className="block mb-1 text-sm">
+                Nombre del producto
+              </label>
               <input
-                type="radio"
-                name="isBCV"
-                checked={isBCV === true}
-                onChange={() => setIsBCV(true)}
+                id="name"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                className="w-full border p-2 rounded"
+                required
+                disabled={loading}
+                autoComplete="off"
               />
-              Sí
-            </label>
+            </div>
 
-            <label className="flex items-center gap-1 text-sm cursor-pointer">
-              <input
-                type="radio"
-                name="isBCV"
-                checked={isBCV === false}
-                onChange={() => setIsBCV(false)}
+            <div>
+              <label htmlFor="description" className="block mb-1 text-sm">
+                Descripción
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                value={form.description || ""}
+                onChange={handleChange}
+                className="w-full border p-2 rounded"
+                disabled={loading}
               />
-              No
-            </label>
+            </div>
+
+            <div>
+              <label htmlFor="categoryId" className="block text-sm mb-1">
+                Categoría
+              </label>
+              <select
+                id="categoryId"
+                name="categoryId"
+                value={form.categoryId}
+                onChange={handleChange}
+                className="w-full border p-2 rounded"
+                required
+                disabled={loading}
+              >
+                <option value="">Seleccione una categoría</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
       </div>
-
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="flex-1">
-          <label htmlFor="price" className="block mb-1 text-sm">
-            Precio ($)
-          </label>
-          <input
-            id="price"
-            name="price"
-            type="number"
-            min={1}
-            step={1}
-            value={form.price}
-            onChange={handleChange}
-            className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-            required
-            onWheel={(e) => e.currentTarget.blur()}
-          />
-        </div>
-
-        <div className="flex-1">
-          <label htmlFor="installmentAmount" className="block mb-1 text-sm">
-            Semanas
-          </label>
-          <input
-            id="weeks"
-            name="weeks"
-            type="number"
-            min={1}
-            step={1}
-            value={weeks}
-            onChange={(e) => setWeeks(parseInt(e.target.value, 10))}
-            className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-            required
-            onWheel={(e) => e.currentTarget.blur()}
-          />
-        </div>
-
-        <div className="flex-1">
-          <label htmlFor="installmentAmount" className="block mb-1 text-sm">
-            Cuota semanal ($)
-          </label>
-          <input
-            id="installmentAmount"
-            name="installmentAmount"
-            type="number"
-            min={1}
-            step={1}
-            value={form.installmentAmount}
-            onChange={handleChange}
-            className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-            required
-            onWheel={(e) => e.currentTarget.blur()}
-          />
-        </div>
-      </div>
-
-      {id && user?.role === "main" && (
+      <div className="bg-white p-6 rounded shadow space-y-6">
+        {/* ===== COTIZACIÓN ===== */}
         <div>
-          <label htmlFor="stock" className="block mb-1 text-sm">
-            Stock
-          </label>
-          <input
-            id="stock"
-            name="stock"
-            type="number"
-            value={stock === 0 ? stock : stock || ""}
-            onChange={(e) => {
-              const value = e.target.value;
-              const intValue = parseInt(value, 10);
+          <div className="mb-4 border-b pb-2">
+            <h3 className="text-lg font-semibold">Cotización</h3>
 
-              if (
-                value === "" ||
-                (!isNaN(intValue) &&
-                  intValue >= 0 &&
-                  value === intValue.toString())
-              ) {
-                setStock(intValue);
-              }
-            }}
-            className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-            required
-            onWheel={(e) => e.currentTarget.blur()}
-          />
+            <p className="text-xs text-gray-500 mt-1">
+              EUR: <span className="font-medium text-gray-600">{priceEUR}</span>{" "}
+              Bs · USDT:{" "}
+              <span className="font-medium text-gray-600">{priceUSDT}</span> Bs
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex-1">
+                <label className="block mb-1 text-sm">
+                  Precio de compra ($)
+                </label>
+                <input
+                  id="purchasePrice"
+                  name="purchasePrice"
+                  type="number"
+                  min={1}
+                  step={1}
+                  //value={form.purchasePrice}
+                  onChange={(p) => {
+                    const value = p.target.value;
+                    const numericValue = value ? parseFloat(value) : 0;
+                    const txt = calculatePrice(isBCV, numericValue);
+                    console.log(txt);
+                  }}
+                  className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                  required
+                  onWheel={(e) => e.currentTarget.blur()}
+                />
+              </div>
+
+              {/* RADIO BCV */}
+              <div className="flex flex-col gap-2">
+                <label className="text-sm mb-1">¿BCV?</label>
+
+                <div className="flex items-center gap-3">
+                  <label className="flex items-center gap-1 text-sm cursor-pointer">
+                    <input
+                      type="radio"
+                      name="isBCV"
+                      checked={isBCV === true}
+                      onChange={() => setIsBCV(true)}
+                    />
+                    Sí
+                  </label>
+
+                  <label className="flex items-center gap-1 text-sm cursor-pointer">
+                    <input
+                      type="radio"
+                      name="isBCV"
+                      checked={isBCV === false}
+                      onChange={() => setIsBCV(false)}
+                    />
+                    No
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1">
+                <label htmlFor="price" className="block mb-1 text-sm">
+                  Precio ($)
+                </label>
+                <input
+                  id="price"
+                  name="price"
+                  type="number"
+                  min={1}
+                  step={1}
+                  value={form.price}
+                  onChange={handleChange}
+                  className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                  required
+                  onWheel={(e) => e.currentTarget.blur()}
+                />
+              </div>
+
+              <div className="flex-1">
+                <label
+                  htmlFor="installmentAmount"
+                  className="block mb-1 text-sm"
+                >
+                  Cuota semanal ($)
+                </label>
+                <input
+                  id="installmentAmount"
+                  name="installmentAmount"
+                  type="number"
+                  min={1}
+                  step={1}
+                  value={form.installmentAmount}
+                  onChange={handleChange}
+                  className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                  required
+                  onWheel={(e) => e.currentTarget.blur()}
+                />
+              </div>
+
+              <div className="flex-1">
+                <label
+                  htmlFor="installmentAmount"
+                  className="block mb-1 text-sm"
+                >
+                  Semanas
+                </label>
+                <input
+                  id="weeks"
+                  name="weeks"
+                  type="number"
+                  min={1}
+                  step={1}
+                  value={weeks}
+                  onChange={(e) => setWeeks(parseInt(e.target.value, 10))}
+                  className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                  required
+                  onWheel={(e) => e.currentTarget.blur()}
+                />
+              </div>
+            </div>
+          </div>
         </div>
-      )}
 
-      <div className="flex justify-end gap-2">
-        <button
-          type="button"
-          disabled={loading}
-          onClick={() => navigate("/products")}
-          className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 cursor-pointer"
-        >
-          Cancelar
-        </button>
-        <button
-          type="submit"
-          disabled={loading}
-          className={`px-4 py-2 rounded text-white ${
-            loading
-              ? "bg-blue-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
-          }`}
-        >
-          {loading ? "Guardando..." : "Guardar"}
-        </button>
+        {id && user?.role === "main" && (
+          <div>
+            <label htmlFor="stock" className="block mb-1 text-sm">
+              Stock
+            </label>
+            <input
+              id="stock"
+              name="stock"
+              type="number"
+              value={stock === 0 ? stock : stock || ""}
+              onChange={(e) => {
+                const value = e.target.value;
+                const intValue = parseInt(value, 10);
+
+                if (
+                  value === "" ||
+                  (!isNaN(intValue) &&
+                    intValue >= 0 &&
+                    value === intValue.toString())
+                ) {
+                  setStock(intValue);
+                }
+              }}
+              className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+              required
+              onWheel={(e) => e.currentTarget.blur()}
+            />
+          </div>
+        )}
+
+        <div className="flex justify-end gap-2">
+          <button
+            type="button"
+            disabled={loading}
+            onClick={() => navigate("/products")}
+            className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 cursor-pointer"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className={`px-4 py-2 rounded text-white ${
+              loading
+                ? "bg-blue-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+            }`}
+          >
+            {loading ? "Guardando..." : "Guardar"}
+          </button>
+        </div>
       </div>
     </form>
   );
