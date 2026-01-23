@@ -122,54 +122,36 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
     }
   };
 
-  const calculatePrice = (isBCV: boolean, purchasePrice: number) => {
-    let salePriceTemp = 0;
+  function getBestTriad(n: number, minK: number) {
+    const candidates = [];
 
-    if (isBCV) {
-      salePriceTemp = purchasePrice * 2;
-    } else {
-      salePriceTemp = +(purchasePrice * 2 * (priceUSDT / priceEUR)).toFixed(2);
-    }
-
-    const candidates: {
-      x: number;
-      k: number;
-      product: number;
-      diff: number;
-    }[] = [];
-    const ki = salePriceTemp >= 150 ? 15 : 10;
-
-    for (let k = ki; k <= 20; k++) {
-      // x debe cumplir: x*k >= n y x múltiplo de 5
-      // entonces primero calculamos lo mínimo que debería ser x
-      let x = Math.ceil(salePriceTemp / k);
-
-      // pero x debe ser múltiplo de 5 → ajustamos hacia arriba al próximo múltiplo de 5
-      if (x % 5 !== 0) {
-        x = x + (5 - (x % 5));
-      }
+    for (let k = minK; k <= 20; k++) {
+      let x = Math.ceil(n / k);
+      if (x % 5 !== 0) x += 5 - (x % 5);
 
       const product = x * k;
-      const diff = Math.abs(product - salePriceTemp);
+      const diff = Math.abs(product - n);
 
       candidates.push({ x, k, product, diff });
     }
 
-    // elegimos la más cercana
-    candidates.sort((a, b) => a.diff - b.diff);
+    return candidates.sort((a, b) => a.diff - b.diff)[0];
+  }
 
-    setWeeks(candidates[0].k);
+  const calculatePrice = (isBCV: boolean, purchasePrice: number) => {
+    const salePrice = isBCV
+      ? purchasePrice * 2
+      : +(purchasePrice * 2 * (priceUSDT / priceEUR)).toFixed(2);
+
+    const minK = Math.max(1, Math.ceil(Math.min(salePrice / 10, 15)));
+    const best = getBestTriad(salePrice, minK);
+
+    setWeeks(best.k);
     setForm((prev) => ({
       ...prev,
-      installmentAmount: candidates[0].x,
-      price: candidates[0].product,
+      installmentAmount: best.x,
+      price: best.product,
     }));
-
-    return {
-      original: salePriceTemp,
-      bestTriad: candidates[0],
-      allTriads: candidates, // opcional
-    };
   };
 
   return loadingData ? (
@@ -268,8 +250,7 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
                   onChange={(p) => {
                     const value = p.target.value;
                     const numericValue = value ? parseFloat(value) : 0;
-                    const txt = calculatePrice(isBCV, numericValue);
-                    console.log(txt);
+                    calculatePrice(isBCV, numericValue);
                   }}
                   className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                   required
