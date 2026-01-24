@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import type { CreateProduct, Product } from "../api/product";
-import type { Category } from "../api/category";
-import { useNavigate, useParams } from "react-router-dom";
-import { InventoryApi } from "../api/inventory";
 import { useAuth } from "../auth/useAuth";
+import { InventoryApi } from "../api/inventory";
+import type { Category } from "../api/category";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import type { CreateProduct, Product } from "../api/product";
 
 interface Props {
   initialData?: Product;
@@ -29,6 +29,7 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
   const [priceUSDT, setPriceUSDT] = useState<number>(0);
   const [priceEUR, setPriceEUR] = useState<number>(0);
   const [weeks, setWeeks] = useState<number>(0);
+  const [purchasePrice, setPurchasePrice] = useState<number>(0);
 
   useEffect(() => {
     if (initialData) {
@@ -138,7 +139,17 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
     return candidates.sort((a, b) => a.diff - b.diff)[0];
   }
 
-  const calculatePrice = (isBCV: boolean, purchasePrice: number) => {
+  const calculatePrice = useCallback(() => {
+    if (purchasePrice <= 0) {
+      setForm((prev) => ({
+        ...prev,
+        installmentAmount: 0,
+        price: 0,
+      }));
+      setWeeks(0);
+      return;
+    }
+
     const salePrice = isBCV
       ? purchasePrice * 2
       : +(purchasePrice * 2 * (priceUSDT / priceEUR)).toFixed(2);
@@ -152,7 +163,11 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
       installmentAmount: best.x,
       price: best.product,
     }));
-  };
+  }, [purchasePrice, isBCV, priceUSDT, priceEUR]);
+
+  useEffect(() => {
+    calculatePrice();
+  }, [calculatePrice]);
 
   return loadingData ? (
     <div className="bg-white p-6 rounded shadow space-y-4">
@@ -246,11 +261,10 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
                   type="number"
                   min={1}
                   step={1}
-                  //value={form.purchasePrice}
-                  onChange={(p) => {
-                    const value = p.target.value;
-                    const numericValue = value ? parseFloat(value) : 0;
-                    calculatePrice(isBCV, numericValue);
+                  value={purchasePrice || ""}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setPurchasePrice(value ? Number(value) : 0);
                   }}
                   className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                   required
