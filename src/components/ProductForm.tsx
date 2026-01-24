@@ -310,9 +310,9 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
                 <input
                   id="price"
                   name="price"
-                  type="number"
-                  min={1}
-                  step={1}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={form.price || ""}
                   onChange={handleChange}
                   className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
@@ -332,9 +332,9 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
                   <input
                     id="installmentAmount"
                     name="installmentAmount"
-                    type="number"
-                    min={1}
-                    step={1}
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     value={form.installmentAmount || ""}
                     onChange={handleChange}
                     className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
