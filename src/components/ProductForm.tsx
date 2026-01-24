@@ -303,7 +303,7 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1">
                 <label htmlFor="price" className="block mb-1 text-sm">
-                  Precio ($)
+                  Precio de venta ($)
                 </label>
                 <input
                   id="price"
@@ -311,7 +311,7 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
                   type="number"
                   min={1}
                   step={1}
-                  value={form.price}
+                  value={form.price || ""}
                   onChange={handleChange}
                   className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                   required
@@ -326,39 +326,24 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
                 >
                   Cuota semanal ($)
                 </label>
-                <input
-                  id="installmentAmount"
-                  name="installmentAmount"
-                  type="number"
-                  min={1}
-                  step={1}
-                  value={form.installmentAmount}
-                  onChange={handleChange}
-                  className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                  required
-                  onWheel={(e) => e.currentTarget.blur()}
-                />
-              </div>
+                <div className="flex items-center gap-3">
+                  <input
+                    id="installmentAmount"
+                    name="installmentAmount"
+                    type="number"
+                    min={1}
+                    step={1}
+                    value={form.installmentAmount || ""}
+                    onChange={handleChange}
+                    className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                    required
+                    onWheel={(e) => e.currentTarget.blur()}
+                  />
 
-              <div className="flex-1">
-                <label
-                  htmlFor="installmentAmount"
-                  className="block mb-1 text-sm"
-                >
-                  Semanas
-                </label>
-                <input
-                  id="weeks"
-                  name="weeks"
-                  type="number"
-                  min={1}
-                  step={1}
-                  value={weeks}
-                  onChange={(e) => setWeeks(parseInt(e.target.value, 10))}
-                  className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                  required
-                  onWheel={(e) => e.currentTarget.blur()}
-                />
+                  <span className="w-28 shrink-0 flex py-2 text-sm">
+                    {weeks > 0 ? `x${weeks} semanas` : "—"}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
