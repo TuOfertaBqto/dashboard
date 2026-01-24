@@ -314,7 +314,15 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
                   inputMode="numeric"
                   pattern="[0-9]*"
                   value={form.price || ""}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    handleChange(e);
+                    const sanitized = e.target.value.replace(/\D/g, "");
+                    const num = sanitized ? Number(sanitized) : 0;
+
+                    const newWeeks = num > 0 ? num / form.installmentAmount : 0;
+
+                    setWeeks(newWeeks);
+                  }}
                   className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                   required
                   onWheel={(e) => e.currentTarget.blur()}
@@ -336,7 +344,15 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
                     inputMode="numeric"
                     pattern="[0-9]*"
                     value={form.installmentAmount || ""}
-                    onChange={handleChange}
+                    onChange={(e) => {
+                      handleChange(e);
+                      const sanitized = e.target.value.replace(/\D/g, "");
+                      const num = sanitized ? Number(sanitized) : 0;
+
+                      const newWeeks = num > 0 ? form.price / num : 0;
+
+                      setWeeks(newWeeks);
+                    }}
                     className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                     required
                     onWheel={(e) => e.currentTarget.blur()}
@@ -344,7 +360,7 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
 
                   <span className="w-28 shrink-0 flex py-2 text-sm">
                     {weeks > 0
-                      ? `x${weeks} ${weeks === 1 ? "semana" : "semanas"}`
+                      ? `x${Number(weeks.toFixed(2))} ${weeks === 1 ? "semana" : "semanas"}`
                       : ""}
                   </span>
                 </div>
