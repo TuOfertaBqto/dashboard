@@ -258,13 +258,15 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
                 <input
                   id="purchasePrice"
                   name="purchasePrice"
-                  type="number"
-                  min={1}
-                  step={1}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={purchasePrice || ""}
                   onChange={(e) => {
-                    const value = e.target.value;
-                    setPurchasePrice(value ? Number(value) : 0);
+                    const sanitized = e.target.value.replace(/\D/g, "");
+                    const num = sanitized ? Number(sanitized) : 0;
+                    if (num > 999999) return;
+                    setPurchasePrice(num);
                   }}
                   className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                   required
