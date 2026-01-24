@@ -341,7 +341,9 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
                   />
 
                   <span className="w-28 shrink-0 flex py-2 text-sm">
-                    {weeks > 0 ? `x${weeks} semanas` : "—"}
+                    {weeks > 0
+                      ? `x${weeks} ${weeks === 1 ? "semana" : "semanas"}`
+                      : ""}
                   </span>
                 </div>
               </div>
