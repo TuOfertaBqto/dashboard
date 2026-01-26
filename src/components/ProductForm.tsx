@@ -318,7 +318,10 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
                     const sanitized = e.target.value.replace(/\D/g, "");
                     const num = sanitized ? Number(sanitized) : 0;
 
-                    const newWeeks = num > 0 ? num / form.installmentAmount : 0;
+                    const newWeeks =
+                      num > 0 && form.installmentAmount > 0
+                        ? num / form.installmentAmount
+                        : 0;
 
                     setWeeks(newWeeks);
                   }}
