@@ -1,8 +1,9 @@
+import { toast } from "sonner";
+import { useAuth } from "../auth/useAuth";
 import { useEffect, useRef, useState } from "react";
+import { TrashIcon } from "@heroicons/react/24/outline";
 import { useNavigate, useParams } from "react-router-dom";
 import { userApi, type User, type UserRole } from "../api/user";
-import { useAuth } from "../auth/useAuth";
-import { TrashIcon } from "@heroicons/react/24/outline";
 
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
@@ -33,7 +34,10 @@ export default function UserFormPage() {
       userApi
         .getById(id!)
         .then(setForm)
-        .catch((err) => console.error("Error al cargar usuario:", err));
+        .catch((err) => {
+          console.error("Error al cargar usuario:", err);
+          toast.error("No se pudo cargar el usuario.");
+        });
     }
   }, [id, isEdit]);
 
@@ -88,6 +92,7 @@ export default function UserFormPage() {
     );
 
     if (!res.ok) {
+      toast.error("Error al subir la imagen");
       throw new Error("Error subiendo la imagen a Cloudinary");
     }
 
@@ -99,7 +104,7 @@ export default function UserFormPage() {
     e.preventDefault();
 
     if (!form.documentIdPhoto && !localImage && form.role === "customer") {
-      alert("Debes seleccionar una imagen.");
+      toast.info("Debes seleccionar una imagen");
       return;
     }
 
@@ -138,12 +143,15 @@ export default function UserFormPage() {
           role,
           documentIdPhoto,
         });
+        toast.success("Usuario actualizado correctamente");
       } else {
         await userApi.create(payload);
+        toast.success("Usuario creado correctamente");
       }
       navigate("/users");
     } catch (err) {
       console.error("Error al guardar usuario:", err);
+      toast.error("Error al guardar el usuario");
     } finally {
       setLoading(false);
     }

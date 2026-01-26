@@ -6,6 +6,7 @@ import type { Product } from "../api/product";
 import Select, { type SingleValue } from "react-select";
 import { PlusCircleIcon, TrashIcon } from "@heroicons/react/24/outline";
 import dayjs from "dayjs";
+import { toast } from "sonner";
 
 interface Props {
   initialData?: Contract | null;
@@ -114,7 +115,7 @@ export const ContractForm = ({
     );
 
     if (!hasValidProduct) {
-      alert("Debe agregar al menos un producto válido al contrato.");
+      toast.info("Debe agregar al menos un producto válido al contrato");
       return;
     }
 
@@ -124,7 +125,7 @@ export const ContractForm = ({
     });
 
     if (!allProductsHaveValidInstallment) {
-      alert("Todos los productos deben tener una cuota mayor que cero.");
+      toast.info("Todos los productos deben tener una cuota mayor que cero");
       return;
     }
 

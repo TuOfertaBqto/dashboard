@@ -1,20 +1,21 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
 import {
   ContractApi,
   type Contract,
   type CreateContractProduct,
   type CreateContractRequest,
 } from "../api/contract";
-import { userApi, type User } from "../api/user";
-import { ProductApi, type Product } from "../api/product";
-import Select from "react-select";
-import { PlusCircleIcon, TrashIcon } from "@heroicons/react/24/outline";
 import dayjs from "dayjs";
-import { InstallmentApi } from "../api/installment";
+import { toast } from "sonner";
+import Select from "react-select";
 import { useAuth } from "../auth/useAuth";
-import { ContractProductApi } from "../api/contract-product";
+import { useEffect, useState } from "react";
+import { userApi, type User } from "../api/user";
+import { InstallmentApi } from "../api/installment";
 import { ConfirmModal } from "../components/ConfirmModal";
+import { useNavigate, useParams } from "react-router-dom";
+import { ProductApi, type Product } from "../api/product";
+import { ContractProductApi } from "../api/contract-product";
+import { PlusCircleIcon, TrashIcon } from "@heroicons/react/24/outline";
 
 export default function ContractRequestFormPage() {
   const { id } = useParams();
@@ -143,7 +144,7 @@ export default function ContractRequestFormPage() {
     );
 
     if (!hasValidProduct) {
-      alert("Debe agregar al menos un producto válido al contrato.");
+      toast.info("Debe agregar al menos un producto válido");
       return;
     }
 
@@ -153,7 +154,7 @@ export default function ContractRequestFormPage() {
     });
 
     if (!allProductsHaveValidInstallment) {
-      alert("Todos los productos deben tener una cuota mayor que cero.");
+      toast.info("Todos los productos deben tener una cuota mayor que cero");
       return;
     }
 
@@ -174,12 +175,15 @@ export default function ContractRequestFormPage() {
         });
 
         await ContractProductApi.updateBulk(updatedProducts);
+        toast.success("Solicitud actualizada correctamente");
       } else {
         await ContractApi.create(form);
+        toast.success("Solicitud registrada exitosamente");
       }
       navigate("/requests");
     } catch (err) {
       console.error(err);
+      toast.error("Ocurrió un error al guardar la solicitud");
     } finally {
       setLoading(false);
     }
@@ -211,8 +215,10 @@ export default function ContractRequestFormPage() {
       }
 
       setForm({ ...form, products: updated });
+      toast.success("Producto eliminado");
     } catch (error) {
       console.error("Error eliminando el producto:", error);
+      toast.error("No se pudo eliminar el producto");
     } finally {
       setIsRemoving(false);
       setShowModal(false);

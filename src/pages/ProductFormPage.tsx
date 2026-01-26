@@ -1,8 +1,9 @@
+import { toast } from "sonner";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { ProductApi, type CreateProduct, type Product } from "../api/product";
 import { ProductForm } from "../components/ProductForm";
+import { useNavigate, useParams } from "react-router-dom";
 import { CategoryApi, type Category } from "../api/category";
+import { ProductApi, type CreateProduct, type Product } from "../api/product";
 
 export const ProductFormPage = () => {
   const { id } = useParams();
@@ -23,15 +24,21 @@ export const ProductFormPage = () => {
   }, [id, navigate]);
 
   const handleSubmit = async (data: CreateProduct) => {
+    const t = toast.loading(
+      id ? "Actualizando producto..." : "Creando producto..."
+    );
     try {
       if (id) {
         await ProductApi.update(id, data);
+        toast.success("Producto actualizado correctamente.", { id: t });
       } else {
         await ProductApi.create(data);
+        toast.success("Producto creado correctamente.", { id: t });
       }
       navigate("/products");
     } catch (error) {
       console.error("Error al guardar producto:", error);
+      toast.error("No se pudo guardar el producto.", { id: t });
     }
   };
 
