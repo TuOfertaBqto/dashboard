@@ -269,7 +269,6 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
                     setPurchasePrice(num);
                   }}
                   className="w-full border p-2 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                  required
                   onWheel={(e) => e.currentTarget.blur()}
                 />
               </div>
