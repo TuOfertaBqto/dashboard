@@ -68,7 +68,13 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
           })
           .catch((error) => console.error("Error:", error));
 
-        fetch("https://api.dolarvzla.com/public/exchange-rate")
+        fetch("https://api.dolarvzla.com/public/exchange-rate", {
+          method: "GET",
+          headers: {
+            "x-dolarvzla-key":
+              "db80e87b1f6df149f3819799138702584816aa6b06cfafb629b2a50c9e3cee0d",
+          },
+        })
           .then((response) => response.json())
           .then((data) => {
             const dataParsed = Math.trunc(data.current.eur * 100) / 100;
