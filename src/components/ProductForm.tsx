@@ -72,7 +72,7 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
           method: "GET",
           headers: {
             "x-dolarvzla-key":
-              "db80e87b1f6df149f3819799138702584816aa6b06cfafb629b2a50c9e3cee0d",
+              "fb51db11a26a3a0b3b25fbc4b456035b62a095ba094f47ac6f4d675d9447711f",
           },
         })
           .then((response) => response.json())
