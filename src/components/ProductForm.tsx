@@ -11,6 +11,8 @@ interface Props {
   categories: Category[];
 }
 
+const DOLARVZLA_KEY = import.meta.env.VITE_DOLARVZLA_KEY;
+
 export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
   const { id } = useParams();
   const { user } = useAuth();
@@ -71,8 +73,7 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
         fetch("https://api.dolarvzla.com/public/exchange-rate", {
           method: "GET",
           headers: {
-            "x-dolarvzla-key":
-              "fb51db11a26a3a0b3b25fbc4b456035b62a095ba094f47ac6f4d675d9447711f",
+            "x-dolarvzla-key": DOLARVZLA_KEY,
           },
         })
           .then((response) => response.json())
