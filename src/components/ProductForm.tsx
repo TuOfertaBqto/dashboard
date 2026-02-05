@@ -62,8 +62,6 @@ export const ProductForm = ({ initialData, onSubmit, categories }: Props) => {
   useEffect(() => {
     const fetchPrice = async () => {
       try {
-        console.log(DOLARVZLA_KEY);
-        
         fetch("https://criptoya.com/api/binancep2p/usdt/ves")
           .then((response) => response.json())
           .then((data) => {
