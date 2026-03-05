@@ -20,7 +20,7 @@ export const InstallmentPaymentPage = () => {
 
   const [form, setForm] = useState<UpdateInstallment>({
     contract: "",
-    amountPaid: 0,
+    amountPaid: "",
     paymentMethod: "cash",
     referenceNumber: "",
     paidAt: dayjs().format("YYYY-MM-DD"),
@@ -56,7 +56,7 @@ export const InstallmentPaymentPage = () => {
   }, [id, navigate]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
 
@@ -160,7 +160,7 @@ export const InstallmentPaymentPage = () => {
         {payment.installmentAmount -
           (payment.installmentPayments.reduce(
             (total, ip) => total + Number(ip.amount),
-            0
+            0,
           ) ?? 0)}
       </p>
 
