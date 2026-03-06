@@ -18,7 +18,7 @@ export const InstallmentPaymentPage = () => {
   const [loading, setLoading] = useState(false);
   const [account, setAccount] = useState<Account[]>();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  //const [, setPhoto] = useState<File | null>(null);
+  const [error, setError] = useState<string>("");
 
   const [form, setForm] = useState<UpdateInstallment>({
     contract: "",
@@ -77,6 +77,7 @@ export const InstallmentPaymentPage = () => {
     }
 
     if (name === "amountPaid") {
+      setError("");
       if (
         value === "" ||
         (!isNaN(parseFloat(value)) && parseFloat(value) >= 0)
@@ -108,11 +109,6 @@ export const InstallmentPaymentPage = () => {
     }));
   };
 
-  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = e.target.files?.[0] || null;
-  //   setPhoto(file);
-  // };
-
   const submitPayment = async () => {
     setLoading(true);
     const t = toast.loading("Registrando pago...");
@@ -138,10 +134,23 @@ export const InstallmentPaymentPage = () => {
     }
   };
 
+  if (!payment) return <p className="text-gray-600">Cargando cuota...</p>;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const amount = Number(form.amountPaid);
+
+    const totalDebt = Number(payment.debt ?? 0);
+
+    if (amount > totalDebt) {
+      setError(
+        `El monto ingresado no puede ser mayor que la deuda total del contrato ($${totalDebt.toFixed(
+          2,
+        )})`,
+      );
+      return;
+    }
 
     if (amount > remainingAmount) {
       setShowConfirmModal(true);
@@ -150,8 +159,6 @@ export const InstallmentPaymentPage = () => {
 
     await submitPayment();
   };
-
-  if (!payment) return <p className="text-gray-600">Cargando cuota...</p>;
 
   const remainingAmount =
     payment.installmentAmount -
@@ -273,15 +280,11 @@ export const InstallmentPaymentPage = () => {
           />
         </div>
 
-        {/* <div>
-          <label className="block text-sm mb-1">Comprobante (opcional)</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="w-full"
-          />
-        </div> */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">
+            {error}
+          </div>
+        )}
 
         <div className="flex justify-end gap-2">
           <button
@@ -318,12 +321,16 @@ export const InstallmentPaymentPage = () => {
             <div className="bg-gray-50 border rounded-md p-3 space-y-1 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-500">Monto pendiente</span>
-                <span className="font-semibold">${remainingAmount}</span>
+                <span className="font-semibold">
+                  ${remainingAmount.toFixed(2)}
+                </span>
               </div>
 
               <div className="flex justify-between">
                 <span className="text-gray-500">Monto ingresado</span>
-                <span className="font-semibold">${form.amountPaid}</span>
+                <span className="font-semibold">
+                  ${Number(form.amountPaid).toFixed(2)}
+                </span>
               </div>
 
               <div className="flex justify-between border-t pt-2">
