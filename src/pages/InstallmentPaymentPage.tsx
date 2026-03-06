@@ -340,7 +340,7 @@ export const InstallmentPaymentPage = () => {
           </div>
         }
         cancelText="Cancelar"
-        confirmText="Confirmar pago"
+        confirmText="Continuar"
         onCancel={() => setShowConfirmModal(false)}
         onConfirm={async () => {
           setShowConfirmModal(false);
