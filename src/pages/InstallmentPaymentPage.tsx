@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AccountApi, type Account } from "../api/account";
 import { toast } from "sonner";
+import { ConfirmModal } from "../components/ConfirmModal";
 
 export const InstallmentPaymentPage = () => {
   const { id } = useParams();
@@ -16,6 +17,7 @@ export const InstallmentPaymentPage = () => {
   const [payment, setPayment] = useState<Installment | null>(null);
   const [loading, setLoading] = useState(false);
   const [account, setAccount] = useState<Account[]>();
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   //const [, setPhoto] = useState<File | null>(null);
 
   const [form, setForm] = useState<UpdateInstallment>({
@@ -111,43 +113,52 @@ export const InstallmentPaymentPage = () => {
   //   setPhoto(file);
   // };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const submitPayment = async () => {
     setLoading(true);
     const t = toast.loading("Registrando pago...");
 
-    const payload: UpdateInstallment = {
-      ...form,
-      photo: null,
-      referenceNumber: form.referenceNumber || undefined,
-      owner: form.owner,
-    };
-
-    // If photo upload is supported, handle it separately in the API or add logic here
-    // Otherwise, ignore photo for now
-
     try {
       await PaymentApi.create(id!, {
-        amount: Number(payload.amountPaid),
-        owner: payload.owner,
-        paidAt: payload.paidAt,
-        photo: payload.photo,
-        referenceNumber: payload.referenceNumber,
-        type: payload.paymentMethod,
-        accountId: payload.accountId,
+        amount: Number(form.amountPaid),
+        owner: form.owner,
+        paidAt: form.paidAt,
+        photo: null,
+        referenceNumber: form.referenceNumber || undefined,
+        type: form.paymentMethod,
+        accountId: form.accountId,
       });
 
       toast.success("Pago registrado exitosamente", { id: t });
+      navigate(-1);
     } catch (error) {
       console.error("Error al registrar pago:", error);
       toast.error("Hubo un error al registrar el pago.", { id: t });
     } finally {
-      navigate(-1);
       setLoading(false);
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const amount = Number(form.amountPaid);
+
+    if (amount > remainingAmount) {
+      setShowConfirmModal(true);
+      return;
+    }
+
+    await submitPayment();
+  };
+
   if (!payment) return <p className="text-gray-600">Cargando cuota...</p>;
+
+  const remainingAmount =
+    payment.installmentAmount -
+    payment.installmentPayments.reduce(
+      (total, ip) => total + Number(ip.amount),
+      0,
+    );
 
   return (
     <div className="max-w-xl mx-auto space-y-6">
@@ -156,12 +167,7 @@ export const InstallmentPaymentPage = () => {
         Contrato: C#{payment.contract.code}
       </p>
       <p className="text-sm text-gray-600">
-        Monto a pagar: $
-        {payment.installmentAmount -
-          (payment.installmentPayments.reduce(
-            (total, ip) => total + Number(ip.amount),
-            0,
-          ) ?? 0)}
+        Monto a pagar: ${remainingAmount.toFixed(2)}
       </p>
 
       <form
@@ -299,6 +305,48 @@ export const InstallmentPaymentPage = () => {
           </button>
         </div>
       </form>
+      <ConfirmModal
+        open={showConfirmModal}
+        title="Pago mayor al monto pendiente"
+        message={
+          <div className="space-y-4 pb-2">
+            <p className="text-gray-700">
+              El monto ingresado es mayor al monto pendiente de la cuota. El
+              excedente será abonado a la <strong>siguiente cuota</strong>.
+            </p>
+
+            <div className="bg-gray-50 border rounded-md p-3 space-y-1 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-500">Monto pendiente</span>
+                <span className="font-semibold">${remainingAmount}</span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-gray-500">Monto ingresado</span>
+                <span className="font-semibold">${form.amountPaid}</span>
+              </div>
+
+              <div className="flex justify-between border-t pt-2">
+                <span className="text-gray-500">Excedente</span>
+                <span className="font-semibold text-red-600">
+                  ${(Number(form.amountPaid) - remainingAmount).toFixed(2)}
+                </span>
+              </div>
+            </div>
+
+            <p className="text-sm text-gray-600">
+              ¿Deseas continuar con el registro del pago?
+            </p>
+          </div>
+        }
+        cancelText="Cancelar"
+        confirmText="Confirmar pago"
+        onCancel={() => setShowConfirmModal(false)}
+        onConfirm={async () => {
+          setShowConfirmModal(false);
+          await submitPayment();
+        }}
+      />
     </div>
   );
 };
