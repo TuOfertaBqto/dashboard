@@ -343,7 +343,7 @@ export const InstallmentModal = ({
                                           e.target.value,
                                         )
                                       }
-                                      className="border rounded px-1 py-0.5 text-xs"
+                                      className="border rounded py-0.5 text-xs w-full"
                                     />
                                   ) : (
                                     dayjs(p.dueDate.split("T")[0]).format(
@@ -377,7 +377,7 @@ export const InstallmentModal = ({
                                       val,
                                     );
                                   }}
-                                  className="border rounded px-1 py-0.5 w-20"
+                                  className="border rounded px-1 py-0.5 w-full appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                                 />
                               ) : (
                                 `$${Number(p.installmentAmount).toFixed(2)}`
