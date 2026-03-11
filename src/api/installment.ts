@@ -171,7 +171,7 @@ export const InstallmentApi = {
   },
 
   getOneVendorPaymentsSummary: async (
-    id: string
+    id: string,
   ): Promise<VendorPaymentsTotals> => {
     try {
       const res = await api.get(`installment/vendor/${id}/payments-summary`);
@@ -183,11 +183,11 @@ export const InstallmentApi = {
   },
 
   getOverdueCustomersByOneVendor: async (
-    id: string
+    id: string,
   ): Promise<VendorsWithDebts> => {
     try {
       const res = await api.get(
-        `installment/overdue/${id}/customers-by-vendor`
+        `installment/overdue/${id}/customers-by-vendor`,
       );
       return res.data;
     } catch (error) {
@@ -199,12 +199,24 @@ export const InstallmentApi = {
   getVendorEffectiveness: async (vendorId: string): Promise<number> => {
     try {
       const res = await api.get(
-        `installment/vendor/${vendorId}/collection-effectiveness`
+        `installment/vendor/${vendorId}/collection-effectiveness`,
       );
       return res.data;
     } catch (error) {
       console.error("Error fetching Vendor Effectiveness", error);
       return 0;
+    }
+  },
+
+  updateMany: async (
+    installments: { id: string; dueDate: string; installmentAmount: number }[],
+  ): Promise<Installment[]> => {
+    try {
+      const res = await api.patch("installment", installments);
+      return res.data;
+    } catch (error) {
+      console.error("Error updating installments", error);
+      return [];
     }
   },
 };

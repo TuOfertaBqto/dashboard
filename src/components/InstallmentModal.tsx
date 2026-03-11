@@ -13,6 +13,7 @@ import {
 } from "@heroicons/react/24/outline";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface Props {
   open: boolean;
@@ -29,6 +30,8 @@ export const InstallmentModal = ({
 }: Props) => {
   const [payments, setPayments] = useState<Installment[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editablePayments, setEditablePayments] = useState<Installment[]>([]);
 
   useEffect(() => {
     if (!contract?.id || !open) {
@@ -50,8 +53,11 @@ export const InstallmentModal = ({
 
         if (res && res.length > 0) {
           setPayments(res);
+          setEditablePayments(res);
         } else {
-          setPayments(generateInstallmentsFromContract(contract));
+          const generated = generateInstallmentsFromContract(contract);
+          setPayments(generated);
+          setEditablePayments(generated);
         }
       } catch (err) {
         console.error("Error al obtener cuotas:", err);
@@ -71,6 +77,54 @@ export const InstallmentModal = ({
       isMounted = false;
     };
   }, [contract, open]);
+
+  const handleChange = (
+    index: number,
+    field: "dueDate" | "installmentAmount",
+    value: string,
+  ) => {
+    const updated = [...editablePayments];
+
+    updated[index] = {
+      ...updated[index],
+      [field]: value,
+    };
+
+    setEditablePayments(updated);
+  };
+
+  const handleSave = async () => {
+    for (const p of editablePayments) {
+      if (!p.installmentAmount || p.installmentAmount <= 0) {
+        toast.info("Todos los montos deben ser mayores a 0");
+        return;
+      }
+    }
+    try {
+      const payload = editablePayments.map((p) => ({
+        id: p.id,
+        dueDate: p.dueDate,
+        installmentAmount: parseInt(String(p.installmentAmount), 10),
+      }));
+
+      await InstallmentApi.updateMany(payload);
+
+      const sortedPayments = [...editablePayments].sort(
+        (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime(),
+      );
+
+      setPayments(sortedPayments);
+      setEditablePayments(sortedPayments);
+      setIsEditing(false);
+    } catch (err) {
+      console.error("Error al actualizar cuotas", err);
+    }
+  };
+
+  const handleClose = () => {
+    setIsEditing(false);
+    onClose();
+  };
 
   const InstallmentSkeletonRow = () => (
     <tr className="border-t animate-pulse">
@@ -126,7 +180,7 @@ export const InstallmentModal = ({
               Cuotas del contrato C#{contract?.code}
             </h2>
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="text-gray-500 hover:text-gray-700 text-xl"
               title="Cerrar"
             >
@@ -219,112 +273,164 @@ export const InstallmentModal = ({
                   ? [...Array(10)].map((_, i) => (
                       <InstallmentSkeletonRow key={i} />
                     ))
-                  : payments.map((p, index) => {
-                      let dueDateClass = "";
-                      let IconComponent = null;
-                      let number = "";
+                  : (isEditing ? editablePayments : payments).map(
+                      (p, index) => {
+                        let dueDateClass = "";
+                        let IconComponent = null;
+                        let number = "";
 
-                      if (
-                        ["discount", "payment_agreement"].includes(
-                          p.installmentPayments[0]?.payment.type ?? ""
-                        )
-                      ) {
-                        dueDateClass = "bg-blue-100 text-blue-700";
-                        IconComponent = InformationCircleIcon;
-                      } else if (p.paidAt) {
-                        dueDateClass = "bg-green-100 text-green-700";
-                        IconComponent = CheckCircleIcon;
-                      } else if (
-                        dayjs(p.dueDate.split("T")[0]).isBefore(dayjs(), "day")
-                      ) {
-                        dueDateClass = "bg-red-100 text-red-700";
-                        IconComponent = ExclamationCircleIcon;
-                      } else {
-                        dueDateClass = "bg-yellow-100 text-yellow-800";
-                        IconComponent = ClockIcon;
-                      }
-
-                      if (
-                        payments[0] &&
-                        payments[1] &&
-                        payments[0].installmentAmount >
-                          payments[1].installmentAmount
-                      ) {
-                        if (index === 0) {
-                          number = "Inicial";
+                        if (
+                          ["discount", "payment_agreement"].includes(
+                            p.installmentPayments[0]?.payment.type ?? "",
+                          )
+                        ) {
+                          dueDateClass = "bg-blue-100 text-blue-700";
+                          IconComponent = InformationCircleIcon;
+                        } else if (p.paidAt) {
+                          dueDateClass = "bg-green-100 text-green-700";
+                          IconComponent = CheckCircleIcon;
+                        } else if (
+                          dayjs(p.dueDate.split("T")[0]).isBefore(
+                            dayjs(),
+                            "day",
+                          )
+                        ) {
+                          dueDateClass = "bg-red-100 text-red-700";
+                          IconComponent = ExclamationCircleIcon;
                         } else {
-                          number = index.toString();
+                          dueDateClass = "bg-yellow-100 text-yellow-800";
+                          IconComponent = ClockIcon;
                         }
-                      } else {
-                        number = (index + 1).toString();
-                      }
 
-                      return (
-                        <tr key={p.id} className="border-t">
-                          <td className="p-2">{number}</td>
-                          <td className="p-2">
-                            <span
-                              className={`
+                        if (
+                          payments[0] &&
+                          payments[1] &&
+                          payments[0].installmentAmount >
+                            payments[1].installmentAmount
+                        ) {
+                          if (index === 0) {
+                            number = "Inicial";
+                          } else {
+                            number = index.toString();
+                          }
+                        } else {
+                          number = (index + 1).toString();
+                        }
+
+                        return (
+                          <tr key={p.id} className="border-t">
+                            <td className="p-2">{number}</td>
+                            <td className="p-2">
+                              <span
+                                className={`
       inline-flex items-center gap-1 px-2 py-1 rounded-full font-semibold 
       ${dueDateClass} 
       max-w-full 
     `}
-                            >
-                              {IconComponent && (
-                                <IconComponent className="w-4 h-4 shrink-0" />
-                              )}
-                              <span className="truncate">
-                                {dayjs(p.dueDate.split("T")[0]).format(
-                                  "DD-MM-YYYY"
+                              >
+                                {IconComponent && (
+                                  <IconComponent className="w-4 h-4 shrink-0" />
                                 )}
+                                <span className="truncate">
+                                  {isEditing ? (
+                                    <input
+                                      type="date"
+                                      value={p.dueDate.split("T")[0]}
+                                      onChange={(e) =>
+                                        handleChange(
+                                          index,
+                                          "dueDate",
+                                          e.target.value,
+                                        )
+                                      }
+                                      className="border rounded px-1 py-0.5 text-xs"
+                                    />
+                                  ) : (
+                                    dayjs(p.dueDate.split("T")[0]).format(
+                                      "DD-MM-YYYY",
+                                    )
+                                  )}
+                                </span>
                               </span>
-                            </span>
-                          </td>
-                          <td className="p-2">${p.installmentAmount}</td>
-                          <td className="p-2">
-                            {p.installmentPayments &&
-                            p.installmentPayments.length > 0
-                              ? (() => {
-                                  const total = p.installmentPayments.reduce(
-                                    (sum, ip) => sum + Number(ip.amount),
-                                    0
-                                  );
-                                  return `$${total.toFixed(2)}`;
-                                })()
-                              : "—"}
-                          </td>
+                            </td>
+                            <td className="p-2">
+                              {isEditing ? (
+                                <input
+                                  type="number"
+                                  step="1"
+                                  min={1}
+                                  value={parseInt(
+                                    String(p.installmentAmount),
+                                    10,
+                                  )}
+                                  onWheel={(e) => e.currentTarget.blur()}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "." || e.key === ",")
+                                      e.preventDefault();
+                                  }}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
 
-                          <td className="p-2 hidden md:table-cell md:w-[15%]">
-                            {p.installmentPayments &&
-                            p.installmentPayments.length > 0
-                              ? translatePaymentMethod(
-                                  p.installmentPayments[0]?.payment?.type ?? ""
-                                )
-                              : ""}
-                          </td>
-                          <td className="p-2">
-                            {p.paidAt
-                              ? dayjs(p.paidAt.split("T")[0]).format(
-                                  "DD-MM-YYYY"
-                                )
-                              : "—"}
-                          </td>
-                          <td className="p-2">{p.debt ? "$" + p.debt : ""}</td>
-                        </tr>
-                      );
-                    })}
+                                    handleChange(
+                                      index,
+                                      "installmentAmount",
+                                      val,
+                                    );
+                                  }}
+                                  className="border rounded px-1 py-0.5 w-20"
+                                />
+                              ) : (
+                                `$${Number(p.installmentAmount).toFixed(2)}`
+                              )}
+                            </td>
+                            <td className="p-2">
+                              {p.installmentPayments &&
+                              p.installmentPayments.length > 0
+                                ? (() => {
+                                    const total = p.installmentPayments.reduce(
+                                      (sum, ip) => sum + Number(ip.amount),
+                                      0,
+                                    );
+                                    return `$${total.toFixed(2)}`;
+                                  })()
+                                : "—"}
+                            </td>
+
+                            <td className="p-2 hidden md:table-cell md:w-[15%]">
+                              {p.installmentPayments &&
+                              p.installmentPayments.length > 0
+                                ? translatePaymentMethod(
+                                    p.installmentPayments[0]?.payment?.type ??
+                                      "",
+                                  )
+                                : ""}
+                            </td>
+                            <td className="p-2">
+                              {p.paidAt
+                                ? dayjs(p.paidAt.split("T")[0]).format(
+                                    "DD-MM-YYYY",
+                                  )
+                                : "—"}
+                            </td>
+                            <td className="p-2">
+                              {p.debt ? "$" + p.debt : ""}
+                            </td>
+                          </tr>
+                        );
+                      },
+                    )}
               </tbody>
             </table>
           </div>
 
-          <div className="flex justify-end mt-6">
-            {!isRequest && (
+          <div className="flex flex-wrap justify-end items-center mt-6 gap-2">
+            {!isRequest && !isEditing && (
               <div>
                 {loading || payments.length === 0 ? (
                   <button
                     type="button"
                     disabled
-                    className="flex items-center gap-2 px-4 py-2 bg-gray-400 text-white rounded cursor-not-allowed mr-2"
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-400 text-white rounded cursor-not-allowed"
                   >
                     <ArrowDownTrayIcon className="w-5 h-5" />
                     Cargando cuotas...
@@ -346,7 +452,7 @@ export const InstallmentModal = ({
                     {({ loading: pdfLoading }) => (
                       <button
                         type="button"
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-all mr-2"
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-all"
                         disabled={pdfLoading}
                       >
                         <ArrowDownTrayIcon className="w-5 h-5" />
@@ -358,9 +464,39 @@ export const InstallmentModal = ({
               </div>
             )}
 
+            <div className="flex flex-wrap gap-2">
+              {!isRequest && !isEditing && (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-all"
+                >
+                  Editar cuotas
+                </button>
+              )}
+
+              {isEditing && (
+                <>
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    className="px-3 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-all"
+                  >
+                    Cancelar
+                  </button>
+
+                  <button
+                    onClick={handleSave}
+                    className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-all"
+                  >
+                    Guardar cambios
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Botón Cerrar */}
             <button
-              onClick={onClose}
-              className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 cursor-pointer"
+              onClick={handleClose}
+              className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition-all"
             >
               Cerrar
             </button>
