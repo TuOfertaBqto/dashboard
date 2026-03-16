@@ -219,4 +219,14 @@ export const InstallmentApi = {
       return [];
     }
   },
+
+  remove: async (id: string) => {
+    try {
+      await api.delete(`/installment/${id}`);
+      return true;
+    } catch (error) {
+      console.error("Error removing installment:", error);
+      return false;
+    }
+  },
 };
