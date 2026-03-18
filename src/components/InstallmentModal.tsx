@@ -10,10 +10,12 @@ import {
   ClockIcon,
   ExclamationCircleIcon,
   InformationCircleIcon,
+  TrashIcon,
 } from "@heroicons/react/24/outline";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { ConfirmModal } from "./ConfirmModal";
 
 interface Props {
   open: boolean;
@@ -32,6 +34,12 @@ export const InstallmentModal = ({
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editablePayments, setEditablePayments] = useState<Installment[]>([]);
+  const [installmentToDelete, setInstallmentToDelete] = useState<{
+    id: string;
+    index: number;
+  } | null>(null);
+
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
   useEffect(() => {
     if (!contract?.id || !open) {
@@ -164,6 +172,32 @@ export const InstallmentModal = ({
       </td>
     </tr>
   );
+
+  const handleAskRemoveInstallment = (id: string, index: number) => {
+    setInstallmentToDelete({ id, index });
+    setOpenDeleteModal(true);
+  };
+
+  const handleRemoveInstallment = async () => {
+    if (!installmentToDelete) return;
+
+    const ok = await InstallmentApi.remove(installmentToDelete.id);
+
+    if (!ok) {
+      toast.error("Error eliminando la cuota");
+      return;
+    }
+
+    const updated = [...editablePayments];
+    updated.splice(installmentToDelete.index, 1);
+    setEditablePayments(updated);
+    setPayments(updated);
+
+    toast.success("Cuota eliminada");
+
+    setOpenDeleteModal(false);
+    setInstallmentToDelete(null);
+  };
 
   if (!open || !contract) return null;
 
@@ -413,7 +447,22 @@ export const InstallmentModal = ({
                                 : "—"}
                             </td>
                             <td className="p-2">
-                              {p.debt ? "$" + p.debt : ""}
+                              <div className="flex items-center justify-between">
+                                <span>{p.debt ? "$" + p.debt : ""}</span>
+
+                                {isEditing && (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleAskRemoveInstallment(p.id, index)
+                                    }
+                                    className="text-white bg-red-600 hover:bg-red-700 p-1 rounded-full cursor-pointer"
+                                    title="Eliminar cuota"
+                                  >
+                                    <TrashIcon className="h-4 w-4" />
+                                  </button>
+                                )}
+                              </div>
                             </td>
                           </tr>
                         );
@@ -422,6 +471,16 @@ export const InstallmentModal = ({
               </tbody>
             </table>
           </div>
+          <ConfirmModal
+            open={openDeleteModal}
+            title="Eliminar cuota"
+            message="¿Estás seguro de que deseas eliminar esta cuota?"
+            onConfirm={handleRemoveInstallment}
+            onCancel={() => {
+              setOpenDeleteModal(false);
+              setInstallmentToDelete(null);
+            }}
+          />
 
           <div className="flex flex-wrap justify-end items-center mt-6 gap-2">
             {!isRequest && !isEditing && (
