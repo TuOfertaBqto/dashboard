@@ -1,5 +1,5 @@
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import type { Contract } from "../api/contract";
+import { type Contract } from "../api/contract";
 import { InstallmentApi, type Installment } from "../api/installment";
 import { generateInstallmentsFromContract } from "../utils/generateInstallments";
 import { translatePaymentMethod } from "../utils/translations";
@@ -21,6 +21,7 @@ interface Props {
   open: boolean;
   isRequest: boolean;
   onClose: () => void;
+  updateContract?: () => Promise<void>;
   contract?: Contract;
 }
 
@@ -28,6 +29,7 @@ export const InstallmentModal = ({
   open,
   isRequest,
   onClose,
+  updateContract,
   contract,
 }: Props) => {
   const [payments, setPayments] = useState<Installment[]>([]);
@@ -125,7 +127,11 @@ export const InstallmentModal = ({
         (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime(),
       );
 
+      if (updateContract) {
+        await updateContract();
+      }
       recalculateContractDebtWithStop(sortedPayments);
+
       setIsEditing(false);
     } catch (err) {
       console.error("Error al actualizar cuotas", err);
@@ -177,7 +183,9 @@ export const InstallmentModal = ({
     </tr>
   );
 
-  const recalculateContractDebtWithStop = (installments: Installment[]) => {
+  const recalculateContractDebtWithStop = async (
+    installments: Installment[],
+  ) => {
     const totalContractAmount = installments.reduce(
       (acc, inst) => acc + Number(inst.installmentAmount),
       0,
@@ -237,6 +245,10 @@ export const InstallmentModal = ({
 
     recalculateContractDebtWithStop(updated);
 
+    if (updateContract) {
+      await updateContract();
+    }
+
     toast.success("Cuota eliminada");
 
     setOpenDeleteModal(false);
@@ -276,6 +288,11 @@ export const InstallmentModal = ({
 
         setPayments(finalArray);
         setEditablePayments(finalArray);
+
+        if (updateContract) {
+          await updateContract();
+        }
+
         toast.success("Cuota agregada exitosamente");
       }
     } catch (err) {
