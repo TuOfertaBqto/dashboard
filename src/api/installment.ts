@@ -100,6 +100,16 @@ export const InstallmentApi = {
     }
   },
 
+  createOne: async (contract: { id: string }): Promise<Installment[]> => {
+    try {
+      const res = await api.post("/installment/one", contract);
+      return res.data;
+    } catch (error) {
+      console.error("Error creating one installment:", error);
+      return [] as Installment[];
+    }
+  },
+
   getAllByVendor: async (vendorId: string): Promise<Installment[]> => {
     try {
       const res = await api.get(`/installment/vendor/${vendorId}`);
@@ -209,7 +219,12 @@ export const InstallmentApi = {
   },
 
   updateMany: async (
-    installments: { id: string; dueDate: string; installmentAmount: number }[],
+    installments: {
+      id: string;
+      dueDate: string;
+      installmentAmount: number;
+      contract: { id: string };
+    }[],
   ): Promise<Installment[]> => {
     try {
       const res = await api.patch("installment", installments);

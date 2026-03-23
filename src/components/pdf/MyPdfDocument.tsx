@@ -36,7 +36,7 @@ Font.register({
     {
       src: new URL(
         "../../../public/fonts/calibri-bold-italic.ttf",
-        import.meta.url
+        import.meta.url,
       ).href,
       fontWeight: "bold",
       fontStyle: "italic",
@@ -100,12 +100,12 @@ export const MyPdfDocument = ({ contract, installments }: Props) => {
   const startDate =
     contract.startDate?.split("T")[0] ?? dayjs().format("YYYY-MM-DD");
   const description = contract.products.map(
-    (p) => `(${p.quantity}) ${p.product.name}`
+    (p) => `(${p.quantity}) ${p.product.name}`,
   ) || ["Sin productos"];
   const totalPrice = contract.totalPrice;
   const quantityProducts = contract.products.reduce(
     (total, p) => total + p.quantity,
-    0
+    0,
   );
   const documentIdPhoto = contract.customerId.documentIdPhoto;
 
@@ -113,7 +113,7 @@ export const MyPdfDocument = ({ contract, installments }: Props) => {
   const debt = Math.min(
     ...installments
       .map((c) => (c.debt == null ? NaN : Number(c.debt)))
-      .filter((d) => !isNaN(d))
+      .filter((d) => !isNaN(d)),
   );
 
   function fechaEnPalabras(fechaString: string): string {
@@ -247,7 +247,7 @@ export const MyPdfDocument = ({ contract, installments }: Props) => {
             </Text>
             <Text style={[styles.tableCol, { width: "20%" }]}>
               {dayjs(
-                installments[installments.length - 1].dueDate.split("T")[0]
+                installments[installments.length - 1].dueDate.split("T")[0],
               ).format("DD-MM-YYYY")}
             </Text>
           </View>
@@ -337,9 +337,11 @@ export const MyPdfDocument = ({ contract, installments }: Props) => {
                   ${cuota.installmentAmount}
                 </Text>
                 <Text style={[styles.tableCol, { width: "25%" }]}>
-                  {translatePaymentMethod(
-                    cuota.installmentPayments[0]?.payment.type ?? ""
-                  )}
+                  {cuota.installmentPayments?.length > 0
+                    ? translatePaymentMethod(
+                        cuota.installmentPayments[0].payment.type ?? "",
+                      )
+                    : ""}
                 </Text>
                 <Text style={[styles.tableCol, { width: "20%" }]}>
                   {cuota.debt ? "$" + cuota.debt : ""}

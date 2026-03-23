@@ -33,12 +33,14 @@ export const InstallmentModal = ({
   const [payments, setPayments] = useState<Installment[]>([]);
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isRemoveOrAdd, setIsRemoveOrAdd] = useState(false);
   const [editablePayments, setEditablePayments] = useState<Installment[]>([]);
   const [installmentToDelete, setInstallmentToDelete] = useState<{
     id: string;
     index: number;
   } | null>(null);
 
+  const isViewMode = !isEditing && !isRemoveOrAdd;
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
   useEffect(() => {
@@ -102,6 +104,7 @@ export const InstallmentModal = ({
   };
 
   const handleSave = async () => {
+    if (!contract) return;
     for (const p of editablePayments) {
       if (!p.installmentAmount || p.installmentAmount <= 0) {
         toast.info("Todos los montos deben ser mayores a 0");
@@ -113,6 +116,7 @@ export const InstallmentModal = ({
         id: p.id,
         dueDate: p.dueDate,
         installmentAmount: parseInt(String(p.installmentAmount), 10),
+        contract: { id: contract.id },
       }));
 
       await InstallmentApi.updateMany(payload);
@@ -121,8 +125,7 @@ export const InstallmentModal = ({
         (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime(),
       );
 
-      setPayments(sortedPayments);
-      setEditablePayments(sortedPayments);
+      recalculateContractDebtWithStop(sortedPayments);
       setIsEditing(false);
     } catch (err) {
       console.error("Error al actualizar cuotas", err);
@@ -131,6 +134,7 @@ export const InstallmentModal = ({
 
   const handleClose = () => {
     setIsEditing(false);
+    setIsRemoveOrAdd(false);
     onClose();
   };
 
@@ -173,6 +177,46 @@ export const InstallmentModal = ({
     </tr>
   );
 
+  const recalculateContractDebtWithStop = (installments: Installment[]) => {
+    const totalContractAmount = installments.reduce(
+      (acc, inst) => acc + Number(inst.installmentAmount),
+      0,
+    );
+
+    const sorted = [...installments].sort(
+      (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime(),
+    );
+
+    let currentRunningDebt = totalContractAmount;
+    let stopCalculating = false;
+
+    const result = sorted.map((installment) => {
+      if (stopCalculating) {
+        return { ...installment, debt: undefined };
+      }
+
+      const amountPaidInThisInstallment =
+        installment.installmentPayments.reduce(
+          (acc, p) => acc + (Number(p.amount) || 0),
+          0,
+        );
+
+      currentRunningDebt -= amountPaidInThisInstallment;
+
+      if (amountPaidInThisInstallment < installment.installmentAmount) {
+        stopCalculating = true;
+      }
+
+      return {
+        ...installment,
+        debt: currentRunningDebt > 0 ? currentRunningDebt.toFixed(2) : "0.00",
+      };
+    });
+
+    setPayments(result);
+    setEditablePayments(result);
+  };
+
   const handleAskRemoveInstallment = (id: string, index: number) => {
     setInstallmentToDelete({ id, index });
     setOpenDeleteModal(true);
@@ -190,13 +234,56 @@ export const InstallmentModal = ({
 
     const updated = [...editablePayments];
     updated.splice(installmentToDelete.index, 1);
-    setEditablePayments(updated);
-    setPayments(updated);
+
+    recalculateContractDebtWithStop(updated);
 
     toast.success("Cuota eliminada");
 
     setOpenDeleteModal(false);
     setInstallmentToDelete(null);
+  };
+
+  const handleAddInstallment = async () => {
+    // setLoading(true);
+    if (!contract) return;
+
+    try {
+      const response = await InstallmentApi.createOne({
+        id: contract.id,
+      });
+
+      const newInstallment = {
+        ...response[0],
+        installmentPayments: [],
+      };
+
+      if (newInstallment && newInstallment.id) {
+        const amountToAddNum = Number(newInstallment.installmentAmount) || 0;
+
+        const updatedPayments = payments.map((p) => {
+          if (p.debt !== null && p.debt !== undefined) {
+            const currentDebtNum = Number(p.debt) || 0;
+
+            return {
+              ...p,
+              debt: (currentDebtNum + amountToAddNum).toFixed(2),
+            };
+          }
+          return p;
+        });
+
+        const finalArray = [...updatedPayments, newInstallment];
+
+        setPayments(finalArray);
+        setEditablePayments(finalArray);
+        toast.success("Cuota agregada exitosamente");
+      }
+    } catch (err) {
+      console.error("Error al agregar cuota:", err);
+      toast.error("No se pudo agregar la cuota");
+    } finally {
+      //setLoading(false);
+    }
   };
 
   if (!open || !contract) return null;
@@ -215,7 +302,7 @@ export const InstallmentModal = ({
             </h2>
             <button
               onClick={handleClose}
-              className="text-gray-500 hover:text-gray-700 text-xl"
+              className="text-gray-500 hover:text-gray-700 text-xl cursor-pointer"
               title="Cerrar"
             >
               ✕
@@ -314,8 +401,10 @@ export const InstallmentModal = ({
                         let number = "";
 
                         if (
+                          p.installmentPayments &&
+                          p.installmentPayments.length > 0 &&
                           ["discount", "payment_agreement"].includes(
-                            p.installmentPayments[0]?.payment.type ?? "",
+                            p.installmentPayments[0]?.payment?.type ?? "",
                           )
                         ) {
                           dueDateClass = "bg-blue-100 text-blue-700";
@@ -450,7 +539,7 @@ export const InstallmentModal = ({
                               <div className="flex items-center justify-between">
                                 <span>{p.debt ? "$" + p.debt : ""}</span>
 
-                                {isEditing && (
+                                {isRemoveOrAdd && (
                                   <button
                                     type="button"
                                     onClick={() =>
@@ -482,83 +571,108 @@ export const InstallmentModal = ({
             }}
           />
 
-          <div className="flex flex-wrap justify-end items-center mt-6 gap-2">
-            {!isRequest && !isEditing && (
-              <div>
-                {loading || payments.length === 0 ? (
-                  <button
-                    type="button"
-                    disabled
-                    className="flex items-center gap-2 px-4 py-2 bg-gray-400 text-white rounded cursor-not-allowed"
-                  >
-                    <ArrowDownTrayIcon className="w-5 h-5" />
-                    Cargando cuotas...
-                  </button>
-                ) : (
-                  <PDFDownloadLink
-                    document={
-                      <MyPdfDocument
-                        contract={contract}
-                        installments={payments}
-                      />
-                    }
-                    fileName={`Contrato ${
-                      contract.customerId.firstName.split(" ")[0] +
-                      " " +
-                      contract.customerId.lastName.split(" ")[0]
-                    }.pdf`}
-                  >
-                    {({ loading: pdfLoading }) => (
+          <div className="flex flex-wrap justify-end items-center mt-6 gap-3 border-t pt-4">
+            {/* MODO VISTA: PDF y Navegación Principal */}
+            {isViewMode && (
+              <>
+                {!isRequest && (
+                  <div className="flex gap-2 mr-auto">
+                    {loading || payments.length === 0 ? (
                       <button
-                        type="button"
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-all"
-                        disabled={pdfLoading}
+                        disabled
+                        className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-400 rounded-lg cursor-not-allowed border shadow-sm"
                       >
                         <ArrowDownTrayIcon className="w-5 h-5" />
-                        {pdfLoading ? "Generando PDF..." : "Descargar PDF"}
+                        <span className="text-sm font-medium">Cargando...</span>
                       </button>
+                    ) : (
+                      <PDFDownloadLink
+                        document={
+                          <MyPdfDocument
+                            contract={contract}
+                            installments={payments}
+                          />
+                        }
+                        fileName={`Contrato_${contract.customerId.firstName}.pdf`}
+                      >
+                        {({ loading: pdfLoading }) => (
+                          <button
+                            disabled={pdfLoading}
+                            className="flex items-center gap-2 px-4 py-2 bg-white text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors shadow-sm cursor-pointer"
+                          >
+                            <ArrowDownTrayIcon className="w-5 h-5" />
+                            <span className="text-sm font-medium hidden sm:inline">
+                              {pdfLoading ? "Generando..." : "Descargar PDF"}
+                            </span>
+                          </button>
+                        )}
+                      </PDFDownloadLink>
                     )}
-                  </PDFDownloadLink>
+                  </div>
                 )}
+
+                <div className="flex gap-2">
+                  {!isRequest && (
+                    <>
+                      <button
+                        onClick={() => setIsEditing(true)}
+                        className="px-4 py-2 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors text-sm font-medium cursor-pointer"
+                      >
+                        Editar cuotas
+                      </button>
+                      <button
+                        onClick={() => setIsRemoveOrAdd(true)}
+                        className="px-4 py-2 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors text-sm font-medium cursor-pointer"
+                      >
+                        Gestionar cuotas
+                      </button>
+                    </>
+                  )}
+                  <button
+                    onClick={handleClose}
+                    className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors text-sm font-medium cursor-pointer"
+                  >
+                    Cerrar
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* MODO EDICIÓN: Solo Guardar/Cancelar */}
+            {isEditing && (
+              <div className="flex gap-2 w-full justify-end">
+                <button
+                  onClick={() => setIsEditing(false)}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium text-sm cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 shadow-md transition-all text-sm font-bold cursor-pointer"
+                >
+                  Guardar Cambios
+                </button>
               </div>
             )}
 
-            <div className="flex flex-wrap gap-2">
-              {!isRequest && !isEditing && (
+            {/* MODO GESTIÓN: Agregar/Eliminar */}
+            {isRemoveOrAdd && (
+              <div className="flex gap-2 w-full justify-end">
                 <button
-                  onClick={() => setIsEditing(true)}
-                  className="px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-all"
+                  onClick={() => setIsRemoveOrAdd(false)}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium text-sm cursor-pointer"
                 >
-                  Editar cuotas
+                  Finalizar
                 </button>
-              )}
-
-              {isEditing && (
-                <>
-                  <button
-                    onClick={() => setIsEditing(false)}
-                    className="px-3 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-all"
-                  >
-                    Cancelar
-                  </button>
-
-                  <button
-                    onClick={handleSave}
-                    className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-all"
-                  >
-                    Guardar cambios
-                  </button>
-                </>
-              )}
-            </div>
-
-            {/* Botón Cerrar */}
-            <button
-              onClick={handleClose}
-              className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition-all"
-            >
-              Cerrar
-            </button>
+                <button
+                  onClick={handleAddInstallment}
+                  className="flex items-center gap-2 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-md transition-all text-sm font-bold cursor-pointer"
+                >
+                  <span>+</span> Agregar Cuota
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
