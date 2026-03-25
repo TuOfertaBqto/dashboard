@@ -44,6 +44,8 @@ export const InstallmentModal = ({
 
   const isViewMode = !isEditing && !isRemoveOrAdd;
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     if (!contract?.id || !open) {
@@ -113,6 +115,7 @@ export const InstallmentModal = ({
         return;
       }
     }
+    setUpdating(true);
     try {
       const payload = editablePayments.map((p) => ({
         id: p.id,
@@ -135,6 +138,8 @@ export const InstallmentModal = ({
       setIsEditing(false);
     } catch (err) {
       console.error("Error al actualizar cuotas", err);
+    } finally {
+      setUpdating(false);
     }
   };
 
@@ -256,8 +261,8 @@ export const InstallmentModal = ({
   };
 
   const handleAddInstallment = async () => {
-    // setLoading(true);
     if (!contract) return;
+    setAdding(true);
 
     try {
       const response = await InstallmentApi.createOne({
@@ -299,7 +304,7 @@ export const InstallmentModal = ({
       console.error("Error al agregar cuota:", err);
       toast.error("No se pudo agregar la cuota");
     } finally {
-      //setLoading(false);
+      setAdding(false);
     }
   };
 
@@ -660,15 +665,33 @@ export const InstallmentModal = ({
               <div className="flex gap-2 w-full justify-end">
                 <button
                   onClick={() => setIsEditing(false)}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium text-sm cursor-pointer"
+                  disabled={updating}
+                  className={`px-4 py-2 text-gray-600 font-medium text-sm transition-all ${
+                    updating
+                      ? "opacity-50 cursor-not-allowed"
+                      : "hover:text-gray-800 cursor-pointer"
+                  }`}
                 >
                   Cancelar
                 </button>
+
                 <button
                   onClick={handleSave}
-                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 shadow-md transition-all text-sm font-bold cursor-pointer"
+                  disabled={updating}
+                  className={`flex items-center justify-center gap-2 px-6 py-2 bg-green-600 text-white rounded-lg shadow-md transition-all text-sm font-bold ${
+                    updating
+                      ? "opacity-70 cursor-not-allowed"
+                      : "hover:bg-green-700 cursor-pointer"
+                  }`}
                 >
-                  Guardar Cambios
+                  {updating ? (
+                    <>
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      <span>Guardando...</span>
+                    </>
+                  ) : (
+                    "Guardar Cambios"
+                  )}
                 </button>
               </div>
             )}
@@ -678,15 +701,31 @@ export const InstallmentModal = ({
               <div className="flex gap-2 w-full justify-end">
                 <button
                   onClick={() => setIsRemoveOrAdd(false)}
+                  disabled={adding}
                   className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium text-sm cursor-pointer"
                 >
                   Finalizar
                 </button>
                 <button
                   onClick={handleAddInstallment}
-                  className="flex items-center gap-2 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-md transition-all text-sm font-bold cursor-pointer"
+                  disabled={adding}
+                  className={`flex items-center justify-center gap-2 px-6 py-2 bg-indigo-600 text-white rounded-lg shadow-md transition-all text-sm font-bold ${
+                    adding
+                      ? "opacity-70 cursor-not-allowed"
+                      : "hover:bg-indigo-700 cursor-pointer"
+                  }`}
                 >
-                  <span>+</span> Agregar Cuota
+                  {adding ? (
+                    <>
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      <span>Procesando...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>+</span>
+                      <span>Agregar Cuota</span>
+                    </>
+                  )}
                 </button>
               </div>
             )}
