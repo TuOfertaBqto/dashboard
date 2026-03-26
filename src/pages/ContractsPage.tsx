@@ -21,14 +21,14 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
   const navigate = useNavigate();
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [contractToDelete, setContractToDelete] = useState<Contract | null>(
-    null
+    null,
   );
   const [contractToDispatch, setContractToDispatch] = useState<Contract | null>(
-    null
+    null,
   );
   const [contractSelected, setContractSelected] = useState<Contract>();
   const [dispatchDate, setDispatchDate] = useState<string>(
-    dayjs().format("YYYY-MM-DD")
+    dayjs().format("YYYY-MM-DD"),
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
@@ -86,7 +86,7 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
         if (config) {
           data = await ContractApi.getAllByStatus(
             config.apiStatus,
-            config.type
+            config.type,
           );
           title = config.title;
         } else {
@@ -118,7 +118,7 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
       fetchContracts();
 
       toast.success(
-        `Contrato C#${contractToDelete.code} eliminado correctamente`
+        `Contrato C#${contractToDelete.code} eliminado correctamente`,
       );
     } catch (err) {
       console.error(err);
@@ -167,16 +167,27 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
 
       fetchContracts();
       toast.success(
-        `Contrato C#${contractToDispatch.code} despachado con éxito`
+        `Contrato C#${contractToDispatch.code} despachado con éxito`,
       );
     } catch (error) {
       console.error("Error al despachar contrato:", error);
       toast.error(
-        `Error al despachar el contrato C#${contractToDispatch.code}`
+        `Error al despachar el contrato C#${contractToDispatch.code}`,
       );
     } finally {
       setContractToDispatch(null);
     }
+  };
+
+  const updateContract = async () => {
+    if (!contractSelected) return;
+    const updatedContract = await ContractApi.getById(contractSelected.id);
+    setContractSelected(updatedContract);
+    setContracts((prevContracts) =>
+      prevContracts.map((c) =>
+        c.id === updatedContract.id ? updatedContract : c,
+      ),
+    );
   };
 
   return (
@@ -218,6 +229,7 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
         open={isModalOpen}
         isRequest={false}
         onClose={() => setIsModalOpen(false)}
+        updateContract={updateContract}
         contract={contractSelected}
       />
 

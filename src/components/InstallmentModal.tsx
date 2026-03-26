@@ -1,5 +1,5 @@
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import type { Contract } from "../api/contract";
+import { type Contract } from "../api/contract";
 import { InstallmentApi, type Installment } from "../api/installment";
 import { generateInstallmentsFromContract } from "../utils/generateInstallments";
 import { translatePaymentMethod } from "../utils/translations";
@@ -10,14 +10,18 @@ import {
   ClockIcon,
   ExclamationCircleIcon,
   InformationCircleIcon,
+  TrashIcon,
 } from "@heroicons/react/24/outline";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { ConfirmModal } from "./ConfirmModal";
 
 interface Props {
   open: boolean;
   isRequest: boolean;
   onClose: () => void;
+  updateContract?: () => Promise<void>;
   contract?: Contract;
 }
 
@@ -25,10 +29,23 @@ export const InstallmentModal = ({
   open,
   isRequest,
   onClose,
+  updateContract,
   contract,
 }: Props) => {
   const [payments, setPayments] = useState<Installment[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isRemoveOrAdd, setIsRemoveOrAdd] = useState(false);
+  const [editablePayments, setEditablePayments] = useState<Installment[]>([]);
+  const [installmentToDelete, setInstallmentToDelete] = useState<{
+    id: string;
+    index: number;
+  } | null>(null);
+
+  const isViewMode = !isEditing && !isRemoveOrAdd;
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     if (!contract?.id || !open) {
@@ -50,8 +67,11 @@ export const InstallmentModal = ({
 
         if (res && res.length > 0) {
           setPayments(res);
+          setEditablePayments(res);
         } else {
-          setPayments(generateInstallmentsFromContract(contract));
+          const generated = generateInstallmentsFromContract(contract);
+          setPayments(generated);
+          setEditablePayments(generated);
         }
       } catch (err) {
         console.error("Error al obtener cuotas:", err);
@@ -71,6 +91,63 @@ export const InstallmentModal = ({
       isMounted = false;
     };
   }, [contract, open]);
+
+  const handleChange = (
+    index: number,
+    field: "dueDate" | "installmentAmount",
+    value: string,
+  ) => {
+    const updated = [...editablePayments];
+
+    updated[index] = {
+      ...updated[index],
+      [field]: value,
+    };
+
+    setEditablePayments(updated);
+  };
+
+  const handleSave = async () => {
+    if (!contract) return;
+    for (const p of editablePayments) {
+      if (!p.installmentAmount || p.installmentAmount <= 0) {
+        toast.info("Todos los montos deben ser mayores a 0");
+        return;
+      }
+    }
+    setUpdating(true);
+    try {
+      const payload = editablePayments.map((p) => ({
+        id: p.id,
+        dueDate: p.dueDate,
+        installmentAmount: parseInt(String(p.installmentAmount), 10),
+        contract: { id: contract.id },
+      }));
+
+      await InstallmentApi.updateMany(payload);
+
+      const sortedPayments = [...editablePayments].sort(
+        (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime(),
+      );
+
+      if (updateContract) {
+        await updateContract();
+      }
+      recalculateContractDebtWithStop(sortedPayments);
+
+      setIsEditing(false);
+    } catch (err) {
+      console.error("Error al actualizar cuotas", err);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleClose = () => {
+    setIsEditing(false);
+    setIsRemoveOrAdd(false);
+    onClose();
+  };
 
   const InstallmentSkeletonRow = () => (
     <tr className="border-t animate-pulse">
@@ -111,6 +188,126 @@ export const InstallmentModal = ({
     </tr>
   );
 
+  const recalculateContractDebtWithStop = async (
+    installments: Installment[],
+  ) => {
+    const totalContractAmount = installments.reduce(
+      (acc, inst) => acc + Number(inst.installmentAmount),
+      0,
+    );
+
+    const sorted = [...installments].sort(
+      (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime(),
+    );
+
+    let currentRunningDebt = totalContractAmount;
+    let stopCalculating = false;
+
+    const result = sorted.map((installment) => {
+      if (stopCalculating) {
+        return { ...installment, debt: undefined };
+      }
+
+      const amountPaidInThisInstallment =
+        installment.installmentPayments.reduce(
+          (acc, p) => acc + (Number(p.amount) || 0),
+          0,
+        );
+
+      currentRunningDebt -= amountPaidInThisInstallment;
+
+      if (amountPaidInThisInstallment < installment.installmentAmount) {
+        stopCalculating = true;
+      }
+
+      return {
+        ...installment,
+        debt: currentRunningDebt > 0 ? currentRunningDebt.toFixed(2) : "0.00",
+      };
+    });
+
+    setPayments(result);
+    setEditablePayments(result);
+  };
+
+  const handleAskRemoveInstallment = (id: string, index: number) => {
+    setInstallmentToDelete({ id, index });
+    setOpenDeleteModal(true);
+  };
+
+  const handleRemoveInstallment = async () => {
+    if (!installmentToDelete) return;
+
+    const ok = await InstallmentApi.remove(installmentToDelete.id);
+
+    if (!ok) {
+      toast.error("Error eliminando la cuota");
+      return;
+    }
+
+    const updated = [...editablePayments];
+    updated.splice(installmentToDelete.index, 1);
+
+    recalculateContractDebtWithStop(updated);
+
+    if (updateContract) {
+      await updateContract();
+    }
+
+    toast.success("Cuota eliminada");
+
+    setOpenDeleteModal(false);
+    setInstallmentToDelete(null);
+  };
+
+  const handleAddInstallment = async () => {
+    if (!contract) return;
+    setAdding(true);
+
+    try {
+      const response = await InstallmentApi.createOne({
+        id: contract.id,
+      });
+
+      const newInstallment = {
+        ...response[0],
+        installmentPayments: [],
+      };
+
+      if (newInstallment && newInstallment.id) {
+        const amountToAddNum = Number(newInstallment.installmentAmount) || 0;
+
+        const updatedPayments = payments.map((p) => {
+          if (p.debt !== null && p.debt !== undefined) {
+            const currentDebtNum = Number(p.debt) || 0;
+
+            return {
+              ...p,
+              debt: (currentDebtNum + amountToAddNum).toFixed(2),
+            };
+          }
+          return p;
+        });
+
+        const finalArray = [...updatedPayments, newInstallment];
+
+        setPayments(finalArray);
+        setEditablePayments(finalArray);
+
+        if (updateContract) {
+          await updateContract();
+        }
+
+        toast.success("Cuota agregada exitosamente");
+      }
+    } catch (err) {
+      console.error("Error al agregar cuota:", err);
+      toast.error("No se pudo agregar la cuota");
+    } finally {
+      setAdding(false);
+    }
+  };
+
   if (!open || !contract) return null;
 
   return (
@@ -126,8 +323,8 @@ export const InstallmentModal = ({
               Cuotas del contrato C#{contract?.code}
             </h2>
             <button
-              onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 text-xl"
+              onClick={handleClose}
+              className="text-gray-500 hover:text-gray-700 text-xl cursor-pointer"
               title="Cerrar"
             >
               ✕
@@ -219,151 +416,319 @@ export const InstallmentModal = ({
                   ? [...Array(10)].map((_, i) => (
                       <InstallmentSkeletonRow key={i} />
                     ))
-                  : payments.map((p, index) => {
-                      let dueDateClass = "";
-                      let IconComponent = null;
-                      let number = "";
+                  : (isEditing ? editablePayments : payments).map(
+                      (p, index) => {
+                        let dueDateClass = "";
+                        let IconComponent = null;
+                        let number = "";
 
-                      if (
-                        ["discount", "payment_agreement"].includes(
-                          p.installmentPayments[0]?.payment.type ?? ""
-                        )
-                      ) {
-                        dueDateClass = "bg-blue-100 text-blue-700";
-                        IconComponent = InformationCircleIcon;
-                      } else if (p.paidAt) {
-                        dueDateClass = "bg-green-100 text-green-700";
-                        IconComponent = CheckCircleIcon;
-                      } else if (
-                        dayjs(p.dueDate.split("T")[0]).isBefore(dayjs(), "day")
-                      ) {
-                        dueDateClass = "bg-red-100 text-red-700";
-                        IconComponent = ExclamationCircleIcon;
-                      } else {
-                        dueDateClass = "bg-yellow-100 text-yellow-800";
-                        IconComponent = ClockIcon;
-                      }
-
-                      if (
-                        payments[0] &&
-                        payments[1] &&
-                        payments[0].installmentAmount >
-                          payments[1].installmentAmount
-                      ) {
-                        if (index === 0) {
-                          number = "Inicial";
+                        if (
+                          p.installmentPayments &&
+                          p.installmentPayments.length > 0 &&
+                          ["discount", "payment_agreement"].includes(
+                            p.installmentPayments[0]?.payment?.type ?? "",
+                          )
+                        ) {
+                          dueDateClass = "bg-blue-100 text-blue-700";
+                          IconComponent = InformationCircleIcon;
+                        } else if (p.paidAt) {
+                          dueDateClass = "bg-green-100 text-green-700";
+                          IconComponent = CheckCircleIcon;
+                        } else if (
+                          dayjs(p.dueDate.split("T")[0]).isBefore(
+                            dayjs(),
+                            "day",
+                          )
+                        ) {
+                          dueDateClass = "bg-red-100 text-red-700";
+                          IconComponent = ExclamationCircleIcon;
                         } else {
-                          number = index.toString();
+                          dueDateClass = "bg-yellow-100 text-yellow-800";
+                          IconComponent = ClockIcon;
                         }
-                      } else {
-                        number = (index + 1).toString();
-                      }
 
-                      return (
-                        <tr key={p.id} className="border-t">
-                          <td className="p-2">{number}</td>
-                          <td className="p-2">
-                            <span
-                              className={`
+                        if (
+                          payments[0] &&
+                          payments[1] &&
+                          payments[0].installmentAmount >
+                            payments[1].installmentAmount
+                        ) {
+                          if (index === 0) {
+                            number = "Inicial";
+                          } else {
+                            number = index.toString();
+                          }
+                        } else {
+                          number = (index + 1).toString();
+                        }
+
+                        return (
+                          <tr key={p.id} className="border-t">
+                            <td className="p-2">{number}</td>
+                            <td className="p-2">
+                              <span
+                                className={`
       inline-flex items-center gap-1 px-2 py-1 rounded-full font-semibold 
       ${dueDateClass} 
       max-w-full 
     `}
-                            >
-                              {IconComponent && (
-                                <IconComponent className="w-4 h-4 shrink-0" />
-                              )}
-                              <span className="truncate">
-                                {dayjs(p.dueDate.split("T")[0]).format(
-                                  "DD-MM-YYYY"
+                              >
+                                {IconComponent && (
+                                  <IconComponent className="w-4 h-4 shrink-0" />
                                 )}
+                                <span className="truncate">
+                                  {isEditing ? (
+                                    <input
+                                      type="date"
+                                      value={p.dueDate.split("T")[0]}
+                                      onChange={(e) =>
+                                        handleChange(
+                                          index,
+                                          "dueDate",
+                                          e.target.value,
+                                        )
+                                      }
+                                      className="border rounded py-0.5 text-xs w-full"
+                                    />
+                                  ) : (
+                                    dayjs(p.dueDate.split("T")[0]).format(
+                                      "DD-MM-YYYY",
+                                    )
+                                  )}
+                                </span>
                               </span>
-                            </span>
-                          </td>
-                          <td className="p-2">${p.installmentAmount}</td>
-                          <td className="p-2">
-                            {p.installmentPayments &&
-                            p.installmentPayments.length > 0
-                              ? (() => {
-                                  const total = p.installmentPayments.reduce(
-                                    (sum, ip) => sum + Number(ip.amount),
-                                    0
-                                  );
-                                  return `$${total.toFixed(2)}`;
-                                })()
-                              : "—"}
-                          </td>
+                            </td>
+                            <td className="p-2">
+                              {isEditing ? (
+                                <input
+                                  type="number"
+                                  step="1"
+                                  min={1}
+                                  value={parseInt(
+                                    String(p.installmentAmount),
+                                    10,
+                                  )}
+                                  onWheel={(e) => e.currentTarget.blur()}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "." || e.key === ",")
+                                      e.preventDefault();
+                                  }}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
 
-                          <td className="p-2 hidden md:table-cell md:w-[15%]">
-                            {p.installmentPayments &&
-                            p.installmentPayments.length > 0
-                              ? translatePaymentMethod(
-                                  p.installmentPayments[0]?.payment?.type ?? ""
-                                )
-                              : ""}
-                          </td>
-                          <td className="p-2">
-                            {p.paidAt
-                              ? dayjs(p.paidAt.split("T")[0]).format(
-                                  "DD-MM-YYYY"
-                                )
-                              : "—"}
-                          </td>
-                          <td className="p-2">{p.debt ? "$" + p.debt : ""}</td>
-                        </tr>
-                      );
-                    })}
+                                    handleChange(
+                                      index,
+                                      "installmentAmount",
+                                      val,
+                                    );
+                                  }}
+                                  className="border rounded px-1 py-0.5 w-full appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                                />
+                              ) : (
+                                `$${Number(p.installmentAmount).toFixed(2)}`
+                              )}
+                            </td>
+                            <td className="p-2">
+                              {p.installmentPayments &&
+                              p.installmentPayments.length > 0
+                                ? (() => {
+                                    const total = p.installmentPayments.reduce(
+                                      (sum, ip) => sum + Number(ip.amount),
+                                      0,
+                                    );
+                                    return `$${total.toFixed(2)}`;
+                                  })()
+                                : "—"}
+                            </td>
+
+                            <td className="p-2 hidden md:table-cell md:w-[15%]">
+                              {p.installmentPayments &&
+                              p.installmentPayments.length > 0
+                                ? translatePaymentMethod(
+                                    p.installmentPayments[0]?.payment?.type ??
+                                      "",
+                                  )
+                                : ""}
+                            </td>
+                            <td className="p-2">
+                              {p.paidAt
+                                ? dayjs(p.paidAt.split("T")[0]).format(
+                                    "DD-MM-YYYY",
+                                  )
+                                : "—"}
+                            </td>
+                            <td className="p-2">
+                              <div className="flex items-center justify-between">
+                                <span>{p.debt ? "$" + p.debt : ""}</span>
+
+                                {isRemoveOrAdd && (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleAskRemoveInstallment(p.id, index)
+                                    }
+                                    className="text-white bg-red-600 hover:bg-red-700 p-1 rounded-full cursor-pointer"
+                                    title="Eliminar cuota"
+                                  >
+                                    <TrashIcon className="h-4 w-4" />
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      },
+                    )}
               </tbody>
             </table>
           </div>
+          <ConfirmModal
+            open={openDeleteModal}
+            title="Eliminar cuota"
+            message="¿Estás seguro de que deseas eliminar esta cuota?"
+            onConfirm={handleRemoveInstallment}
+            onCancel={() => {
+              setOpenDeleteModal(false);
+              setInstallmentToDelete(null);
+            }}
+          />
 
-          <div className="flex justify-end mt-6">
-            {!isRequest && (
-              <div>
-                {loading || payments.length === 0 ? (
-                  <button
-                    type="button"
-                    disabled
-                    className="flex items-center gap-2 px-4 py-2 bg-gray-400 text-white rounded cursor-not-allowed mr-2"
-                  >
-                    <ArrowDownTrayIcon className="w-5 h-5" />
-                    Cargando cuotas...
-                  </button>
-                ) : (
-                  <PDFDownloadLink
-                    document={
-                      <MyPdfDocument
-                        contract={contract}
-                        installments={payments}
-                      />
-                    }
-                    fileName={`Contrato ${
-                      contract.customerId.firstName.split(" ")[0] +
-                      " " +
-                      contract.customerId.lastName.split(" ")[0]
-                    }.pdf`}
-                  >
-                    {({ loading: pdfLoading }) => (
+          <div className="flex flex-wrap justify-end items-center mt-6 gap-3 border-t pt-4">
+            {/* MODO VISTA: PDF y Navegación Principal */}
+            {isViewMode && (
+              <>
+                {!isRequest && (
+                  <div className="flex gap-2 mr-auto">
+                    {loading || payments.length === 0 ? (
                       <button
-                        type="button"
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-all mr-2"
-                        disabled={pdfLoading}
+                        disabled
+                        className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-400 rounded-lg cursor-not-allowed border shadow-sm"
                       >
                         <ArrowDownTrayIcon className="w-5 h-5" />
-                        {pdfLoading ? "Generando PDF..." : "Descargar PDF"}
+                        <span className="text-sm font-medium">Cargando...</span>
                       </button>
+                    ) : (
+                      <PDFDownloadLink
+                        document={
+                          <MyPdfDocument
+                            contract={contract}
+                            installments={payments}
+                          />
+                        }
+                        fileName={`Contrato_${contract.customerId.firstName}.pdf`}
+                      >
+                        {({ loading: pdfLoading }) => (
+                          <button
+                            disabled={pdfLoading}
+                            className="flex items-center gap-2 px-4 py-2 bg-white text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors shadow-sm cursor-pointer"
+                          >
+                            <ArrowDownTrayIcon className="w-5 h-5" />
+                            <span className="text-sm font-medium hidden sm:inline">
+                              {pdfLoading ? "Generando..." : "Descargar PDF"}
+                            </span>
+                          </button>
+                        )}
+                      </PDFDownloadLink>
                     )}
-                  </PDFDownloadLink>
+                  </div>
                 )}
+
+                <div className="flex gap-2">
+                  {!isRequest && (
+                    <>
+                      <button
+                        onClick={() => setIsEditing(true)}
+                        className="px-4 py-2 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors text-sm font-medium cursor-pointer"
+                      >
+                        Editar cuotas
+                      </button>
+                      <button
+                        onClick={() => setIsRemoveOrAdd(true)}
+                        className="px-4 py-2 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors text-sm font-medium cursor-pointer"
+                      >
+                        Gestionar cuotas
+                      </button>
+                    </>
+                  )}
+                  <button
+                    onClick={handleClose}
+                    className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors text-sm font-medium cursor-pointer"
+                  >
+                    Cerrar
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* MODO EDICIÓN: Solo Guardar/Cancelar */}
+            {isEditing && (
+              <div className="flex gap-2 w-full justify-end">
+                <button
+                  onClick={() => setIsEditing(false)}
+                  disabled={updating}
+                  className={`px-4 py-2 text-gray-600 font-medium text-sm transition-all ${
+                    updating
+                      ? "opacity-50 cursor-not-allowed"
+                      : "hover:text-gray-800 cursor-pointer"
+                  }`}
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  onClick={handleSave}
+                  disabled={updating}
+                  className={`flex items-center justify-center gap-2 px-6 py-2 bg-green-600 text-white rounded-lg shadow-md transition-all text-sm font-bold ${
+                    updating
+                      ? "opacity-70 cursor-not-allowed"
+                      : "hover:bg-green-700 cursor-pointer"
+                  }`}
+                >
+                  {updating ? (
+                    <>
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      <span>Guardando...</span>
+                    </>
+                  ) : (
+                    "Guardar Cambios"
+                  )}
+                </button>
               </div>
             )}
 
-            <button
-              onClick={onClose}
-              className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 cursor-pointer"
-            >
-              Cerrar
-            </button>
+            {/* MODO GESTIÓN: Agregar/Eliminar */}
+            {isRemoveOrAdd && (
+              <div className="flex gap-2 w-full justify-end">
+                <button
+                  onClick={() => setIsRemoveOrAdd(false)}
+                  disabled={adding}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium text-sm cursor-pointer"
+                >
+                  Finalizar
+                </button>
+                <button
+                  onClick={handleAddInstallment}
+                  disabled={adding}
+                  className={`flex items-center justify-center gap-2 px-6 py-2 bg-indigo-600 text-white rounded-lg shadow-md transition-all text-sm font-bold ${
+                    adding
+                      ? "opacity-70 cursor-not-allowed"
+                      : "hover:bg-indigo-700 cursor-pointer"
+                  }`}
+                >
+                  {adding ? (
+                    <>
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      <span>Procesando...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>+</span>
+                      <span>Agregar Cuota</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -100,6 +100,16 @@ export const InstallmentApi = {
     }
   },
 
+  createOne: async (contract: { id: string }): Promise<Installment[]> => {
+    try {
+      const res = await api.post("/installment/one", contract);
+      return res.data;
+    } catch (error) {
+      console.error("Error creating one installment:", error);
+      return [] as Installment[];
+    }
+  },
+
   getAllByVendor: async (vendorId: string): Promise<Installment[]> => {
     try {
       const res = await api.get(`/installment/vendor/${vendorId}`);
@@ -171,7 +181,7 @@ export const InstallmentApi = {
   },
 
   getOneVendorPaymentsSummary: async (
-    id: string
+    id: string,
   ): Promise<VendorPaymentsTotals> => {
     try {
       const res = await api.get(`installment/vendor/${id}/payments-summary`);
@@ -183,11 +193,11 @@ export const InstallmentApi = {
   },
 
   getOverdueCustomersByOneVendor: async (
-    id: string
+    id: string,
   ): Promise<VendorsWithDebts> => {
     try {
       const res = await api.get(
-        `installment/overdue/${id}/customers-by-vendor`
+        `installment/overdue/${id}/customers-by-vendor`,
       );
       return res.data;
     } catch (error) {
@@ -199,12 +209,39 @@ export const InstallmentApi = {
   getVendorEffectiveness: async (vendorId: string): Promise<number> => {
     try {
       const res = await api.get(
-        `installment/vendor/${vendorId}/collection-effectiveness`
+        `installment/vendor/${vendorId}/collection-effectiveness`,
       );
       return res.data;
     } catch (error) {
       console.error("Error fetching Vendor Effectiveness", error);
       return 0;
+    }
+  },
+
+  updateMany: async (
+    installments: {
+      id: string;
+      dueDate: string;
+      installmentAmount: number;
+      contract: { id: string };
+    }[],
+  ): Promise<Installment[]> => {
+    try {
+      const res = await api.patch("installment", installments);
+      return res.data;
+    } catch (error) {
+      console.error("Error updating installments", error);
+      return [];
+    }
+  },
+
+  remove: async (id: string) => {
+    try {
+      await api.delete(`/installment/${id}`);
+      return true;
+    } catch (error) {
+      console.error("Error removing installment:", error);
+      return false;
     }
   },
 };
