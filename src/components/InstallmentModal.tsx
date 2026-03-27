@@ -634,22 +634,25 @@ export const InstallmentModal = ({
                 )}
 
                 <div className="flex gap-2">
-                  {!isRequest && (
-                    <>
-                      <button
-                        onClick={() => setIsEditing(true)}
-                        className="px-4 py-2 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors text-sm font-medium cursor-pointer"
-                      >
-                        Editar cuotas
-                      </button>
-                      <button
-                        onClick={() => setIsRemoveOrAdd(true)}
-                        className="px-4 py-2 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors text-sm font-medium cursor-pointer"
-                      >
-                        Gestionar cuotas
-                      </button>
-                    </>
-                  )}
+                  {!isRequest &&
+                    contract.status === "approved" &&
+                    contract.startDate != null &&
+                    contract.endDate == null && (
+                      <>
+                        <button
+                          onClick={() => setIsEditing(true)}
+                          className="px-4 py-2 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors text-sm font-medium cursor-pointer"
+                        >
+                          Editar cuotas
+                        </button>
+                        <button
+                          onClick={() => setIsRemoveOrAdd(true)}
+                          className="px-4 py-2 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors text-sm font-medium cursor-pointer"
+                        >
+                          Gestionar cuotas
+                        </button>
+                      </>
+                    )}
                   <button
                     onClick={handleClose}
                     className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors text-sm font-medium cursor-pointer"
