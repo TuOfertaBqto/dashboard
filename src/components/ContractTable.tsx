@@ -111,7 +111,7 @@ export const ContractTable = ({
                     <div
                       key={index}
                       className={`mb-1 px-2 py-1 rounded text-xs font-medium w-fit ${statusStyles(
-                        cp.status
+                        cp.status,
                       )}`}
                     >
                       {translateStatus(cp.status)}
@@ -122,14 +122,14 @@ export const ContractTable = ({
                 <td className="p-2">
                   {contract.startDate
                     ? dayjs(contract.startDate?.split("T")[0]).format(
-                        "DD-MM-YYYY"
+                        "DD-MM-YYYY",
                       )
                     : ""}
                 </td>
                 <td className="p-2">
                   {contract.endDate?.split("T")[0]
                     ? dayjs(contract.endDate?.split("T")[0]).format(
-                        "DD-MM-YYYY"
+                        "DD-MM-YYYY",
                       )
                     : ""}
                 </td>
@@ -149,14 +149,14 @@ export const ContractTable = ({
                             onEdit(contract);
                           }}
                         />
-                        <DeleteButton
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onDelete(contract.id);
-                          }}
-                        />
                       </>
                     )}
+                    <DeleteButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(contract.id);
+                      }}
+                    />
                   </div>
                 </td>
               </tr>
