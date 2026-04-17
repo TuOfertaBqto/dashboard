@@ -168,7 +168,9 @@ export default function Profile() {
                 })}
               </p>
 
-              <span className="text-xs text-gray-400">Total acumulado</span>
+              <span className="text-xs text-gray-400">
+                Comisión de contratos activos
+              </span>
             </div>
           </div>
         )}
