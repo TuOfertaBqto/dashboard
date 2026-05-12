@@ -16,6 +16,7 @@ import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ConfirmModal } from "./ConfirmModal";
+import { FinalizedContractPDF } from "./pdf/FinalizedContractPDF";
 
 interface Props {
   open: boolean;
@@ -608,27 +609,53 @@ export const InstallmentModal = ({
                         <span className="text-sm font-medium">Cargando...</span>
                       </button>
                     ) : (
-                      <PDFDownloadLink
-                        document={
-                          <MyPdfDocument
-                            contract={contract}
-                            installments={payments}
-                          />
-                        }
-                        fileName={`Contrato_${contract.customerId.firstName}.pdf`}
-                      >
-                        {({ loading: pdfLoading }) => (
-                          <button
-                            disabled={pdfLoading}
-                            className="flex items-center gap-2 px-4 py-2 bg-white text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors shadow-sm cursor-pointer"
+                      <>
+                        <PDFDownloadLink
+                          document={
+                            <MyPdfDocument
+                              contract={contract}
+                              installments={payments}
+                            />
+                          }
+                          fileName={`Contrato_${contract.customerId.firstName}.pdf`}
+                        >
+                          {({ loading: pdfLoading }) => (
+                            <button
+                              disabled={pdfLoading}
+                              className="flex items-center gap-2 px-4 py-2 bg-white text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors shadow-sm cursor-pointer"
+                            >
+                              <ArrowDownTrayIcon className="w-5 h-5" />
+                              <span className="text-sm font-medium hidden sm:inline">
+                                {pdfLoading ? "Generando..." : "Descargar PDF"}
+                              </span>
+                            </button>
+                          )}
+                        </PDFDownloadLink>
+
+                        {contract.endDate && (
+                          <PDFDownloadLink
+                            document={
+                              <FinalizedContractPDF
+                                contract={contract}
+                                installments={payments}
+                              />
+                            }
+                            fileName={`Constancia_${contract.customerId.firstName}-C#${contract.code}.pdf`}
                           >
-                            <ArrowDownTrayIcon className="w-5 h-5" />
-                            <span className="text-sm font-medium hidden sm:inline">
-                              {pdfLoading ? "Generando..." : "Descargar PDF"}
-                            </span>
-                          </button>
+                            {({ loading: pdfLoading }) => (
+                              <button
+                                disabled={pdfLoading}
+                                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white border border-green-600 rounded-lg hover:bg-green-700 transition-colors shadow-sm cursor-pointer"
+                              >
+                                <ArrowDownTrayIcon className="w-5 h-5" />
+                                <span className="text-sm font-medium hidden sm:inline">
+                                  {pdfLoading ? "Generando..." : "Constancia"}
+                                </span>
+                              </button>
+                            )}
+                          </PDFDownloadLink>
                         )}
-                      </PDFDownloadLink>
+                      </>
                     )}
                   </div>
                 )}
