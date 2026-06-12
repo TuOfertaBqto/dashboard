@@ -12,6 +12,11 @@ export type ContractProduct = {
   quantity: number;
   price: number;
   installmentAmount: number;
+  details: {
+    id: string;
+    isNew: boolean;
+    serialNumber: string;
+  }[];
 };
 
 type UpdateContractProducts = {
@@ -44,7 +49,7 @@ export const ContractProductApi = {
   getToDispatchQuantity: async (productId: string): Promise<number> => {
     try {
       const res = await api.get<{ toDispatchQuantity: number }>(
-        `/contract-product/to-dispatch/${productId}`
+        `/contract-product/to-dispatch/${productId}`,
       );
       return res.data.toDispatchQuantity ?? 0;
     } catch (error) {
@@ -55,7 +60,7 @@ export const ContractProductApi = {
 
   getDispatchedTotals: async (
     page = 1,
-    limit = 10
+    limit = 10,
   ): Promise<{ data: ProductDispatchedTotals[]; total: number }> => {
     try {
       const res = await api.get("/contract-product/dispatched", {
@@ -71,7 +76,7 @@ export const ContractProductApi = {
   getVendorEarnings: async (vendorId: string): Promise<{ total: number }> => {
     try {
       const res = await api.get(
-        `/contract-product/vendor/${vendorId}/earnings`
+        `/contract-product/vendor/${vendorId}/earnings`,
       );
       return res.data;
     } catch (error) {
@@ -91,7 +96,7 @@ export const ContractProductApi = {
 
   updateProducts: async (
     id: string,
-    status: "to_buy" | "to_dispatch" | "dispatched"
+    status: "to_buy" | "to_dispatch" | "dispatched",
   ) => {
     try {
       const res = await api.patch(`/contract-product/${id}`, { status });
