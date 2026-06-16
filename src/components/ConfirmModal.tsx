@@ -39,15 +39,18 @@ export const ConfirmModal = ({
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
 
       {/* Contenido del modal */}
-      <div className="relative z-10 bg-white text-black rounded-lg shadow-lg p-6 w-full max-w-md">
-        <h2 className="text-xl font-semibold mb-4">{title}</h2>
-        {typeof message === "string" ? (
-          <p className="text-gray-700 mb-6">{message}</p>
-        ) : (
-          message
-        )}
+      <div className="relative z-10 bg-white text-black rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] overflow-hidden">
+        <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
+          <h2 className="text-xl font-semibold mb-4">{title}</h2>
 
-        <div className="flex justify-end gap-3">
+          {typeof message === "string" ? (
+            <p className="text-gray-700">{message}</p>
+          ) : (
+            message
+          )}
+        </div>
+
+        <div className="border-t p-3 flex justify-end gap-3 bg-white">
           <button
             onClick={onCancel}
             disabled={loading}
