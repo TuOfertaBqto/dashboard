@@ -177,7 +177,7 @@ export const MyPdfDocument = ({ contract, installments }: Props) => {
         const serials = data.flatMap((item) =>
           item.details.map(
             (detail) =>
-              `${detail.serialNumber} - ${detail.isNew ? "Nuevo" : "Refurbished"}`,
+              `${detail.serialNumber} - ${detail.isNew ? "Nuevo" : "Reacondicionado"}`,
           ),
         );
         setSerialNumbers(serials);
@@ -403,7 +403,7 @@ export const MyPdfDocument = ({ contract, installments }: Props) => {
             </View>
             <View style={styles.tableCol2}>
               <Text>
-                {cantidadLetras} DÓLARES AMERICANOS (USD {totalPrice})
+                {cantidadLetras} DÓLARES AMERICANOS (USD ${totalPrice})
               </Text>
             </View>
           </View>
