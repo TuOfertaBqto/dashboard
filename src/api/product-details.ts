@@ -1,17 +1,22 @@
 import { api } from "./api";
 
 export type CreateProductDetails = {
-  items: [
-    {
-      cpId: {
-        id: string;
-      };
-      serialNumber: string;
-      isNew: boolean;
-    },
-  ];
+  items: {
+    cpId: {
+      id: string;
+    };
+    serialNumber: string;
+    isNew: boolean;
+  }[];
 };
 export type ProductDetails = {
+  cpId: {
+    id: string;
+  };
+  serialNumber: string;
+  isNew: boolean;
+};
+type ProductDetailsResponse = {
   cpId: {
     id: string;
   };
@@ -21,13 +26,15 @@ export type ProductDetails = {
 };
 
 export const ProductDetailsApi = {
-  create: async (data: CreateProductDetails): Promise<ProductDetails[]> => {
+  create: async (
+    data: CreateProductDetails,
+  ): Promise<ProductDetailsResponse[]> => {
     try {
       const res = await api.post("/product-details", data);
       return res.data;
     } catch (error) {
       console.error("Error creating product-details:", error);
-      return [] as ProductDetails[];
+      return [] as ProductDetailsResponse[];
     }
   },
 };
