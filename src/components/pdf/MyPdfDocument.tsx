@@ -10,7 +10,10 @@ import {
 import type { Installment } from "../../api/installment";
 import type { Contract } from "../../api/contract";
 import { numeroALetras } from "../../utils/numero-a-letras";
-import { translatePaymentMethod } from "../../utils/translations";
+import {
+  formatDateToText,
+  translatePaymentMethod,
+} from "../../utils/translations";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { ContractProductApi } from "../../api/contract-product";
@@ -146,30 +149,6 @@ export const MyPdfDocument = ({ contract, installments }: Props) => {
       .filter((d) => !isNaN(d)),
   );
 
-  function fechaEnPalabras(fechaString: string, withYear: boolean): string {
-    const [anio, mes, dia] = fechaString.split("-").map(Number);
-
-    const fecha = new Date(anio, mes - 1, dia);
-    const mesText = fecha.toLocaleString("es-ES", { month: "long" });
-
-    const nombreMes = mesText.charAt(0).toUpperCase() + mesText.slice(1);
-
-    const diaTexto = numeroALetras(dia);
-    const anioTexto = numeroALetras(anio);
-
-    if (dia === 1) {
-      if (withYear) {
-        return `al primer (1) día del mes de ${nombreMes} del año ${anioTexto} (${anio})`;
-      }
-      return `al primer (1) día del mes de ${nombreMes} de ${anio}`;
-    }
-
-    if (withYear)
-      return `a los ${diaTexto} (${dia}) días del mes de ${nombreMes} del año ${anioTexto} (${anio})`;
-
-    return `a los ${diaTexto.toUpperCase()} (${dia}) días del mes de ${nombreMes} de ${anio}`;
-  }
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -204,8 +183,8 @@ export const MyPdfDocument = ({ contract, installments }: Props) => {
         <Text style={{ textAlign: "justify", marginBottom: 10 }} wrap={false}>
           En la ciudad de{" "}
           <Text style={{ fontWeight: "bold" }}>Barquisimeto, Estado Lara</Text>,{" "}
-          {fechaEnPalabras(startDate, true)}, se celebra el presente Contrato de
-          Compraventa a Crédito con Reserva de Dominio, de conformidad con lo
+          {formatDateToText(startDate, true)}, se celebra el presente Contrato
+          de Compraventa a Crédito con Reserva de Dominio, de conformidad con lo
           establecido en el{" "}
           <Text style={{ fontWeight: "bold" }}>Código Civil Venezolano</Text>,
           la{" "}
@@ -1008,7 +987,7 @@ export const MyPdfDocument = ({ contract, installments }: Props) => {
           }}
         >
           Firmado en Barquisimeto, Estado Lara,{" "}
-          {fechaEnPalabras(startDate, false)}.
+          {formatDateToText(startDate, false)}.
         </Text>
 
         <View
