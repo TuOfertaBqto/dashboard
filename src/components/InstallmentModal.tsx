@@ -662,7 +662,7 @@ export const InstallmentModal = ({
                       >
                         <ArrowDownTrayIcon className="w-5 h-5" />
                         <span className="hidden text-sm font-medium sm:inline">
-                          {downloadingContract ? "Descargando..." : "Descargar"}
+                          {downloadingContract ? "Descargando..." : "Contrato"}
                         </span>
                       </button>
                       {contract.endDate && (
