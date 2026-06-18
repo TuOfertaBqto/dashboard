@@ -653,7 +653,7 @@ export const InstallmentModal = ({
                           loading ||
                           payments.length === 0
                         }
-                        className={`mt-3 px-4 py-2 rounded-lg shadow transition flex items-center justify-center gap-2 font-medium w-full sm:w-auto
+                        className={`px-4 py-2 rounded-lg shadow transition flex items-center justify-center gap-2 font-medium w-full sm:w-auto
     ${
       downloadingContract
         ? "bg-blue-600 text-white cursor-not-allowed opacity-70"
@@ -673,7 +673,7 @@ export const InstallmentModal = ({
                             loading ||
                             payments.length === 0
                           }
-                          className={`mt-3 px-4 py-2 rounded-lg shadow transition flex items-center justify-center gap-2 font-medium w-full sm:w-auto
+                          className={`px-4 py-2 rounded-lg shadow transition flex items-center justify-center gap-2 font-medium w-full sm:w-auto
     ${
       downloadingSettlement
         ? "bg-green-600 text-white cursor-not-allowed opacity-70"
