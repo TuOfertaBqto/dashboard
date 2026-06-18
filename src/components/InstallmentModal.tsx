@@ -1,4 +1,4 @@
-import { PDFDownloadLink } from "@react-pdf/renderer";
+import { pdf, PDFDownloadLink } from "@react-pdf/renderer";
 import { type Contract } from "../api/contract";
 import { InstallmentApi, type Installment } from "../api/installment";
 import { generateInstallmentsFromContract } from "../utils/generateInstallments";
@@ -47,6 +47,8 @@ export const InstallmentModal = ({
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [adding, setAdding] = useState(false);
   const [updating, setUpdating] = useState(false);
+
+  const [downloadingContract, setDownloadingContract] = useState(false);
 
   useEffect(() => {
     if (!contract?.id || !open) {
@@ -309,7 +311,33 @@ export const InstallmentModal = ({
     }
   };
 
+  const downloadPDF = async (blobPromise: Promise<Blob>, filename: string) => {
+    const blob = await blobPromise;
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
   if (!open || !contract) return null;
+
+  const downloadContract = async () => {
+    setDownloadingContract(true);
+
+    try {
+      await downloadPDF(
+        pdf(
+          <MyPdfDocument contract={contract} installments={payments} />,
+        ).toBlob(),
+        `Contrato_${contract.customerId.firstName}.pdf`,
+      );
+    } catch (error) {
+      console.error("Error al descargar el contrato:", error);
+    } finally {
+      setDownloadingContract(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -600,63 +628,51 @@ export const InstallmentModal = ({
               <>
                 {!isRequest && (
                   <div className="flex gap-2 mr-auto">
-                    {loading || payments.length === 0 ? (
+                    <>
                       <button
-                        disabled
-                        className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-400 rounded-lg cursor-not-allowed border shadow-sm"
+                        onClick={downloadContract}
+                        disabled={
+                          downloadingContract ||
+                          loading ||
+                          payments.length === 0
+                        }
+                        className={`mt-3 px-4 py-2 rounded-lg shadow transition flex items-center justify-center gap-2 font-medium w-full sm:w-auto
+    ${
+      downloadingContract
+        ? "bg-blue-600 text-white cursor-not-allowed opacity-70"
+        : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+    }`}
                       >
                         <ArrowDownTrayIcon className="w-5 h-5" />
-                        <span className="text-sm font-medium">Cargando...</span>
+                        <span className="hidden text-sm font-medium sm:inline">
+                          {downloadingContract ? "Descargando..." : "Descargar"}
+                        </span>
                       </button>
-                    ) : (
-                      <>
+
+                      {contract.endDate && (
                         <PDFDownloadLink
                           document={
-                            <MyPdfDocument
+                            <FinalizedContractPDF
                               contract={contract}
                               installments={payments}
                             />
                           }
-                          fileName={`Contrato_${contract.customerId.firstName}.pdf`}
+                          fileName={`Constancia_${contract.customerId.firstName}-C#${contract.code}.pdf`}
                         >
                           {({ loading: pdfLoading }) => (
                             <button
                               disabled={pdfLoading}
-                              className="flex items-center gap-2 px-4 py-2 bg-white text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors shadow-sm cursor-pointer"
+                              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white border border-green-600 rounded-lg hover:bg-green-700 transition-colors shadow-sm cursor-pointer"
                             >
                               <ArrowDownTrayIcon className="w-5 h-5" />
                               <span className="text-sm font-medium hidden sm:inline">
-                                {pdfLoading ? "Generando..." : "Descargar PDF"}
+                                {pdfLoading ? "Generando..." : "Constancia"}
                               </span>
                             </button>
                           )}
                         </PDFDownloadLink>
-
-                        {contract.endDate && (
-                          <PDFDownloadLink
-                            document={
-                              <FinalizedContractPDF
-                                contract={contract}
-                                installments={payments}
-                              />
-                            }
-                            fileName={`Constancia_${contract.customerId.firstName}-C#${contract.code}.pdf`}
-                          >
-                            {({ loading: pdfLoading }) => (
-                              <button
-                                disabled={pdfLoading}
-                                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white border border-green-600 rounded-lg hover:bg-green-700 transition-colors shadow-sm cursor-pointer"
-                              >
-                                <ArrowDownTrayIcon className="w-5 h-5" />
-                                <span className="text-sm font-medium hidden sm:inline">
-                                  {pdfLoading ? "Generando..." : "Constancia"}
-                                </span>
-                              </button>
-                            )}
-                          </PDFDownloadLink>
-                        )}
-                      </>
-                    )}
+                      )}
+                    </>
                   </div>
                 )}
 
