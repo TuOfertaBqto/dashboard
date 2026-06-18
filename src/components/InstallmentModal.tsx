@@ -1,4 +1,4 @@
-import { pdf, PDFDownloadLink } from "@react-pdf/renderer";
+import { pdf } from "@react-pdf/renderer";
 import { type Contract } from "../api/contract";
 import { InstallmentApi, type Installment } from "../api/installment";
 import { generateInstallmentsFromContract } from "../utils/generateInstallments";
@@ -49,6 +49,7 @@ export const InstallmentModal = ({
   const [updating, setUpdating] = useState(false);
 
   const [downloadingContract, setDownloadingContract] = useState(false);
+  const [downloadingSettlement, setDownloadingSettlement] = useState(false);
 
   useEffect(() => {
     if (!contract?.id || !open) {
@@ -336,6 +337,22 @@ export const InstallmentModal = ({
       console.error("Error al descargar el contrato:", error);
     } finally {
       setDownloadingContract(false);
+    }
+  };
+  const downloadSettlement = async () => {
+    setDownloadingSettlement(true);
+
+    try {
+      await downloadPDF(
+        pdf(
+          <FinalizedContractPDF contract={contract} installments={payments} />,
+        ).toBlob(),
+        `Finiquito_${contract.customerId.firstName}-C#${contract.code}.pdf`,
+      );
+    } catch (error) {
+      console.error("Error al descargar el finiquito:", error);
+    } finally {
+      setDownloadingSettlement(false);
     }
   };
 
@@ -648,29 +665,28 @@ export const InstallmentModal = ({
                           {downloadingContract ? "Descargando..." : "Descargar"}
                         </span>
                       </button>
-
                       {contract.endDate && (
-                        <PDFDownloadLink
-                          document={
-                            <FinalizedContractPDF
-                              contract={contract}
-                              installments={payments}
-                            />
+                        <button
+                          onClick={downloadSettlement}
+                          disabled={
+                            downloadingSettlement ||
+                            loading ||
+                            payments.length === 0
                           }
-                          fileName={`Constancia_${contract.customerId.firstName}-C#${contract.code}.pdf`}
+                          className={`mt-3 px-4 py-2 rounded-lg shadow transition flex items-center justify-center gap-2 font-medium w-full sm:w-auto
+    ${
+      downloadingSettlement
+        ? "bg-green-600 text-white cursor-not-allowed opacity-70"
+        : "bg-green-600 text-white hover:bg-green-700 cursor-pointer"
+    }`}
                         >
-                          {({ loading: pdfLoading }) => (
-                            <button
-                              disabled={pdfLoading}
-                              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white border border-green-600 rounded-lg hover:bg-green-700 transition-colors shadow-sm cursor-pointer"
-                            >
-                              <ArrowDownTrayIcon className="w-5 h-5" />
-                              <span className="text-sm font-medium hidden sm:inline">
-                                {pdfLoading ? "Generando..." : "Constancia"}
-                              </span>
-                            </button>
-                          )}
-                        </PDFDownloadLink>
+                          <ArrowDownTrayIcon className="w-5 h-5" />
+                          <span className="hidden text-sm font-medium sm:inline">
+                            {downloadingSettlement
+                              ? "Descargando..."
+                              : "Finiquito"}
+                          </span>
+                        </button>
                       )}
                     </>
                   </div>
