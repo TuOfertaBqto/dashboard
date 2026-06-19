@@ -15,8 +15,7 @@ import {
   translatePaymentMethod,
 } from "../../utils/translations";
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
-import { ContractProductApi } from "../../api/contract-product";
+import { type ContractProduct } from "../../api/contract-product";
 
 Font.registerHyphenationCallback((word) => [word]);
 
@@ -118,11 +117,12 @@ const styles = StyleSheet.create({
 interface Props {
   contract: Contract;
   installments: Installment[];
+  products: ContractProduct[];
 }
 
 const SIGNATURE_VENDOR = import.meta.env.VITE_SIGNATURE_VENDOR;
 
-export const MyPdfDocument = ({ contract, installments }: Props) => {
+export const MyPdfDocument = ({ contract, installments, products }: Props) => {
   const name = contract.customerId.firstName.trim().toUpperCase();
   const lastName = contract.customerId.lastName.trim().toUpperCase();
   const documentId = contract.customerId.documentId;
@@ -138,7 +138,6 @@ export const MyPdfDocument = ({ contract, installments }: Props) => {
   ) || ["Sin productos"];
   const totalPrice = contract.totalPrice;
   const documentIdPhoto = contract.customerId.documentIdPhoto;
-  const [serialNumbers, setSerialNumbers] = useState<string[]>([]);
   const cantidadLetras = numeroALetras(totalPrice).toUpperCase();
   const numberInstallmentsText = numeroALetras(
     installments.length,
@@ -149,24 +148,12 @@ export const MyPdfDocument = ({ contract, installments }: Props) => {
       .filter((d) => !isNaN(d)),
   );
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await ContractProductApi.getAllByContract(contract.id);
-        const serials = data.flatMap((item) =>
-          item.details.map(
-            (detail) =>
-              `${detail.serialNumber} - ${detail.isNew ? "Nuevo" : "Reacondicionado"}`,
-          ),
-        );
-        setSerialNumbers(serials);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchData();
-  }, [contract.id]);
+  const serialNumbers = products.flatMap((item) =>
+    item.details.map(
+      (detail) =>
+        `${detail.serialNumber} - ${detail.isNew ? "Nuevo" : "Reacondicionado"}`,
+    ),
+  );
 
   return (
     <Document style={{ textAlign: "justify" }}>

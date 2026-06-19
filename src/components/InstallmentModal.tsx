@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ConfirmModal } from "./ConfirmModal";
 import { FinalizedContractPDF } from "./pdf/FinalizedContractPDF";
+import { ContractProductApi } from "../api/contract-product";
 
 interface Props {
   open: boolean;
@@ -327,9 +328,14 @@ export const InstallmentModal = ({
     setDownloadingContract(true);
 
     try {
+      const products = await ContractProductApi.getAllByContract(contract.id);
       await downloadPDF(
         pdf(
-          <MyPdfDocument contract={contract} installments={payments} />,
+          <MyPdfDocument
+            contract={contract}
+            installments={payments}
+            products={products}
+          />,
         ).toBlob(),
         `Contrato_${contract.customerId.firstName}.pdf`,
       );
