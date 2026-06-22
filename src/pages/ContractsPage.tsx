@@ -11,9 +11,19 @@ import { InventoryMovApi } from "../api/inventory-movement";
 import { ContractProductApi } from "../api/contract-product";
 import { ContractApi, type Contract } from "../api/contract";
 import { InstallmentModal } from "../components/InstallmentModal";
+import { ProductDetailsApi } from "../api/product-details";
 
 interface ContractsPageProps {
   mode: "vendor" | "status";
+}
+interface Details {
+  id: string;
+  name: string;
+  cpId: {
+    id: string;
+  };
+  serialNumber: string;
+  isNew: boolean;
 }
 
 export default function ContractsPage({ mode }: ContractsPageProps) {
@@ -30,6 +40,8 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
   const [dispatchDate, setDispatchDate] = useState<string>(
     dayjs().format("YYYY-MM-DD"),
   );
+  const [productsDetails, setProductsDetails] = useState<Details[]>([]);
+  const [submitted, setSubmitted] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [pageTitle, setPageTitle] = useState<string>("Contratos");
@@ -131,6 +143,17 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
   const handleDispatch = async () => {
     if (!contractToDispatch) return;
 
+    setSubmitted(true);
+
+    const hasEmptySerials = productsDetails.some(
+      (item) => !item.serialNumber.trim(),
+    );
+
+    if (hasEmptySerials) {
+      toast.error("Todos los productos deben tener un número de serie.");
+      return;
+    }
+
     try {
       await ContractApi.update(contractToDispatch.id, {
         startDate: dispatchDate,
@@ -165,6 +188,16 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
         })),
       });
 
+      const data = productsDetails.map((item) => ({
+        cpId: item.cpId,
+        serialNumber: item.serialNumber,
+        isNew: item.isNew,
+      }));
+
+      await ProductDetailsApi.create({
+        items: data,
+      });
+
       fetchContracts();
       toast.success(
         `Contrato C#${contractToDispatch.code} despachado con éxito`,
@@ -187,6 +220,16 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
       prevContracts.map((c) =>
         c.id === updatedContract.id ? updatedContract : c,
       ),
+    );
+  };
+
+  const handleProductChange = (
+    id: string,
+    field: "serialNumber" | "isNew",
+    value: string | boolean,
+  ) => {
+    setProductsDetails((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
     );
   };
 
@@ -215,7 +258,22 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
               const selected = contracts.find((c) => c.id === id);
               if (selected) setContractToDelete(selected);
             }}
-            onDispatch={(contract) => setContractToDispatch(contract)}
+            onDispatch={(contract) => {
+              let counter = 0;
+              const result = contract.products.flatMap((item) =>
+                Array.from({ length: item.quantity }, () => ({
+                  id: `temp-${++counter}`,
+                  cpId: {
+                    id: item.id,
+                  },
+                  serialNumber: "",
+                  isNew: true,
+                  name: item.product.name,
+                })),
+              );
+              setProductsDetails(result);
+              setContractToDispatch(contract);
+            }}
             onRowClick={(contract) => {
               setContractSelected(contract);
               setIsModalOpen(true);
@@ -245,29 +303,108 @@ export default function ContractsPage({ mode }: ContractsPageProps) {
         open={!!contractToDispatch}
         title={`Despachar contrato C#${contractToDispatch?.code}`}
         message={
-          <div className="flex flex-col w-full my-3">
-            <label
-              htmlFor="dispatchDate"
-              className="mb-1 text-sm font-medium text-gray-700"
-            >
-              Selecciona la fecha de despacho
-            </label>
-            <input
-              type="date"
-              id="dispatchDate"
-              name="dispatchDate"
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800
-               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              value={dispatchDate}
-              required
-              min="2025-05-01"
-              max={dayjs().format("YYYY-MM-DD")}
-              onChange={(e) => setDispatchDate(e.target.value)}
-            />
+          <div className="flex flex-col gap-6">
+            {/* Fecha de despacho */}
+            <div className="flex flex-col w-full">
+              <label
+                htmlFor="dispatchDate"
+                className="mb-1 text-sm font-medium text-gray-700"
+              >
+                <h3 className="text-lg font-semibold text-slate-800 mb-2">
+                  Selecciona la fecha del despacho
+                </h3>
+              </label>
+
+              <input
+                type="date"
+                id="dispatchDate"
+                name="dispatchDate"
+                className="border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800
+      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                value={dispatchDate}
+                required
+                min="2025-05-01"
+                max={dayjs().format("YYYY-MM-DD")}
+                onChange={(e) => setDispatchDate(e.target.value)}
+              />
+            </div>
+
+            {/* Productos */}
+            <div className="flex flex-col gap-4">
+              <h3 className="text-lg font-semibold text-gray-800">
+                Información de los productos
+              </h3>
+
+              {productsDetails.map((item) => (
+                <div
+                  key={item.id}
+                  className="border border-gray-200 rounded-lg p-4 bg-gray-50"
+                >
+                  <div className="mb-4">
+                    <p className="font-medium text-gray-900">{item.name}</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Serial */}
+                    <div className="flex flex-col">
+                      <label className="mb-1 text-sm font-medium text-gray-700">
+                        Número de serie
+                      </label>
+
+                      <input
+                        type="text"
+                        value={item.serialNumber}
+                        onChange={(e) =>
+                          handleProductChange(
+                            item.id,
+                            "serialNumber",
+                            e.target.value,
+                          )
+                        }
+                        className={`border rounded-md px-3 py-2 text-sm ${
+                          submitted && !item.serialNumber.trim()
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        }`}
+                        placeholder="Ingrese el número de serie"
+                      />
+                      {submitted && !item.serialNumber.trim() && (
+                        <span className="text-xs text-red-500 mt-1">
+                          El número de serie es obligatorio
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Estado */}
+                    <div className="flex flex-col">
+                      <label className="mb-1 text-sm font-medium text-gray-700">
+                        Estado del producto
+                      </label>
+
+                      <select
+                        value={item.isNew ? "true" : "false"}
+                        onChange={(e) =>
+                          handleProductChange(
+                            item.id,
+                            "isNew",
+                            e.target.value === "true",
+                          )
+                        }
+                        className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+                      >
+                        <option value="true">Nuevo</option>
+                        <option value="false">Reacondicionado</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         }
         onCancel={() => {
           setContractToDispatch(null);
+          setSubmitted(false);
           setDispatchDate(dayjs().format("YYYY-MM-DD"));
         }}
         onConfirm={handleDispatch}

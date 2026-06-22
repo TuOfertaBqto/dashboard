@@ -1,5 +1,4 @@
-// numeroALetras.ts
-export function numeroALetras(num: number): string {
+export function numeroALetras(n: number): string {
   const unidades = [
     "",
     "uno",
@@ -11,6 +10,9 @@ export function numeroALetras(num: number): string {
     "siete",
     "ocho",
     "nueve",
+  ];
+
+  const especiales = [
     "diez",
     "once",
     "doce",
@@ -21,7 +23,6 @@ export function numeroALetras(num: number): string {
     "diecisiete",
     "dieciocho",
     "diecinueve",
-    "veinte",
   ];
 
   const decenas = [
@@ -50,38 +51,47 @@ export function numeroALetras(num: number): string {
     "novecientos",
   ];
 
-  if (num === 0) return "cero";
-  if (num === 100) return "cien";
+  if (n === 0) return "cero";
+  if (n === 100) return "cien";
 
-  const partes: string[] = [];
+  const convertirMenorMil = (num: number): string => {
+    let resultado = "";
 
-  if (num >= 1000) {
-    const miles = Math.floor(num / 1000);
-    if (miles === 1) {
-      partes.push("mil");
+    const c = Math.floor(num / 100);
+    const resto = num % 100;
+
+    if (c > 0) resultado += centenas[c] + " ";
+
+    if (resto < 10) {
+      resultado += unidades[resto];
+    } else if (resto < 20) {
+      resultado += especiales[resto - 10];
+    } else if (resto < 30) {
+      resultado += resto === 20 ? "veinte" : `veinti${unidades[resto - 20]}`;
     } else {
-      partes.push(numeroALetras(miles) + " mil");
+      const d = Math.floor(resto / 10);
+      const u = resto % 10;
+
+      resultado += decenas[d];
+
+      if (u > 0) {
+        resultado += ` y ${unidades[u]}`;
+      }
     }
-    num = num % 1000;
+
+    return resultado.trim();
+  };
+
+  if (n < 1000) return convertirMenorMil(n);
+
+  const miles = Math.floor(n / 1000);
+  const resto = n % 1000;
+
+  let resultado = miles === 1 ? "mil" : `${convertirMenorMil(miles)} mil`;
+
+  if (resto > 0) {
+    resultado += ` ${convertirMenorMil(resto)}`;
   }
 
-  if (num >= 100) {
-    const cent = Math.floor(num / 100);
-    partes.push(centenas[cent]);
-    num = num % 100;
-  }
-
-  if (num > 20) {
-    const dec = Math.floor(num / 10);
-    const uni = num % 10;
-    if (uni > 0) {
-      partes.push(decenas[dec] + " y " + unidades[uni]);
-    } else {
-      partes.push(decenas[dec]);
-    }
-  } else if (num > 0) {
-    partes.push(unidades[num]);
-  }
-
-  return partes.join(" ");
+  return resultado.trim();
 }
